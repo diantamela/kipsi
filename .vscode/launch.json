@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Odoo18",
+            "type": "debugpy",
+            "request": "launch",
+            // Sesuai dengan struktur folder server/odoo-bin Anda tadi
+            "program": "${workspaceFolder}/odoo18/server/odoo-bin",
+            "args": [
+                "-c", 
+                "${workspaceFolder}/odoo.conf"
+            ],
+            "gevent": false,
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            // Tambahkan ini agar menggunakan venv yang sudah Anda buat
+            "python": "${workspaceFolder}/venv/Scripts/python.exe"
+        }
+    ]
+}
