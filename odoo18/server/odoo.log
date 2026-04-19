@@ -1929,3 +1929,557 @@ psycopg2.OperationalError: connection to server at "localhost" (::1), port 5432 
 2026-04-17 14:48:32,683 17496 INFO ? werkzeug: 127.0.0.1 - - [17/Apr/2026 14:48:32] "GET /sms/static/img/sms_failure.svg HTTP/1.1" 200 - 0 0.000 0.031
 2026-04-17 14:48:32,684 17496 INFO ? werkzeug: 127.0.0.1 - - [17/Apr/2026 14:48:32] "GET /mail/static/src/img/smiley/mailfailure.svg HTTP/1.1" 200 - 0 0.000 0.032
 2026-04-17 14:48:32,694 17496 INFO kelapa werkzeug: 127.0.0.1 - - [17/Apr/2026 14:48:32] "GET /web/image/discuss.channel/6/avatar_128?unique=6fb56d8f622384154aa4317266a298678f75d27e3ec032f8704def157669cce63879e91b9c0c17accf611bc6782590a5d2ad3fe337b8652e434b38ed47694257 HTTP/1.1" 200 - 9 0.027 0.011
+2026-04-19 12:42:38,969 17496 INFO kelapa odoo.addons.base.models.res_device: User 2 inserts device log (BqInytfPXiMn9SiavZLNLBVDSmskNxVdAqoI3QrcHq) 
+2026-04-19 12:42:39,020 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:39] "GET / HTTP/1.1" 303 - 3 0.041 0.276
+2026-04-19 12:42:39,889 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:39] "GET /odoo HTTP/1.1" 200 - 61 0.321 0.503
+2026-04-19 12:42:39,989 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:39] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.010 0.008
+2026-04-19 12:42:40,824 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:40] "POST /web/action/load HTTP/1.1" 200 - 6 0.011 0.015
+2026-04-19 12:42:41,167 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "GET /web/image/res.partner/3/avatar_128?unique=1776412006000 HTTP/1.1" 200 - 8 0.070 0.210
+2026-04-19 12:42:41,252 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 3 0.011 0.193
+2026-04-19 12:42:41,262 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.094 0.284
+2026-04-19 12:42:41,439 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "POST /mail/data HTTP/1.1" 200 - 67 0.248 0.264
+2026-04-19 12:42:41,483 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "POST /mail/data HTTP/1.1" 200 - 57 0.324 0.272
+2026-04-19 12:42:41,591 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.002 0.008
+2026-04-19 12:42:41,669 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:41] "POST /mail/inbox/messages HTTP/1.1" 200 - 5 0.039 0.012
+2026-04-19 12:42:43,654 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:43] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.088
+2026-04-19 12:42:50,652 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:50] "POST /web/action/load HTTP/1.1" 200 - 6 0.006 0.010
+2026-04-19 12:42:50,973 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:50] "GET /web/bundle/web.chartjs_lib?lang=en_US HTTP/1.1" 200 - 1 0.000 0.006
+2026-04-19 12:42:51,241 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:51] "GET /web/bundle/spreadsheet.o_spreadsheet?lang=en_US HTTP/1.1" 200 - 1 0.000 0.009
+2026-04-19 12:42:51,525 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:51] "POST /web/dataset/call_kw/spreadsheet.dashboard.group/web_search_read HTTP/1.1" 200 - 9 0.028 0.027
+2026-04-19 12:42:51,954 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:51] "POST /web/dataset/call_kw/spreadsheet.dashboard/get_readonly_dashboard HTTP/1.1" 200 - 13 0.059 0.051
+2026-04-19 12:42:55,839 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:55] "POST /web/action/load HTTP/1.1" 200 - 10 0.026 0.016
+2026-04-19 12:42:56,277 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:56] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 22 0.040 0.069
+2026-04-19 12:42:56,433 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:56] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.003 0.010
+2026-04-19 12:42:56,787 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:56] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 48 0.082 0.050
+2026-04-19 12:42:56,850 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:42:56] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.014 0.180
+2026-04-19 12:43:28,194 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:43:28] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.000
+2026-04-19 12:51:52,507 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:51:52] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 48 0.125 0.035
+2026-04-19 12:51:52,619 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:51:52] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.014 0.010
+2026-04-19 12:51:54,438 17496 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_install on ['Time Off'] to user tameladian@gmail.com #2 via 127.0.0.1 
+2026-04-19 12:51:54,438 17496 INFO kelapa odoo.addons.base.models.ir_module: User #2 triggered module installation 
+2026-04-19 12:51:54,446 17496 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['Time Off'] to user tameladian@gmail.com #2 via 127.0.0.1 
+2026-04-19 12:51:54,978 17496 INFO kelapa odoo.modules.loading: loading 1 modules... 
+2026-04-19 12:51:55,030 17496 INFO kelapa odoo.modules.loading: 1 modules loaded in 0.05s, 0 queries (+0 extra) 
+2026-04-19 12:51:55,171 17496 INFO kelapa odoo.modules.loading: updating modules list 
+2026-04-19 12:51:55,174 17496 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2026-04-19 12:51:58,812 17496 INFO kelapa odoo.modules.loading: loading 92 modules... 
+2026-04-19 12:51:59,072 17496 INFO kelapa odoo.modules.loading: 92 modules loaded in 0.26s, 0 queries (+0 extra) 
+2026-04-19 12:51:59,076 17496 INFO kelapa odoo.modules.loading: loading 96 modules... 
+2026-04-19 12:51:59,080 17496 INFO kelapa odoo.modules.loading: Loading module calendar (27/96) 
+2026-04-19 12:52:00,908 17496 INFO kelapa odoo.modules.registry: module calendar: creating or updating database tables 
+2026-04-19 12:52:06,933 17496 INFO kelapa odoo.modules.loading: loading calendar/security/ir.model.access.csv 
+2026-04-19 12:52:07,102 17496 INFO kelapa odoo.modules.loading: loading calendar/security/calendar_security.xml 
+2026-04-19 12:52:07,317 17496 INFO kelapa odoo.modules.loading: loading calendar/data/calendar_cron.xml 
+2026-04-19 12:52:07,421 17496 INFO kelapa odoo.modules.loading: loading calendar/data/mail_template_data.xml 
+2026-04-19 12:52:07,597 17496 INFO kelapa odoo.modules.loading: loading calendar/data/calendar_data.xml 
+2026-04-19 12:52:07,685 17496 INFO kelapa odoo.modules.loading: loading calendar/data/mail_activity_type_data.xml 
+2026-04-19 12:52:07,727 17496 INFO kelapa odoo.modules.loading: loading calendar/data/mail_message_subtype_data.xml 
+2026-04-19 12:52:07,772 17496 INFO kelapa odoo.modules.loading: loading calendar/views/mail_activity_views.xml 
+2026-04-19 12:52:07,930 17496 INFO kelapa odoo.modules.loading: loading calendar/views/calendar_templates.xml 
+2026-04-19 12:52:08,010 17496 INFO kelapa odoo.modules.loading: loading calendar/views/calendar_views.xml 
+2026-04-19 12:52:08,866 17496 INFO kelapa odoo.modules.loading: loading calendar/views/res_config_settings_views.xml 
+2026-04-19 12:52:08,981 17496 INFO kelapa odoo.modules.loading: loading calendar/views/res_partner_views.xml 
+2026-04-19 12:52:09,107 17496 INFO kelapa odoo.modules.loading: loading calendar/views/res_users_views.xml 
+2026-04-19 12:52:09,226 17496 INFO kelapa odoo.modules.loading: loading calendar/wizard/calendar_provider_config.xml 
+2026-04-19 12:52:09,271 17496 INFO kelapa odoo.modules.loading: loading calendar/wizard/calendar_popover_delete_wizard.xml 
+2026-04-19 12:52:09,314 17496 INFO kelapa odoo.modules.loading: loading calendar/wizard/mail_activity_schedule_views.xml 
+2026-04-19 12:52:09,387 17496 INFO kelapa odoo.modules.loading: Module calendar: loading demo 
+2026-04-19 12:52:09,389 17496 INFO kelapa odoo.modules.loading: loading calendar/data/calendar_demo.xml 
+2026-04-19 12:52:19,508 17496 INFO kelapa odoo.modules.loading: Module calendar loaded in 20.43s, 1383 queries (+1383 other) 
+2026-04-19 12:52:19,509 17496 INFO kelapa odoo.modules.loading: Loading module calendar_sms (46/96) 
+2026-04-19 12:52:20,218 17496 INFO kelapa odoo.modules.registry: module calendar_sms: creating or updating database tables 
+2026-04-19 12:52:20,238 17496 INFO kelapa odoo.models: Prepare computation of calendar.alarm.sms_template_id 
+2026-04-19 12:52:20,521 17496 INFO kelapa odoo.modules.loading: loading calendar_sms/data/sms_data.xml 
+2026-04-19 12:52:20,562 17496 INFO kelapa odoo.modules.loading: loading calendar_sms/views/calendar_views.xml 
+2026-04-19 12:52:20,741 17496 INFO kelapa odoo.modules.loading: Module calendar_sms loaded in 1.23s, 107 queries (+107 other) 
+2026-04-19 12:52:20,741 17496 INFO kelapa odoo.modules.loading: Loading module hr_calendar (62/96) 
+2026-04-19 12:52:21,470 17496 INFO kelapa odoo.modules.registry: module hr_calendar: creating or updating database tables 
+2026-04-19 12:52:21,922 17496 INFO kelapa odoo.modules.loading: loading hr_calendar/views/calendar_views_calendarApp.xml 
+2026-04-19 12:52:22,271 17496 INFO kelapa odoo.modules.loading: loading hr_calendar/views/res_partner_views.xml 
+2026-04-19 12:52:22,389 17496 INFO kelapa odoo.modules.loading: Module hr_calendar loaded in 1.65s, 140 queries (+140 other) 
+2026-04-19 12:52:22,389 17496 INFO kelapa odoo.modules.loading: Loading module hr_holidays (64/96) 
+2026-04-19 12:52:25,173 17496 INFO kelapa odoo.modules.registry: module hr_holidays: creating or updating database tables 
+2026-04-19 12:52:25,289 17496 INFO kelapa odoo.models: Prepare computation of hr.employee.leave_manager_id 
+2026-04-19 12:52:28,364 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/report_paperformat.xml 
+2026-04-19 12:52:28,408 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/mail_activity_type_data.xml 
+2026-04-19 12:52:28,482 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/mail_message_subtype_data.xml 
+2026-04-19 12:52:28,572 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/hr_holidays_data.xml 
+2026-04-19 12:52:28,939 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/ir_cron_data.xml 
+2026-04-19 12:52:29,002 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/hr_holidays_tour.xml 
+2026-04-19 12:52:29,045 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/security/hr_holidays_security.xml 
+2026-04-19 12:52:30,472 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/security/ir.model.access.csv 
+2026-04-19 12:52:30,604 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/resource_views.xml 
+2026-04-19 12:52:30,798 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_leave_views.xml 
+2026-04-19 12:52:31,701 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_leave_type_views.xml 
+2026-04-19 12:52:31,810 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_leave_allocation_views.xml 
+2026-04-19 12:52:32,103 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_leave_accrual_views.xml 
+2026-04-19 12:52:32,221 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_leave_mandatory_day_views.xml 
+2026-04-19 12:52:32,298 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/mail_activity_views.xml 
+2026-04-19 12:52:32,335 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/calendar_views.xml 
+2026-04-19 12:52:32,410 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/wizard/hr_holidays_cancel_leave_views.xml 
+2026-04-19 12:52:32,487 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/wizard/hr_holidays_summary_employees_views.xml 
+2026-04-19 12:52:32,575 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/wizard/hr_leave_generate_multi_wizard_views.xml 
+2026-04-19 12:52:32,638 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/wizard/hr_leave_allocation_generate_multi_wizard_views.xml 
+2026-04-19 12:52:32,708 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/report/hr_holidays_templates.xml 
+2026-04-19 12:52:32,748 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/report/hr_holidays_reports.xml 
+2026-04-19 12:52:32,803 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/report/hr_leave_reports.xml 
+2026-04-19 12:52:32,903 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/report/hr_leave_report_calendar.xml 
+2026-04-19 12:52:32,989 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/report/hr_leave_employee_type_report.xml 
+2026-04-19 12:52:33,051 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_views.xml 
+2026-04-19 12:52:33,404 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/views/hr_holidays_views.xml 
+2026-04-19 12:52:33,772 17496 INFO kelapa odoo.modules.loading: Module hr_holidays: loading demo 
+2026-04-19 12:52:33,774 17496 INFO kelapa odoo.modules.loading: loading hr_holidays/data/hr_holidays_demo.xml 
+2026-04-19 12:52:51,309 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [21, 22, 24] 
+2026-04-19 12:53:00,226 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [25] 
+2026-04-19 12:53:13,351 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [26, 27, 28] 
+2026-04-19 12:53:18,364 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [29] 
+2026-04-19 12:53:22,819 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [30] 
+2026-04-19 12:53:27,184 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [31] 
+2026-04-19 12:53:36,242 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [33] 
+2026-04-19 12:53:41,008 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [34] 
+2026-04-19 12:53:53,834 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [36, 37] 
+2026-04-19 12:54:02,515 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [38] 
+2026-04-19 12:54:11,290 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [39] 
+2026-04-19 12:54:15,610 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [40] 
+2026-04-19 12:54:28,407 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [42, 43] 
+2026-04-19 12:54:33,385 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [44] 
+2026-04-19 12:54:37,848 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [45] 
+2026-04-19 12:54:50,742 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [48] 
+2026-04-19 12:54:55,194 17496 INFO kelapa odoo.models.unlink: User #1 deleted mail.activity records with IDs: [49] 
+2026-04-19 12:54:55,627 17496 INFO kelapa odoo.modules.loading: Module hr_holidays loaded in 153.24s, 4576 queries (+4577 other) 
+2026-04-19 12:54:55,627 17496 INFO kelapa odoo.modules.loading: 96 modules loaded in 176.55s, 6206 queries (+6207 extra) 
+2026-04-19 12:55:00,445 17496 INFO kelapa odoo.modules.loading: Modules loaded. 
+2026-04-19 12:55:00,498 17496 INFO kelapa odoo.modules.registry: Registry changed, signaling through the database 
+2026-04-19 12:55:00,501 17496 INFO kelapa odoo.modules.registry: Registry loaded in 185.778s 
+2026-04-19 12:55:00,506 17496 INFO kelapa odoo.addons.base.models.ir_module: getting next ir.actions.todo() 
+2026-04-19 12:55:00,509 17496 INFO kelapa odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-19 12:55:00,900 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:00] "POST /web/dataset/call_button/ir.module.module/button_immediate_install HTTP/1.1" 200 - 9636 20.347 166.134
+2026-04-19 12:55:00,941 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:00] "GET /web/service-worker.js HTTP/1.1" 200 - 3 0.023 72.021
+2026-04-19 12:55:10,307 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:10] "GET /odoo/apps HTTP/1.1" 200 - 77 0.619 153.597
+2026-04-19 12:55:10,312 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:10] "GET /odoo/apps HTTP/1.1" 200 - 92 0.428 54.905
+2026-04-19 12:55:10,370 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:10] "GET /odoo/apps HTTP/1.1" 200 - 66 0.489 61.969
+2026-04-19 12:55:10,753 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:10] "GET /web/webclient/translations/a774b263f9c26774fcb53a350d8f547c06b7a615?lang=en_US HTTP/1.1" 200 - 1 0.002 0.049
+2026-04-19 12:55:11,095 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:11] "GET /web/webclient/load_menus/9caffebdadc3f43caac9fad39fb2ff7f32f6802ffd436ab1943d17f99aceab75 HTTP/1.1" 200 - 136 0.208 0.190
+2026-04-19 12:55:11,143 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:11] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.015 0.015
+2026-04-19 12:55:44,747 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/88d5279/web.assets_web.min.css (id:1268) 
+2026-04-19 12:55:44,755 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1226] (matching /web/assets/_______/web.assets_web.min.css) because it was replaced with /web/assets/88d5279/web.assets_web.min.css 
+2026-04-19 12:55:45,062 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:55:45] "GET /web/assets/88d5279/web.assets_web.min.css HTTP/1.1" 200 - 16 0.348 34.019
+2026-04-19 12:56:07,382 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/c54e241/web.assets_web_print.min.css (id:1269) 
+2026-04-19 12:56:07,382 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1227] (matching /web/assets/_______/web.assets_web_print.min.css) because it was replaced with /web/assets/c54e241/web.assets_web_print.min.css 
+2026-04-19 12:56:07,503 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:56:07] "GET /web/assets/c54e241/web.assets_web_print.min.css HTTP/1.1" 200 - 10 0.223 21.877
+2026-04-19 12:57:21,442 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/0a662a8/web.assets_web.min.js (id:1270) 
+2026-04-19 12:57:21,445 17496 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1228] (matching /web/assets/_______/web.assets_web.min.js) because it was replaced with /web/assets/0a662a8/web.assets_web.min.js 
+2026-04-19 12:57:23,217 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:57:23] "GET /web/assets/0a662a8/web.assets_web.min.js HTTP/1.1" 200 - 13 0.174 132.344
+2026-04-19 12:57:24,685 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:57:24] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 4 0.003 0.019
+2026-04-19 12:57:25,056 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:57:25] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.002 0.024
+2026-04-19 12:57:25,580 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:57:25] "POST /mail/data HTTP/1.1" 200 - 95 0.343 0.198
+2026-04-19 12:57:26,757 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:57:26] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.005 0.002
+2026-04-19 12:58:23,097 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:23] "POST /web/action/load HTTP/1.1" 200 - 11 0.027 0.016
+2026-04-19 12:58:23,439 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:23] "GET /web/image/res.partner/3/avatar_128?unique=1776577942000 HTTP/1.1" 200 - 8 0.023 0.045
+2026-04-19 12:58:23,502 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:23] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.036 0.035
+2026-04-19 12:58:23,633 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:23] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 56 0.132 0.133
+2026-04-19 12:58:23,979 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:23] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.002 0.012
+2026-04-19 12:58:24,132 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:24] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 52 0.087 0.079
+2026-04-19 12:58:24,197 17496 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 12:58:24] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 4 0.004 0.208
+2026-04-19 13:02:33,895 17496 INFO ? odoo.service.server: Initiating shutdown 
+2026-04-19 13:02:33,902 17496 INFO ? odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-04-19 13:02:34,991 17496 INFO ? odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 6 connections  
+2026-04-19 13:02:53,447 18892 INFO ? odoo: Odoo version 18.0-20260415 
+2026-04-19 13:02:53,447 18892 INFO ? odoo: Using configuration file at C:\odoo\odoo18\server\odoo.conf 
+2026-04-19 13:02:53,447 18892 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-04-19 13:02:53,447 18892 INFO ? odoo: database: openpg@localhost:5432 
+2026-04-19 13:02:54,486 18892 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-04-19 13:02:54,828 18892 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-04-19 13:02:56,554 18892 INFO ? odoo.service.server: HTTP service (werkzeug) running on DIANTAMELA:8069 
+2026-04-19 13:02:57,177 18892 INFO ? odoo.modules.loading: loading 1 modules... 
+2026-04-19 13:02:57,206 18892 INFO ? odoo.modules.loading: 1 modules loaded in 0.03s, 0 queries (+0 extra) 
+2026-04-19 13:03:00,568 18892 INFO ? odoo.modules.loading: loading 96 modules... 
+2026-04-19 13:03:07,947 18892 INFO ? odoo.modules.loading: 96 modules loaded in 7.38s, 0 queries (+0 extra) 
+2026-04-19 13:03:08,964 18892 INFO ? odoo.modules.loading: Modules loaded. 
+2026-04-19 13:03:08,990 18892 INFO ? odoo.modules.registry: Registry loaded in 11.990s 
+2026-04-19 13:03:08,995 18892 INFO kelapa odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-19 13:03:09,183 18892 INFO kelapa odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-19 13:03:09,359 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:09] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 20 0.191 12.170
+2026-04-19 13:03:09,388 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:09] "POST /bus/has_missed_notifications HTTP/1.1" 200 - 2 0.000 0.018
+2026-04-19 13:03:09,887 18892 INFO ? odoo.addons.bus.models.bus: Bus.loop listen imbus on db postgres 
+2026-04-19 13:03:13,770 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:13] "GET /odoo/apps HTTP/1.1" 200 - 105 0.457 15.812
+2026-04-19 13:03:14,669 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:14] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.024 0.031
+2026-04-19 13:03:15,377 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:15] "POST /web/action/load HTTP/1.1" 200 - 12 0.043 0.036
+2026-04-19 13:03:15,834 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:15] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 56 0.140 0.164
+2026-04-19 13:03:15,857 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:15] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 4 0.030 0.268
+2026-04-19 13:03:15,864 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:15] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.004 0.010
+2026-04-19 13:03:15,902 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:15] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.117 0.244
+2026-04-19 13:03:16,179 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:16] "POST /mail/data HTTP/1.1" 200 - 95 0.436 0.227
+2026-04-19 13:03:16,215 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:16] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.002 0.020
+2026-04-19 13:03:16,307 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:16] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 52 0.132 0.019
+2026-04-19 13:03:17,248 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:17] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.012 1.064
+2026-04-19 13:03:18,127 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:18] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.002 0.014
+2026-04-19 13:03:21,824 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:21] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 48 0.094 0.200
+2026-04-19 13:03:22,166 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:22] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 2 0.003 0.011
+2026-04-19 13:03:38,531 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:38] "POST /web/action/load HTTP/1.1" 200 - 9 0.005 0.028
+2026-04-19 13:03:42,351 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:42] "POST /web/dataset/call_kw/res.config.settings/get_views HTTP/1.1" 200 - 416 0.351 3.094
+2026-04-19 13:03:42,837 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:42] "POST /web/dataset/call_kw/res.config.settings/onchange HTTP/1.1" 200 - 166 0.312 0.131
+2026-04-19 13:03:43,383 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:43] "POST /base_setup/demo_active HTTP/1.1" 200 - 2 0.002 0.004
+2026-04-19 13:03:43,426 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:03:43] "POST /base_setup/data HTTP/1.1" 200 - 6 0.005 0.012
+2026-04-19 13:03:56,866 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) starting 
+2026-04-19 13:03:58,024 18892 INFO kelapa odoo.addons.base.models.ir_attachment: filestore gc 688 checked, 9 removed 
+2026-04-19 13:03:58,128 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Delete Notifications older than 6 Month' (5) starting 
+2026-04-19 13:03:58,276 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Delete Notifications older than 6 Month' (5) done in 0.141s 
+2026-04-19 13:03:58,297 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Delete Notifications older than 6 Month' (5) processed 0 records, 0 records remaining 
+2026-04-19 13:03:58,325 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Delete Notifications older than 6 Month' (5) completed 
+2026-04-19 13:03:58,325 18892 INFO kelapa odoo.addons.base.models.res_users: GC'd 1 user log entries 
+2026-04-19 13:03:58,367 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Post scheduled messages' (7) starting 
+2026-04-19 13:03:58,375 18892 INFO kelapa odoo.addons.base.models.res_users: GC 'res.users.apikeys' delete 0 entries 
+2026-04-19 13:03:58,375 18892 INFO kelapa odoo.addons.mail.models.mail_scheduled_message: Posting 0 scheduled messages 
+2026-04-19 13:03:58,382 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Post scheduled messages' (7) done in 0.015s 
+2026-04-19 13:03:58,400 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Post scheduled messages' (7) processed 0 records, 0 records remaining 
+2026-04-19 13:03:58,408 18892 INFO kelapa odoo.addons.base.models.res_device: GC device logs delete 7 entries 
+2026-04-19 13:03:58,408 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Post scheduled messages' (7) completed 
+2026-04-19 13:03:58,417 18892 INFO kelapa odoo.addons.base.models.res_device: GC device logs delete 0 entries 
+2026-04-19 13:03:58,444 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Notify scheduled messages' (8) starting 
+2026-04-19 13:03:58,458 18892 INFO kelapa odoo.models.unlink: User #1 deleted base.language.install records with IDs: [1] 
+2026-04-19 13:03:58,459 18892 INFO kelapa odoo.addons.mail.models.mail_message_schedule: Send 1 scheduled messages 
+2026-04-19 13:03:58,522 18892 INFO kelapa odoo.addons.base.models.res_users: GC 'auth_totp.device' delete 0 entries 
+2026-04-19 13:03:58,662 18892 INFO kelapa odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [28153] 
+2026-04-19 13:03:58,662 18892 INFO kelapa odoo.models.unlink: User #1 deleted mail.message.schedule records with IDs: [1] 
+2026-04-19 13:03:58,662 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Notify scheduled messages' (8) done in 0.217s 
+2026-04-19 13:03:58,662 18892 INFO kelapa odoo.modules.registry: Caches invalidated, signaling through the database: ['default'] 
+2026-04-19 13:03:58,687 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Notify scheduled messages' (8) processed 0 records, 0 records remaining 
+2026-04-19 13:03:58,707 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Notification: Notify scheduled messages' (8) completed 
+2026-04-19 13:03:58,757 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: send web push notification' (9) starting 
+2026-04-19 13:03:58,778 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: send web push notification' (9) done in 0.014s 
+2026-04-19 13:03:58,786 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: send web push notification' (9) processed 0 records, 0 records remaining 
+2026-04-19 13:03:58,897 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: send web push notification' (9) completed 
+2026-04-19 13:03:58,955 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: channel member unmute' (10) starting 
+2026-04-19 13:03:58,964 18892 INFO kelapa odoo.models.unlink: User #1 deleted mail.compose.message records with IDs: [1, 2, 3, 4, 5, 6] 
+2026-04-19 13:03:59,006 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: channel member unmute' (10) done in 0.050s 
+2026-04-19 13:03:59,044 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: channel member unmute' (10) processed 0 records, 0 records remaining 
+2026-04-19 13:03:59,055 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: channel member unmute' (10) completed 
+2026-04-19 13:03:59,132 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: users settings unmute' (11) starting 
+2026-04-19 13:03:59,145 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: users settings unmute' (11) done in 0.014s 
+2026-04-19 13:03:59,212 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: users settings unmute' (11) processed 0 records, 0 records remaining 
+2026-04-19 13:03:59,237 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Discuss: users settings unmute' (11) completed 
+2026-04-19 13:03:59,262 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'SMS: SMS Queue Manager' (14) starting 
+2026-04-19 13:03:59,268 18892 INFO kelapa odoo.addons.sms.models.sms_sms: GC'd 0 sms marked for deletion 
+2026-04-19 13:03:59,624 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'SMS: SMS Queue Manager' (14) done in 0.357s 
+2026-04-19 13:03:59,639 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'SMS: SMS Queue Manager' (14) processed 0 records, 0 records remaining 
+2026-04-19 13:03:59,649 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'SMS: SMS Queue Manager' (14) completed 
+2026-04-19 13:03:59,735 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Snailmail: process letters queue' (15) starting 
+2026-04-19 13:03:59,749 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Snailmail: process letters queue' (15) done in 0.014s 
+2026-04-19 13:03:59,802 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Snailmail: process letters queue' (15) processed 0 records, 0 records remaining 
+2026-04-19 13:03:59,812 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Snailmail: process letters queue' (15) completed 
+2026-04-19 13:03:59,864 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Digest Emails' (16) starting 
+2026-04-19 13:04:00,500 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) done in 3.633s 
+2026-04-19 13:04:00,506 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) processed 0 records, 0 records remaining 
+2026-04-19 13:04:00,518 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) completed 
+2026-04-19 13:04:00,568 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Procurement: run scheduler' (17) starting 
+2026-04-19 13:04:01,172 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Digest Emails' (16) done in 1.308s 
+2026-04-19 13:04:01,182 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Digest Emails' (16) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,192 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Digest Emails' (16) completed 
+2026-04-19 13:04:01,344 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Gamification: Goal Challenge Check' (18) starting 
+2026-04-19 13:04:01,527 18892 INFO kelapa odoo.addons.stock.models.stock_orderpoint: A batch of 4 orderpoints is processed and committed 
+2026-04-19 13:04:01,687 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Gamification: Goal Challenge Check' (18) done in 0.337s 
+2026-04-19 13:04:01,696 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Gamification: Goal Challenge Check' (18) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,704 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Gamification: Goal Challenge Check' (18) completed 
+2026-04-19 13:04:01,737 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Employee: check work permit validity' (20) starting 
+2026-04-19 13:04:01,754 18892 INFO kelapa odoo.addons.stock.models.stock_rule: A batch of 2 moves are assigned and committed 
+2026-04-19 13:04:01,768 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Employee: check work permit validity' (20) done in 0.031s 
+2026-04-19 13:04:01,772 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Employee: check work permit validity' (20) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,791 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Employee: check work permit validity' (20) completed 
+2026-04-19 13:04:01,807 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Procurement: run scheduler' (17) done in 1.239s 
+2026-04-19 13:04:01,815 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Project: Send rating' (23) starting 
+2026-04-19 13:04:01,815 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Procurement: run scheduler' (17) processed 3 records, 0 records remaining 
+2026-04-19 13:04:01,829 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Procurement: run scheduler' (17) completed 
+2026-04-19 13:04:01,829 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Project: Send rating' (23) done in 0.014s 
+2026-04-19 13:04:01,840 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Project: Send rating' (23) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,850 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Project: Send rating' (23) completed 
+2026-04-19 13:04:01,862 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Account: Post draft entries with auto_post enabled and accounting date up to today' (25) starting 
+2026-04-19 13:04:01,886 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Send invoices automatically' (26) starting 
+2026-04-19 13:04:01,957 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Send invoices automatically' (26) done in 0.071s 
+2026-04-19 13:04:01,958 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Account: Post draft entries with auto_post enabled and accounting date up to today' (25) done in 0.096s 
+2026-04-19 13:04:01,964 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Send invoices automatically' (26) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,968 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Account: Post draft entries with auto_post enabled and accounting date up to today' (25) processed 0 records, 0 records remaining 
+2026-04-19 13:04:01,977 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Send invoices automatically' (26) completed 
+2026-04-19 13:04:01,983 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Account: Post draft entries with auto_post enabled and accounting date up to today' (25) completed 
+2026-04-19 13:04:02,010 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Purchase reminder' (27) starting 
+2026-04-19 13:04:02,017 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'QRIS Fetch Status' (28) starting 
+2026-04-19 13:04:02,034 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'QRIS Fetch Status' (28) done in 0.017s 
+2026-04-19 13:04:02,044 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'QRIS Fetch Status' (28) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,055 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'QRIS Fetch Status' (28) completed 
+2026-04-19 13:04:02,084 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Calendar: Event Reminder' (29) starting 
+2026-04-19 13:04:02,107 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Calendar: Event Reminder' (29) done in 0.023s 
+2026-04-19 13:04:02,122 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Purchase reminder' (27) done in 0.111s 
+2026-04-19 13:04:02,122 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Calendar: Event Reminder' (29) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,132 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Purchase reminder' (27) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,137 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Calendar: Event Reminder' (29) completed 
+2026-04-19 13:04:02,145 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Purchase reminder' (27) completed 
+2026-04-19 13:04:02,163 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Accrual Time Off: Updates the number of time off' (30) starting 
+2026-04-19 13:04:02,176 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Time Off: Cancel invalid leaves' (31) starting 
+2026-04-19 13:04:02,182 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Accrual Time Off: Updates the number of time off' (30) done in 0.019s 
+2026-04-19 13:04:02,192 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Accrual Time Off: Updates the number of time off' (30) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,202 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Accrual Time Off: Updates the number of time off' (30) completed 
+2026-04-19 13:04:02,214 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Time Off: Cancel invalid leaves' (31) done in 0.038s 
+2026-04-19 13:04:02,227 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Time Off: Cancel invalid leaves' (31) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,234 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Email Queue Manager' (3) starting 
+2026-04-19 13:04:02,242 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Time Off: Cancel invalid leaves' (31) completed 
+2026-04-19 13:04:02,282 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Users: Notify About Unregistered Users' (12) starting 
+2026-04-19 13:04:02,307 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Users: Notify About Unregistered Users' (12) done in 0.022s 
+2026-04-19 13:04:02,317 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Users: Notify About Unregistered Users' (12) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,324 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Users: Notify About Unregistered Users' (12) completed 
+2026-04-19 13:04:02,352 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Partner Autocomplete: Sync with remote DB' (13) starting 
+2026-04-19 13:04:02,359 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Partner Autocomplete: Sync with remote DB' (13) done in 0.007s 
+2026-04-19 13:04:02,367 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Partner Autocomplete: Sync with remote DB' (13) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,377 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Partner Autocomplete: Sync with remote DB' (13) completed 
+2026-04-19 13:04:02,398 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail Marketing: Process queue' (21) starting 
+2026-04-19 13:04:02,419 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail Marketing: Process queue' (21) done in 0.020s 
+2026-04-19 13:04:02,423 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail Marketing: Process queue' (21) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,437 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail Marketing: Process queue' (21) completed 
+2026-04-19 13:04:02,457 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Portal Users Deletion' (2) starting 
+2026-04-19 13:04:02,474 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Portal Users Deletion' (2) done in 0.017s 
+2026-04-19 13:04:02,474 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Portal Users Deletion' (2) processed 0 records, 0 records remaining 
+2026-04-19 13:04:02,485 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Portal Users Deletion' (2) completed 
+2026-04-19 13:04:06,695 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:06] "GET /odoo/settings?debug=1 HTTP/1.1" 200 - 67 0.264 0.271
+2026-04-19 13:04:07,470 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:07] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 3 0.022 0.026
+2026-04-19 13:04:07,486 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:07] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.064 0.048
+2026-04-19 13:04:07,497 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:07] "GET /web/webclient/load_menus/a6fefa495b64d4b6422c9a5a31a513e5bcbbe11a6d0097c7040a5c806c1e732d HTTP/1.1" 200 - 236 0.401 0.354
+2026-04-19 13:04:07,840 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:07] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.001 0.022
+2026-04-19 13:04:07,863 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:07] "POST /mail/data HTTP/1.1" 200 - 88 0.365 0.174
+2026-04-19 13:04:08,039 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:08] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.028 0.029
+2026-04-19 13:04:08,042 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:08] "POST /web/action/load HTTP/1.1" 200 - 10 0.047 0.030
+2026-04-19 13:04:09,395 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:09] "POST /web/dataset/call_kw/res.config.settings/get_views HTTP/1.1" 200 - 411 0.508 0.505
+2026-04-19 13:04:09,820 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:09] "POST /web/dataset/call_kw/res.config.settings/onchange HTTP/1.1" 200 - 168 0.246 0.139
+2026-04-19 13:04:09,843 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:09] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.002 0.021
+2026-04-19 13:04:10,431 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:10] "POST /base_setup/demo_active HTTP/1.1" 200 - 2 0.000 0.009
+2026-04-19 13:04:10,476 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Email Queue Manager' (3) done in 8.238s 
+2026-04-19 13:04:10,522 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Email Queue Manager' (3) processed 0 records, 0 records remaining 
+2026-04-19 13:04:10,536 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Mail: Email Queue Manager' (3) completed 
+2026-04-19 13:04:10,556 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:10] "POST /base_setup/data HTTP/1.1" 200 - 6 0.008 0.015
+2026-04-19 13:04:28,860 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:28] "POST /web/action/load HTTP/1.1" 200 - 10 0.012 0.032
+2026-04-19 13:04:29,308 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:29] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 29 0.056 0.054
+2026-04-19 13:04:29,474 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:29] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.000 0.008
+2026-04-19 13:04:29,778 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:29] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 52 0.086 0.057
+2026-04-19 13:04:29,791 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:29] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.008 0.147
+2026-04-19 13:04:36,161 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:36] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 50 0.079 0.060
+2026-04-19 13:04:36,494 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:36] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 2 0.010 0.005
+2026-04-19 13:04:51,656 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:51] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 50 0.060 0.051
+2026-04-19 13:04:52,062 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:52] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.010 0.078
+2026-04-19 13:04:54,457 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:54] "POST /web/action/load HTTP/1.1" 200 - 9 0.003 0.025
+2026-04-19 13:04:54,834 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:54] "POST /web/dataset/call_kw/base.import.module/get_views HTTP/1.1" 200 - 13 0.022 0.018
+2026-04-19 13:04:55,067 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:04:55] "POST /web/dataset/call_kw/base.import.module/onchange HTTP/1.1" 200 - 2 0.003 0.010
+2026-04-19 13:05:17,046 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:17] "POST /web/action/load HTTP/1.1" 200 - 9 0.011 0.022
+2026-04-19 13:05:17,433 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:17] "POST /web/dataset/call_kw/base.module.update/get_views HTTP/1.1" 200 - 12 0.016 0.037
+2026-04-19 13:05:17,700 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:17] "POST /web/dataset/call_kw/base.module.update/onchange HTTP/1.1" 200 - 2 0.010 0.050
+2026-04-19 13:05:19,458 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:19] "POST /web/dataset/call_kw/base.module.update/web_save HTTP/1.1" 200 - 5 0.012 0.055
+2026-04-19 13:05:19,799 18892 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user tameladian@gmail.com #2 via 127.0.0.1 
+2026-04-19 13:05:38,983 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:38] "POST /web/dataset/call_button/base.module.update/update_module HTTP/1.1" 200 - 1759 2.338 16.857
+2026-04-19 13:05:43,633 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:43] "GET /odoo/apps?debug=1 HTTP/1.1" 200 - 16 0.055 0.059
+2026-04-19 13:05:43,996 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:43] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 7 0.010 0.019
+2026-04-19 13:05:44,603 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:44] "POST /web/action/load HTTP/1.1" 200 - 11 0.009 0.018
+2026-04-19 13:05:44,833 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:44] "POST /web/dataset/call_kw/ir.module.module/get_views HTTP/1.1" 200 - 2 0.009 0.052
+2026-04-19 13:05:44,906 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:44] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.039 0.076
+2026-04-19 13:05:44,916 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:44] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 3 0.009 0.062
+2026-04-19 13:05:44,964 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:44] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 1 0.001 0.028
+2026-04-19 13:05:45,033 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:45] "POST /mail/data HTTP/1.1" 200 - 52 0.134 0.141
+2026-04-19 13:05:45,299 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:45] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.002 0.034
+2026-04-19 13:05:45,375 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:45] "POST /web/dataset/call_kw/ir.module.module/search_panel_select_range HTTP/1.1" 200 - 53 0.116 0.068
+2026-04-19 13:05:45,408 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:45] "POST /web/dataset/call_kw/ir.module.module/web_search_read HTTP/1.1" 200 - 3 0.023 0.184
+2026-04-19 13:05:46,600 18892 INFO ? werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:46] "GET /om_hr_payroll/static/description/icon.png HTTP/1.1" 200 - 0 0.000 0.370
+2026-04-19 13:05:47,645 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:05:47] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.016
+2026-04-19 13:05:49,310 18892 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.button_immediate_install on ['Odoo 18 HR Payroll'] to user tameladian@gmail.com #2 via 127.0.0.1 
+2026-04-19 13:05:49,310 18892 INFO kelapa odoo.addons.base.models.ir_module: User #2 triggered module installation 
+2026-04-19 13:05:49,311 18892 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.button_install on ['Odoo 18 HR Payroll'] to user tameladian@gmail.com #2 via 127.0.0.1 
+2026-04-19 13:05:49,594 18892 INFO kelapa odoo.modules.loading: loading 1 modules... 
+2026-04-19 13:05:49,612 18892 INFO kelapa odoo.modules.loading: 1 modules loaded in 0.02s, 0 queries (+0 extra) 
+2026-04-19 13:05:49,677 18892 INFO kelapa odoo.modules.loading: updating modules list 
+2026-04-19 13:05:49,686 18892 INFO kelapa odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via 127.0.0.1 
+2026-04-19 13:05:52,465 18892 INFO kelapa odoo.modules.loading: loading 96 modules... 
+2026-04-19 13:05:52,630 18892 INFO kelapa odoo.modules.loading: 96 modules loaded in 0.16s, 0 queries (+0 extra) 
+2026-04-19 13:05:52,632 18892 INFO kelapa odoo.modules.loading: loading 99 modules... 
+2026-04-19 13:05:52,632 18892 INFO kelapa odoo.modules.loading: Loading module hr_contract (63/99) 
+2026-04-19 13:05:53,868 18892 INFO kelapa odoo.modules.registry: module hr_contract: creating or updating database tables 
+2026-04-19 13:05:54,284 18892 INFO kelapa odoo.models: Prepare computation of hr.employee.legal_name 
+2026-04-19 13:05:54,285 18892 INFO kelapa odoo.models: Prepare computation of hr.employee.first_contract_date 
+2026-04-19 13:05:54,285 18892 INFO kelapa odoo.models: Prepare computation of hr.employee.contract_warning 
+2026-04-19 13:05:56,065 18892 INFO kelapa odoo.modules.loading: loading hr_contract/security/security.xml 
+2026-04-19 13:05:56,901 18892 INFO kelapa odoo.modules.loading: loading hr_contract/security/ir.model.access.csv 
+2026-04-19 13:05:56,950 18892 INFO kelapa odoo.modules.loading: loading hr_contract/data/hr_contract_data.xml 
+2026-04-19 13:05:57,092 18892 INFO kelapa odoo.modules.loading: loading hr_contract/report/hr_contract_history_report_views.xml 
+2026-04-19 13:05:57,420 18892 INFO kelapa odoo.modules.loading: loading hr_contract/views/hr_contract_views.xml 
+2026-04-19 13:05:57,973 18892 INFO kelapa odoo.modules.loading: loading hr_contract/views/hr_employee_views.xml 
+2026-04-19 13:05:58,208 18892 INFO kelapa odoo.modules.loading: loading hr_contract/views/resource_calendar_views.xml 
+2026-04-19 13:05:58,279 18892 INFO kelapa odoo.modules.loading: loading hr_contract/views/res_config_settings_views.xml 
+2026-04-19 13:05:58,379 18892 INFO kelapa odoo.modules.loading: loading hr_contract/wizard/hr_departure_wizard_views.xml 
+2026-04-19 13:05:58,427 18892 INFO kelapa odoo.modules.loading: Module hr_contract: loading demo 
+2026-04-19 13:05:58,427 18892 INFO kelapa odoo.modules.loading: loading hr_contract/data/hr_contract_demo.xml 
+2026-04-19 13:05:59,849 18892 INFO kelapa odoo.modules.loading: Module hr_contract loaded in 7.22s, 1274 queries (+1274 other) 
+2026-04-19 13:05:59,849 18892 INFO kelapa odoo.modules.loading: Loading module hr_holidays_contract (83/99) 
+2026-04-19 13:06:00,488 18892 INFO kelapa odoo.modules.registry: module hr_holidays_contract: creating or updating database tables 
+2026-04-19 13:06:00,869 18892 INFO kelapa odoo.modules.loading: Module hr_holidays_contract loaded in 1.02s, 84 queries (+84 other) 
+2026-04-19 13:06:00,869 18892 INFO kelapa odoo.modules.loading: Loading module om_hr_payroll (87/99) 
+2026-04-19 13:06:01,570 18892 INFO kelapa odoo.modules.registry: module om_hr_payroll: creating or updating database tables 
+2026-04-19 13:06:04,117 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/security/hr_payroll_security.xml 
+2026-04-19 13:06:04,994 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/security/ir.model.access.csv 
+2026-04-19 13:06:05,060 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/data/hr_payroll_sequence.xml 
+2026-04-19 13:06:05,105 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/data/hr_payroll_category.xml 
+2026-04-19 13:06:05,203 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/data/hr_payroll_data.xml 
+2026-04-19 13:06:05,787 18892 WARNING kelapa py.warnings: C:\odoo\odoo18\server\odoo\addons\om_hr_payroll\models\hr_salary_rule.py:30: DeprecationWarning: Since 18.0, one must use not _has_cycle() instead
+  File "C:\odoo\odoo18\python\Lib\threading.py", line 1030, in _bootstrap
+    self._bootstrap_inner()
+  File "C:\odoo\odoo18\python\Lib\threading.py", line 1073, in _bootstrap_inner
+    self.run()
+  File "C:\odoo\odoo18\python\Lib\threading.py", line 1010, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\odoo\odoo18\python\Lib\socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "C:\odoo\odoo18\python\Lib\socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "C:\odoo\odoo18\server\odoo\service\server.py", line 128, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\odoo\odoo18\python\Lib\socketserver.py", line 761, in __init__
+    self.handle()
+  File "C:\odoo\odoo18\python\Lib\site-packages\werkzeug\serving.py", line 390, in handle
+    super().handle()
+  File "C:\odoo\odoo18\python\Lib\http\server.py", line 436, in handle
+    self.handle_one_request()
+  File "C:\odoo\odoo18\python\Lib\http\server.py", line 424, in handle_one_request
+    method()
+  File "C:\odoo\odoo18\python\Lib\site-packages\werkzeug\serving.py", line 362, in run_wsgi
+    execute(self.server.app)
+  File "C:\odoo\odoo18\python\Lib\site-packages\werkzeug\serving.py", line 323, in execute
+    application_iter = app(environ, start_response)
+  File "C:\odoo\odoo18\server\odoo\http.py", line 2577, in __call__
+    response = request._serve_db()
+  File "C:\odoo\odoo18\server\odoo\http.py", line 2104, in _serve_db
+    return self._transactioning(
+  File "C:\odoo\odoo18\server\odoo\http.py", line 2167, in _transactioning
+    return service_model.retrying(func, env=self.env)
+  File "C:\odoo\odoo18\server\odoo\service\model.py", line 157, in retrying
+    result = func()
+  File "C:\odoo\odoo18\server\odoo\http.py", line 2134, in _serve_ir_http
+    response = self.dispatcher.dispatch(rule.endpoint, args)
+  File "C:\odoo\odoo18\server\odoo\http.py", line 2382, in dispatch
+    result = self.request.registry['ir.http']._dispatch(endpoint)
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_http.py", line 333, in _dispatch
+    result = endpoint(**request.params)
+  File "C:\odoo\odoo18\server\odoo\http.py", line 754, in route_wrapper
+    result = endpoint(self, *args, **params_ok)
+  File "C:\odoo\odoo18\server\odoo\addons\web\controllers\dataset.py", line 42, in call_button
+    action = call_kw(request.env[model], method, args, kwargs)
+  File "C:\odoo\odoo18\server\odoo\api.py", line 535, in call_kw
+    result = getattr(recs, name)(*args, **kwargs)
+  File "C:\odoo\odoo18\python\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_module.py", line 77, in check_and_log
+    return method(self, *args, **kwargs)
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_module.py", line 500, in button_immediate_install
+    return self._button_immediate_function(self.env.registry[self._name].button_install)
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_module.py", line 624, in _button_immediate_function
+    registry = modules.registry.Registry.new(self._cr.dbname, update_module=True)
+  File "C:\odoo\odoo18\python\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 129, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 489, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 365, in load_marked_modules
+    loaded, processed = load_module_graph(
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 228, in load_module_graph
+    load_data(env, idref, mode, kind='data', package=package)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 72, in load_data
+    tools.convert_file(env, package.name, filename, idref, mode, noupdate, kind)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 662, in convert_file
+    convert_xml_import(env, module, fp, idref, mode, noupdate)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 733, in convert_xml_import
+    obj.parse(doc.getroot())
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 648, in parse
+    self._tag_root(de)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 590, in _tag_root
+    f(rec)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 590, in _tag_root
+    f(rec)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 444, in _tag_record
+    record = model._load_records([data], self.mode == 'update')
+  File "C:\odoo\odoo18\server\odoo\models.py", line 5531, in _load_records
+    records = self._load_records_create([data['values'] for data in to_create])
+  File "C:\odoo\odoo18\server\odoo\models.py", line 5435, in _load_records_create
+    records = self.create(vals_list)
+  File "<decorator-gen-0>", line 2, in create
+  File "C:\odoo\odoo18\server\odoo\api.py", line 498, in _model_create_multi
+    return create(self, arg)
+  File "C:\odoo\odoo18\server\odoo\models.py", line 5039, in create
+    records = self._create(data_list)
+  File "C:\odoo\odoo18\server\odoo\models.py", line 5297, in _create
+    records._validate_fields(name for data in data_list for name in data['stored'])
+  File "C:\odoo\odoo18\server\odoo\models.py", line 1636, in _validate_fields
+    check(self)
+  File "C:\odoo\odoo18\server\odoo\addons\om_hr_payroll\models\hr_salary_rule.py", line 30, in _check_parent_id
+    if not self._check_recursion():
+ 
+2026-04-19 13:06:05,822 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/wizard/hr_payroll_payslips_by_employees_views.xml 
+2026-04-19 13:06:05,867 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_contract_type_views.xml 
+2026-04-19 13:06:05,907 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_contract_views.xml 
+2026-04-19 13:06:06,044 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_salary_rule_views.xml 
+2026-04-19 13:06:06,078 18892 WARNING kelapa odoo.addons.base.models.ir_ui_view: 'kanban-box' is deprecated, define a 'card' template instead 
+2026-04-19 13:06:06,237 18892 WARNING kelapa odoo.addons.base.models.ir_ui_view: 'kanban-box' is deprecated, define a 'card' template instead 
+2026-04-19 13:06:06,325 18892 WARNING kelapa odoo.addons.base.models.ir_ui_view: 'kanban-box' is deprecated, define a 'card' template instead 
+2026-04-19 13:06:06,421 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_payslip_views.xml 
+2026-04-19 13:06:06,504 18892 WARNING kelapa odoo.addons.base.models.ir_ui_view: 'kanban-box' is deprecated, define a 'card' template instead 
+2026-04-19 13:06:06,677 18892 WARNING kelapa odoo.addons.base.models.ir_ui_view: 'kanban-box' is deprecated, define a 'card' template instead 
+2026-04-19 13:06:06,735 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_employee_views.xml 
+2026-04-19 13:06:06,863 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_payroll_report.xml 
+2026-04-19 13:06:06,897 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/wizard/hr_payroll_contribution_register_report_views.xml 
+2026-04-19 13:06:06,928 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/res_config_settings_views.xml 
+2026-04-19 13:06:07,024 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/report_contribution_register_templates.xml 
+2026-04-19 13:06:07,040 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/report_payslip_templates.xml 
+2026-04-19 13:06:07,058 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/report_payslip_details_templates.xml 
+2026-04-19 13:06:07,072 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_contract_history_views.xml 
+2026-04-19 13:06:07,112 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/views/hr_leave_type_view.xml 
+2026-04-19 13:06:07,168 18892 INFO kelapa odoo.modules.loading: loading om_hr_payroll/data/mail_template.xml 
+2026-04-19 13:06:07,341 18892 INFO kelapa odoo.modules.loading: Module om_hr_payroll loaded in 6.47s, 1375 queries (+1375 other) 
+2026-04-19 13:06:07,341 18892 INFO kelapa odoo.modules.loading: 99 modules loaded in 14.71s, 2733 queries (+2733 extra) 
+2026-04-19 13:06:11,871 18892 INFO kelapa odoo.modules.loading: Modules loaded. 
+2026-04-19 13:06:11,885 18892 INFO kelapa odoo.modules.registry: Registry changed, signaling through the database 
+2026-04-19 13:06:11,887 18892 INFO kelapa odoo.modules.registry: Registry loaded in 22.390s 
+2026-04-19 13:06:11,887 18892 INFO kelapa odoo.addons.base.models.ir_module: getting next ir.actions.todo() 
+2026-04-19 13:06:11,909 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:11] "POST /web/dataset/call_button/ir.module.module/button_immediate_install HTTP/1.1" 200 - 6212 11.511 11.103
+2026-04-19 13:06:11,976 18892 INFO kelapa odoo.addons.base.models.ir_http: Generating routing map for key None 
+2026-04-19 13:06:15,365 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:15] "GET /odoo HTTP/1.1" 200 - 100 0.148 3.245
+2026-04-19 13:06:15,772 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:15] "GET /web/webclient/translations/a03c8df6a6e6a54d7c9e0cf9ec528f467df72b72?lang=en_US HTTP/1.1" 200 - 1 0.003 0.020
+2026-04-19 13:06:15,823 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:15] "GET /web/manifest.webmanifest HTTP/1.1" 200 - 9 0.029 0.041
+2026-04-19 13:06:16,567 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:16] "GET /web/webclient/load_menus/715c7d0687815b2edc1c62959837d333345be608a9e675e6b4f01368d3d9608d HTTP/1.1" 200 - 245 0.461 0.359
+2026-04-19 13:06:39,619 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/f952217/web.assets_web.min.css (id:1272) 
+2026-04-19 13:06:39,622 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1268] (matching /web/assets/_______/web.assets_web.min.css) because it was replaced with /web/assets/f952217/web.assets_web.min.css 
+2026-04-19 13:06:39,907 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:06:39] "GET /web/assets/f952217/web.assets_web.min.css HTTP/1.1" 200 - 16 0.254 24.250
+2026-04-19 13:07:06,155 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Contract: update state' (32) starting 
+2026-04-19 13:07:06,404 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/7338543/web.assets_web_print.min.css (id:1273) 
+2026-04-19 13:07:06,427 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1269] (matching /web/assets/_______/web.assets_web_print.min.css) because it was replaced with /web/assets/7338543/web.assets_web_print.min.css 
+2026-04-19 13:07:06,491 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:06] "GET /web/assets/7338543/web.assets_web_print.min.css HTTP/1.1" 200 - 10 0.215 25.997
+2026-04-19 13:07:06,606 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Contract: update state' (32) done in 0.452s 
+2026-04-19 13:07:06,637 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Contract: update state' (32) processed 0 records, 0 records remaining 
+2026-04-19 13:07:06,660 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'HR Contract: update state' (32) completed 
+2026-04-19 13:07:10,835 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) starting 
+2026-04-19 13:07:11,175 18892 INFO kelapa odoo.addons.base.models.ir_attachment: filestore gc 5 checked, 2 removed 
+2026-04-19 13:07:11,376 18892 INFO kelapa odoo.addons.base.models.res_users: GC'd 0 user log entries 
+2026-04-19 13:07:11,420 18892 INFO kelapa odoo.addons.base.models.res_users: GC 'res.users.apikeys' delete 0 entries 
+2026-04-19 13:07:11,468 18892 INFO kelapa odoo.addons.base.models.res_device: GC device logs delete 0 entries 
+2026-04-19 13:07:11,477 18892 INFO kelapa odoo.addons.base.models.res_device: GC device logs delete 0 entries 
+2026-04-19 13:07:11,568 18892 INFO kelapa odoo.addons.base.models.res_users: GC 'auth_totp.device' delete 0 entries 
+2026-04-19 13:07:12,116 18892 INFO kelapa odoo.addons.sms.models.sms_sms: GC'd 0 sms marked for deletion 
+2026-04-19 13:07:13,341 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) done in 2.497s 
+2026-04-19 13:07:13,408 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) processed 0 records, 0 records remaining 
+2026-04-19 13:07:13,438 18892 INFO kelapa odoo.addons.base.models.ir_cron: Job 'Base: Auto-vacuum internal data' (1) completed 
+2026-04-19 13:07:13,601 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Generating a new asset bundle attachment /web/assets/ce54ca4/web.assets_web.min.js (id:1274) 
+2026-04-19 13:07:13,604 18892 INFO kelapa odoo.addons.base.models.assetsbundle: Deleting attachments [1270] (matching /web/assets/_______/web.assets_web.min.js) because it was replaced with /web/assets/ce54ca4/web.assets_web.min.js 
+2026-04-19 13:07:15,143 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:15] "GET /web/assets/ce54ca4/web.assets_web.min.js HTTP/1.1" 200 - 13 0.090 59.340
+2026-04-19 13:07:16,141 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "POST /web/action/load HTTP/1.1" 200 - 6 0.005 0.019
+2026-04-19 13:07:16,487 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "GET /web/image/res.partner/3/avatar_128?unique=1776578760000 HTTP/1.1" 200 - 8 0.070 0.085
+2026-04-19 13:07:16,487 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "GET /web/image?model=res.users&field=avatar_128&id=2 HTTP/1.1" 304 - 9 0.081 0.072
+2026-04-19 13:07:16,506 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "GET /bus/websocket_worker_bundle?v=18.0-7 HTTP/1.1" 304 - 4 0.043 0.091
+2026-04-19 13:07:16,900 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "GET /websocket?version=18.0-7 HTTP/1.1" 101 - 1 0.000 0.050
+2026-04-19 13:07:16,900 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "POST /mail/data HTTP/1.1" 200 - 73 0.369 0.203
+2026-04-19 13:07:16,954 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:16] "POST /mail/data HTTP/1.1" 200 - 95 0.415 0.211
+2026-04-19 13:07:17,131 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:17] "POST /mail/inbox/messages HTTP/1.1" 200 - 5 0.007 0.019
+2026-04-19 13:07:17,501 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:17] "GET /web/image/res.partner/2/avatar_128?unique=1776603960000 HTTP/1.1" 200 - 7 0.000 0.084
+2026-04-19 13:07:19,159 18892 INFO kelapa werkzeug: 127.0.0.1 - - [19/Apr/2026 13:07:19] "GET /web/service-worker.js HTTP/1.1" 200 - 1 0.000 0.010
