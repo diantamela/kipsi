@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Coconut Product Template Extension Views -->
+    <record id="view_coconut_product_template_form" model="ir.ui.view">
+        <field name="name">coconut.product.template.form</field>
+        <field name="model">coconut.product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="inside">
+                <notebook>
+                    <page string="Coconut Specifications">
+                        <group>
+                            <group string="Product Type">
+                                <field name="coconut_type"/>
+                                <field name="is_coconut_product"/>
+                            </group>
+                            <group string="Conversion & Yield">
+                                <field name="coconut_count_per_unit"/>
+                                <field name="yield_percentage"/>
+                            </group>
+                            <group string="Quality">
+                                <field name="quality_grade"/>
+                                <field name="shelf_life_days"/>
+                            </group>
+                            <group string="Weight (grams)">
+                                <field name="avg_weight_raw"/>
+                                <field name="avg_weight_processed"/>
+                            </group>
+                            <group string="Storage">
+                                <field name="storage_requirements"/>
+                            </group>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Coconut Product Variant Views -->
+    <record id="view_coconut_product_form" model="ir.ui.view">
+        <field name="name">coconut.product.form</field>
+        <field name="model">coconut.product</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Product">
+                <sheet>
+                    <group>
+                        <field name="coconut_batch_id"/>
+                        <field name="coconut_origin"/>
+                        <field name="harvest_date"/>
+                        <field name="received_date"/>
+                    </group>
+                    <group>
+                        <field name="size"/>
+                        <field name="quality_state"/>
+                        <field name="color_score"/>
+                        <field name="damage_score"/>
+                    </group>
+                    <group>
+                        <field name="inspected_by"/>
+                        <field name="inspection_date"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Coconut Batch / Lot Views -->
+    <record id="view_coconut_batch_form" model="ir.ui.view">
+        <field name="name">coconut.batch.form</field>
+        <field name="model">coconut.batch</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Batch">
+                <sheet>
+                    <group>
+                        <field name="batch_code"/>
+                        <field name="product_id"/>
+                        <field name="supplier_id"/>
+                        <field name="purchase_order_id"/>
+                    </group>
+                    <group>
+                        <field name="received_date"/>
+                        <field name="received_by"/>
+                        <field name="quantity_received"/>
+                        <field name="current_stock"/>
+                    </group>
+                    <group>
+                        <field name="supplier_batch_ref"/>
+                        <field name="current_location"/>
+                    </field>
+                    <group>
+                        <field name="inspection_required"/>
+                        <field name="inspection_completed"/>
+                        <field name="quality_state"/>
+                        <field name="inspection_id"/>
+                    </field>
+                    <notebook>
+                        <page string="Production Usage">
+                            <field name="consumed_by_production" mode="tree,form">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="product_qty"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_batch_tree" model="ir.ui.view">
+        <field name="name">coconut.batch.tree</field>
+        <field name="model">coconut.batch</field>
+        <field name="arch" type="xml">
+            <tree string="Coconut Batches">
+                <field name="batch_code"/>
+                <field name="product_id"/>
+                <field name="supplier_id"/>
+                <field name="quantity_received"/>
+                <field name="current_stock"/>
+                <field name="quality_state"/>
+                <field name="received_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Coconut Inspection Views -->
+    <record id="view_coconut_inspection_form" model="ir.ui.view">
+        <field name="name">coconut.inspection.form</field>
+        <field name="model">coconut.inspection</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Inspection">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="batch_id"/>
+                        <field name="product_id"/>
+                        <field name="inspector_id"/>
+                        <field name="inspection_date"/>
+                    </group>
+                    <group>
+                        <field name="overall_quality"/>
+                        <field name="approved"/>
+                    </group>
+                    <group string="Physical Measurements">
+                        <field name="visual_score"/>
+                        <field name="odor_score"/>
+                        <field name="moisture_content"/>
+                        <field name="oil_content"/>
+                    </group>
+                    <group string="Decision">
+                        <field name="approved_qty"/>
+                        <field name="rejected_qty"/>
+                    </group>
+                    <notebook>
+                        <page string="Details">
+                            <group>
+                                <field name="defects"/>
+                                <field name="notes"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_inspection_tree" model="ir.ui.view">
+        <field name="name">coconut.inspection.tree</field>
+        <field name="model">coconut.inspection</field>
+        <field name="arch" type="xml">
+            <tree string="Coconut Inspections">
+                <field name="name"/>
+                <field name="batch_id"/>
+                <field name="inspector_id"/>
+                <field name="inspection_date"/>
+                <field name="overall_quality"/>
+                <field name="approved"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_coconut_batch" model="ir.actions.act_window">
+        <field name="name">Coconut Batches</field>
+        <field name="res_model">coconut.batch</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_approved': 1}</field>
+    </record>
+
+    <record id="action_coconut_inspection" model="ir.actions.act_window">
+        <field name="name">Coconut Inspections</field>
+        <field name="res_model">coconut.inspection</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

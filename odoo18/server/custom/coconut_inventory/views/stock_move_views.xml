@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Stock Alert Views -->
+    <record id="view_coconut_stock_alert_form" model="ir.ui.view">
+        <field name="name">coconut.stock.alert.form</field>
+        <field name="model">coconut.stock.alert</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Stock Alert">
+                <sheet>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="location_id"/>
+                        <field name="current_stock" readonly="1"/>
+                        <field name="minimum_stock"/>
+                        <field name="maximum_stock"/>
+                    </group>
+                    <group>
+                        <field name="alert_type" readonly="1"/>
+                        <field name="is_active"/>
+                        <field name="last_alert_date" readonly="1"/>
+                        <field name="alert_count" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="notify_users" widget="many2many_tags"/>
+                        <field name="notification_frequency"/>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_stock_alert_tree" model="ir.ui.view">
+        <field name="name">coconut.stock.alert.tree</field>
+        <field name="model">coconut.stock.alert</field>
+        <field name="arch" type="xml">
+            <tree string="Stock Alerts">
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="current_stock"/>
+                <field name="minimum_stock"/>
+                <field name="maximum_stock"/>
+                <field name="alert_type"/>
+                <field name="is_active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Stock Picking Extension -->
+    <record id="view_coconut_picking_form_extend" model="ir.ui.view">
+        <field name="name">coconut.picking.form.extend</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group[1]" position="inside">
+                <field name="picking_type_coconut" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='stock_lines']" position="before">
+                <page string="Coconut Details" attrs="{'invisible': [('picking_type_coconut', '=', False)]}">
+                    <group>
+                        <field name="batch_ids" widget="many2many_tags" 
+                               domain="[('product_id', 'in', [x.product_id.id for x in move_lines])]"
+                               context="{'default_product_id': move_lines.product_id}"/>
+                        <field name="inspection_required"/>
+                        <field name="inspection_completed"/>
+                    </group>
+                    <group>
+                        <field name="supplier_certificate_number"/>
+                        <field name="supplier_batch_reference"/>
+                    </group>
+                    <notebook>
+                        <page string="Quality Checks">
+                            <tree editable="bottom">
+                                <field name="batch_id"/>
+                                <field name="checker_id" readonly="1"/>
+                                <field name="check_date" readonly="1"/>
+                                <field name="moisture_check"/>
+                                <field name="oil_check"/>
+                                <field name="foreign_matter"/>
+                                <field name="broken_ratio"/>
+                                <field name="passed"/>
+                            </tree>
+                        </page>
+                    </notebook>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Quant Extension -->
+    <record id="view_coconut_quant_search" model="ir.ui.view">
+        <field name="name">coconut.quant.search</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location_id']" position="after">
+                <field name="lot_id" domain="[('product_id', 'in', [x.product_id.id for x in self])]" 
+                       context="{'default_product_id': product_id}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_coconut_stock_alert" model="ir.actions.act_window">
+        <field name="name">Stock Alerts</field>
+        <field name="res_model">coconut.stock.alert</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_active': 1}</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_coconut_inventory" name="Inventory" parent="menu_coconut_root" 
+              sequence="30"/>
+    <menuitem id="menu_coconut_batch" name="Batch Tracking" parent="menu_coconut_inventory" 
+              action="action_coconut_batch" sequence="10"/>
+    <menuitem id="menu_coconut_stock_alert" name="Stock Alerts" 
+              parent="menu_coconut_inventory" action="action_coconut_stock_alert" sequence="20"/>
+</odoo>

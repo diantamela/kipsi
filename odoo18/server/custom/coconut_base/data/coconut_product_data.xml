@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Coconut Product Templates -->
+    <record id="product_template_raw_coconut" model="product.template">
+        <field name="name">Raw Coconut (Whole)</field>
+        <field name="coconut_type">raw</field>
+        <field name="is_coconut_product">True</field>
+        <field name="list_price">2.5</field>
+        <field name="standard_price">1.5</field>
+        <field name="type">product</field>
+        <field name="uom_id" ref="uom.product_uom_kg"/>
+        <field name="uom_po_id" ref="uom.product_uom_kg"/>
+        <field name="coconut_count_per_unit">1</field>
+        <field name="yield_percentage">65.0</field>
+        <field name="quality_grade">grade_a</field>
+        <field name="avg_weight_raw">600</field>
+        <field name="storage_requirements">cool_dry</field>
+    </record>
+
+    <record id="product_template_desiccated_coconut" model="product.template">
+        <field name="name">Desiccated Coconut</field>
+        <field name="coconut_type">desiccated</field>
+        <field name="is_coconut_product">True</field>
+        <field name="list_price">5.0</field>
+        <field name="standard_price">3.5</field>
+        <field name="type">product</field>
+        <field name="uom_id" ref="uom.product_uom_kg"/>
+        <field name="uom_po_id" ref="uom.product_uom_kg"/>
+        <field name="coconut_count_per_unit">3.5</field>
+        <field name="yield_percentage">100.0</field>
+        <field name="quality_grade">grade_a</field>
+        <field name="shelf_life_days">90</field>
+        <field name="storage_requirements">cool_dry</field>
+    </record>
+
+    <record id="product_template_coconut_oil" model="product.template">
+        <field name="name">Coconut Oil</field>
+        <field name="coconut_type">coconut_oil</field>
+        <field name="is_coconut_product">True</field>
+        <field name="list_price">8.0</field>
+        <field name="standard_price">5.5</field>
+        <field name="type">product</field>
+        <field name="uom_id" ref="uom.product_uom_liter"/>
+        <field name="uom_po_id" ref="uom.product_uom_liter"/>
+        <field name="coconut_count_per_unit">7</field>
+        <field name="yield_percentage">25.0</field>
+        <field name="quality_grade">grade_a</field>
+        <field name="shelf_life_days">365</field>
+        <field name="storage_requirements">cool_dry</field>
+    </record>
+
+    <record id="product_template_copra" model="product.template">
+        <field name="name">Copra</field>
+        <field name="coconut_type">copra</field>
+        <field name="is_coconut_product">True</field>
+        <field name="list_price">3.0</field>
+        <field name="standard_price">2.0</field>
+        <field name="type">product</field>
+        <field name="uom_id" ref="uom.product_uom_kg"/>
+        <field name="uom_po_id" ref="uom.product_uom_kg"/>
+        <field name="coconut_count_per_unit">2.5</field>
+        <field name="yield_percentage">100.0</field>
+        <field name="quality_grade">grade_a</field>
+        <field name="storage_requirements">cool_dry</field>
+    </record>
+
+    <!-- Coconut Storage Location -->
+    <record id="location_coconut_receiving" model="stock.location">
+        <field name="name">Coconut Receiving</field>
+        <field name="location_type_coconut">receiving</field>
+        <field name="usage">internal</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="location_coconut_quarantine" model="stock.location">
+        <field name="name">Coconut Quarantine</field>
+        <field name="location_type_coconut">quarantine</field>
+        <field name="usage">internal</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="location_coconut_storage" model="stock.location">
+        <field name="name">Coconut Storage</field>
+        <field name="location_type_coconut">dry_storage</field>
+        <field name="usage">internal</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="location_coconut_production_buffer" model="stock.location">
+        <field name="name">Production Buffer</field>
+        <field name="location_type_coconut">production_buffer</field>
+        <field name="usage">internal</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="location_coconut_finished_goods" model="stock.location">
+        <field name="name">Coconut Finished Goods</field>
+        <field name="location_type_coconut">finished_goods</field>
+        <field name="usage">internal</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <!-- Work Centers -->
+    <record id="workcenter_coconut_husking" model="mrp.workcenter">
+        <field name="name">Coconut Husking Line</field>
+        <field name="time_start">0.05</field>
+        <field name="time_stop">0.05</field>
+        <field name="time_efficiency">100</field>
+        <field name="costs_hour">10.0</field>
+    </record>
+
+    <record id="workcenter_coconut_desiccation" model="mrp.workcenter">
+        <field name="name">Desiccated Coconut Production</field>
+        <field name="time_start">0.05</field>
+        <field name="time_stop">0.05</field>
+        <field name="time_efficiency">100</field>
+        <field name="costs_hour">15.0</field>
+    </record>
+
+    <record id="workcenter_coconut_oil_extraction" model="mrp.workcenter">
+        <field name="name">Coconut Oil Extraction</field>
+        <field name="time_start">0.05</field>
+        <field name="time_stop">0.05</field>
+        <field name="time_efficiency">100</field>
+        <field name="costs_hour">20.0</field>
+    </record>
+</odoo>

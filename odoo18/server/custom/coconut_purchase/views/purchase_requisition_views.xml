@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Purchase Requisition Views -->
+    <record id="view_coconut_purchase_requisition_form" model="ir.ui.view">
+        <field name="name">coconut.purchase.requisition.form</field>
+        <field name="model">coconut.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Requisition">
+                <header>
+                    <button name="action_submit" string="Submit" type="object" 
+                            states="draft" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+                    <button name="action_approve" string="Approve" type="object" 
+                            states="submitted" class="oe_highlight" groups="purchase.group_purchase_manager"/>
+                    <button name="action_reject" string="Reject" type="object" 
+                            states="submitted" groups="purchase.group_purchase_manager"/>
+                    <button name="action_cancel" string="Cancel" type="object" 
+                            states="draft,submitted" groups="purchase.group_purchase_manager"/>
+                    <button name="action_reset_to_draft" string="Reset to Draft" type="object" 
+                            states="cancel" groups="purchase.group_purchase_manager"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="user_id" readonly="1"/>
+                            <field name="request_date" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="state" readonly="1"/>
+                            <field name="purchase_order_id" readonly="1" options="{'no_open': True}"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="required_date"/>
+                        <field name="purpose"/>
+                    </group>
+                    <group>
+                        <field name="quality_grade_required"/>
+                        <field name="coconut_size_category"/>
+                    </group>
+                    <notebook>
+                        <page string="Suggested Suppliers">
+                            <field name="suggested_supplier_ids" widget="many2many_tags" readonly="1"/>
+                        </page>
+                        <page string="Justification">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_purchase_requisition_tree" model="ir.ui.view">
+        <field name="name">coconut.purchase.requisition.tree</field>
+        <field name="model">coconut.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <tree string="Purchase Requisitions">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="required_date"/>
+                <field name="purpose"/>
+                <field name="state"/>
+                <field name="purchase_order_id" widget="many2one"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_coconut_purchase_requisition_search" model="ir.ui.view">
+        <field name="name">coconut.purchase.requisition.search</field>
+        <field name="model">coconut.purchase.requisition</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="product_id"/>
+                <field name="state"/>
+                <field name="purpose"/>
+                <field name="required_date"/>
+                <filter name="filter_draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_submitted" string="Submitted" domain="[('state', '=', 'submitted')]"/>
+                <filter name="filter_approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="filter_rejected" string="Rejected" domain="[('state', '=', 'rejected')]"/>
+                <filter name="filter_with_po" string="Has PO" domain="[('purchase_order_id', '!=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_coconut_purchase_requisition" model="ir.actions.act_window">
+        <field name="name">Purchase Requisitions</field>
+        <field name="res_model">coconut.purchase.requisition</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_filter_draft': 1}</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_coconut_purchase_root" name="Purchasing" parent="menu_coconut_root" sequence="20"/>
+    <menuitem id="menu_coconut_purchase_requisition" name="Purchase Requisitions" 
+              parent="menu_coconut_purchase_root" action="action_coconut_purchase_requisition" sequence="10"/>
+</odoo>

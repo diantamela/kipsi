@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend BoM views for coconut -->
+    <record id="view_mrp_bom_form_coconut" model="ir.ui.view">
+        <field name="name">mrp.bom.form.coconut</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general']" position="inside">
+                <group string="Coconut Processing" attrs="{'invisible': [('product_tmpl_id.coconut_product_ids', '=', False)]}">
+                    <field name="coconut_processed_per_unit" readonly="1"/>
+                    <field name="expected_yield_percentage" readonly="1"/>
+                    <field name="processing_loss_percentage"/>
+                    <field name="copra_ratio"/>
+                    <field name="oil_extraction_rate"/>
+                </group>
+                <group string="Quality Requirements">
+                    <field name="min_coconut_quality"/>
+                    <field name="max_moisture_allowed"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_mrp_bom_tree_coconut" model="ir.ui.view">
+        <field name="name">mrp.bom.tree.coconut</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='code']" position="after">
+                <field name="coconut_processed_per_unit"/>
+                <field name="processing_loss_percentage"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- BoM Data template -->
+    <record id="coconut_bom_desiccated_template" model="mrp.bom">
+        <field name="product_tmpl_id" ref="coconut_base.product_template_desiccated_coconut"/>
+        <field name="product_qty">1</field>
+        <field name="product_uom_id" ref="uom.product_uom_kg"/>
+        <field name="type">normal</field>
+        <field name="processing_loss_percentage">15.0</field>
+    </record>
+</odoo>

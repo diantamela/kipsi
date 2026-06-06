@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Production Order Views -->
+    <record id="view_coconut_production_order_form" model="ir.ui.view">
+        <field name="name">coconut.production.order.form</field>
+        <field name="model">coconut.production.order</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Production Order">
+                <header>
+                    <button name="action_plan" string="Plan" type="object" 
+                            states="draft" class="oe_highlight"/>
+                    <button name="action_start" string="Start Production" type="object" 
+                            states="planned" class="oe_highlight"/>
+                    <button name="action_finish" string="Finish" type="object" 
+                            states="in_progress"/>
+                    <button name="action_approve" string="Validate" type="object" 
+                            states="to_approve" class="oe_highlight"/>
+                    <button name="action_cancel" string="Cancel" type="object" 
+                            states="draft,planned,in_progress,to_approve" class="btn-danger"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="production_id" readonly="1" options="{'no_open': True}"/>
+                            <field name="product_id"/>
+                        </group>
+                        <group>
+                            <field name="state" readonly="1"/>
+                            <field name="responsible_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="planned_qty"/>
+                        <field name="actual_qty"/>
+                        <field name="rejected_qty"/>
+                        <field name="workcenter_id"/>
+                    </group>
+                    <group>
+                        <field name="planned_start_date"/>
+                        <field name="planned_end_date"/>
+                        <field name="actual_start_date" readonly="1"/>
+                        <field name="actual_end_date" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Material Requirements">
+                            <field name="material_requirements" mode="tree,form">
+                                <tree>
+                                    <field name="product_id"/>
+                                    <field name="planned_qty"/>
+                                    <field name="actual_qty"/>
+                                    <field name="variance_qty"/>
+                                    <field name="batch_ids"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Coconut Batches">
+                            <field name="batch_ids" widget="many2many_tags" domain="[('product_id.coconut_product_ids', '!=', False)]"/>
+                            <field name="total_raw_material" readonly="1"/>
+                        </page>
+                        <page string="Performance">
+                            <group>
+                                <field name="efficiency" widget="float_percentage" readonly="1"/>
+                                <field name="yield_rate" widget="float_percentage" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_production_order_tree" model="ir.ui.view">
+        <field name="name">coconut.production.order.tree</field>
+        <field name="model">coconut.production.order</field>
+        <field name="arch" type="xml">
+            <tree string="Production Orders">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="workcenter_id"/>
+                <field name="planned_qty"/>
+                <field name="actual_qty"/>
+                <field name="state"/>
+                <field name="planned_start_date"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Work Order Views -->
+    <record id="view_coconut_work_order_form" model="ir.ui.view">
+        <field name="name">coconut.work.order.form</field>
+        <field name="model">coconut.work.order</field>
+        <field name="arch" type="xml">
+            <form string="Work Order">
+                <header>
+                    <button name="action_start" string="Start" type="object" 
+                            states="draft,ready" class="oe_highlight"/>
+                    <button name="action_pause" string="Pause" type="object" 
+                            states="progress"/>
+                    <button name="action_resume" string="Resume" type="object" 
+                            states="ready"/>
+                    <button name="action_finish" string="Finish" type="object" 
+                            states="progress" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name" readonly="1"/>
+                        <field name="production_order_id"/>
+                        <field name="workcenter_id"/>
+                        <field name="state" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="scheduled_start"/>
+                        <field name="scheduled_end"/>
+                        <field name="actual_start" readonly="1"/>
+                        <field name="actual_end" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="employee_ids" widget="many2many_tags"/>
+                        <field name="total_labor_hours"/>
+                        <field name="labor_cost" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="produced_qty"/>
+                        <field name="rejected_qty"/>
+                        <field name="efficiency" widget="float_percentage" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Extend Manufacturing Order view -->
+    <record id="view_mrp_production_form_coconut" model="ir.ui.view">
+        <field name="name">mrp.production.form.coconut</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_planned_start']" position="after">
+                <field name="coconut_production_batch_id" string="Coconut Batch"/>
+            </xpath>
+            <xpath expr="//page[@name='components']" position="inside">
+                <field name="coconut_batch_ids" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_coconut_production_order" model="ir.actions.act_window">
+        <field name="name">Production Orders</field>
+        <field name="res_model">coconut.production.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_coconut_work_order" model="ir.actions.act_window">
+        <field name="name">Work Orders</field>
+        <field name="res_model">coconut.work.order</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_coconut_production" name="Production" parent="menu_coconut_root" 
+              sequence="40"/>
+    <menuitem id="menu_coconut_production_order" name="Production Orders" 
+              parent="menu_coconut_production" action="action_coconut_production_order" sequence="10"/>
+    <menuitem id="menu_coconut_work_order" name="Work Orders" 
+              parent="menu_coconut_production" action="action_coconut_work_order" sequence="20"/>
+</odoo>

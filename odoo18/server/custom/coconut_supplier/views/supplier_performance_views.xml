@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extend res.partner form to add coconut supplier fields -->
+    <record id="view_coconut_supplier_form" model="ir.ui.view">
+        <field name="name">coconut.supplier.form</field>
+        <field name="model">coconut.supplier</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']" position="inside">
+                <group string="Coconut Supplier Info" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="is_coconut_supplier"/>
+                    <field name="coconut_supplier_type"/>
+                    <field name="quality_grade"/>
+                </group>
+                <group string="Geographic Info" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="village"/>
+                    <field name="district"/>
+                    <field name="province"/>
+                    <field name="distance_to_factory"/>
+                </group>
+                <group string="Farming Details" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="farm_size_hectares"/>
+                    <field name="coconut_variety"/>
+                    <field name="annual_capacity"/>
+                    <field name="harvest_season"/>
+                </group>
+                <group string="Certifications" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="organic_certified"/>
+                    <field name="fair_trade_certified"/>
+                    <field name="certifications"/>
+                </group>
+                <group string="Performance Metrics" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}>
+                    <field name="total_deliveries" readonly="1"/>
+                    <field name="total_quantity" readonly="1"/>
+                    <field name="avg_quality_score" readonly="1"/>
+                    <field name="on_time_delivery_rate" readonly="1"/>
+                    <field name="rejection_rate" readonly="1"/>
+                </group>
+                <group string="Financial Terms" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="payment_terms"/>
+                    <field name="unit_price"/>
+                </group>
+                <group string="Notes" attrs="{'invisible': [('is_coconut_supplier', '=', False)]}">
+                    <field name="special_requirements"/>
+                    <field name="notes"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Supplier Performance Tree/Form -->
+    <record id="view_coconut_supplier_performance_form" model="ir.ui.view">
+        <field name="name">coconut.supplier.performance.form</field>
+        <field name="model">coconut.supplier.performance</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Performance Evaluation">
+                <sheet>
+                    <group>
+                        <field name="supplier_id"/>
+                        <field name="date"/>
+                        <field name="evaluated_by"/>
+                        <field name="purchase_order_id"/>
+                        <field name="delivery_id"/>
+                    </group>
+                    <group string="Performance Scores">
+                        <field name="delivery_score"/>
+                        <field name="quality_score"/>
+                        <field name="quantity_score"/>
+                        <field name="price_score"/>
+                        <field name="service_score"/>
+                    </group>
+                    <group>
+                        <field name="overall_score" readonly="1"/>
+                        <field name="grade" readonly="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_supplier_performance_tree" model="ir.ui.view">
+        <field name="name">coconut.supplier.performance.tree</field>
+        <field name="model">coconut.supplier.performance</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Performance Records">
+                <field name="supplier_id"/>
+                <field name="date"/>
+                <field name="delivery_score"/>
+                <field name="quality_score"/>
+                <field name="overall_score"/>
+                <field name="grade"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Supplier History Tree/Form -->
+    <record id="view_coconut_supplier_history_form" model="ir.ui.view">
+        <field name="name">coconut.supplier.history.form</field>
+        <field name="model">coconut.supplier.history</field>
+        <field name="arch" type="xml">
+            <form string="Supplier Transaction History">
+                <sheet>
+                    <group>
+                        <field name="supplier_id"/>
+                        <field name="transaction_date"/>
+                        <field name="transaction_type"/>
+                        <field name="reference"/>
+                    </group>
+                    <group>
+                        <field name="amount"/>
+                        <field name="quantity"/>
+                        <field name="quality_grade"/>
+                    </group>
+                    <group>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_supplier_history_tree" model="ir.ui.view">
+        <field name="name">coconut.supplier.history.tree</field>
+        <field name="model">coconut.supplier.history</field>
+        <field name="arch" type="xml">
+            <tree string="Supplier Transaction History">
+                <field name="supplier_id"/>
+                <field name="transaction_date"/>
+                <field name="transaction_type"/>
+                <field name="amount"/>
+                <field name="quantity"/>
+                <field name="quality_grade"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_coconut_supplier" model="ir.actions.act_window">
+        <field name="name">Coconut Suppliers</field>
+        <field name="res_model">coconut.supplier</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('is_coconut_supplier', '=', True)]</field>
+    </record>
+
+    <record id="action_coconut_supplier_performance" model="ir.actions.act_window">
+        <field name="name">Supplier Performance</field>
+        <field name="res_model">coconut.supplier.performance</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_coconut_supplier_history" model="ir.actions.act_window">
+        <field name="name">Supplier History</field>
+        <field name="res_model">coconut.supplier.history</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_coconut_root" name="Coconut Factory" sequence="100"/>
+    
+    <menuitem id="menu_coconut_supplier" name="Suppliers" parent="menu_coconut_root" 
+              action="action_coconut_supplier" sequence="10"/>
+    <menuitem id="menu_coconut_supplier_performance" name="Performance" 
+              parent="menu_coconut_supplier" action="action_coconut_supplier_performance" sequence="20"/>
+    <menuitem id="menu_coconut_supplier_history" name="Transaction History" 
+              parent="menu_coconut_supplier" action="action_coconut_supplier_history" sequence="30"/>
+</odoo>

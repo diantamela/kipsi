@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coconut_product_template,coconut.product.template,model_coconut_product_template,base.group_user,1,1,1,0
+access_coconut_product,coconut.product,model_coconut_product,base.group_user,1,1,1,0
+access_coconut_batch,coconut.batch,model_coconut_batch,base.group_user,1,1,1,0
+access_coconut_inspection,coconut.inspection,model_coconut_inspection,base.group_user,1,1,1,0

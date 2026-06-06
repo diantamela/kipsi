@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coconut_stock_alert,coconut.stock.alert,model_coconut_stock_alert,base.group_user,1,1,1,0

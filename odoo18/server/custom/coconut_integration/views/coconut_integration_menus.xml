@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main Coconut Factory Menu Structure -->
+    
+    <!-- Root Menu -->
+    <menuitem id="menu_coconut_factory_main" name="Coconut Factory ERP" 
+              sequence="1000" groups="base.group_user"/>
+    
+    <!-- Dashboard (top priority) -->
+    <menuitem id="menu_coconut_dashboard" name="Dashboard" 
+              parent="menu_coconut_factory_main" 
+              action="action_coconut_dashboard" sequence="10"/>
+    
+    <!-- Purchasing Module -->
+    <menuitem id="menu_coconut_purchasing" name="Purchasing" 
+              parent="menu_coconut_factory_main" sequence="20"/>
+    <menuitem id="menu_coconut_requisition" name="Requisitions" 
+              parent="menu_coconut_purchasing" 
+              action="action_coconut_purchase_requisition" sequence="10"/>
+    <menuitem id="menu_coconut_suppliers" name="Suppliers" 
+              parent="menu_coconut_purchasing" 
+              action="action_coconut_supplier" sequence="20"/>
+    <menuitem id="menu_coconut_supplier_performance" name="Supplier Performance" 
+              parent="menu_coconut_suppliers" 
+              action="action_coconut_supplier_performance" sequence="30"/>
+    
+    <!-- Inventory Module -->
+    <menuitem id="menu_coconut_inventory" name="Inventory" 
+              parent="menu_coconut_factory_main" sequence="30"/>
+    <menuitem id="menu_coconut_batches" name="Batch Tracking" 
+              parent="menu_coconut_inventory" 
+              action="action_coconut_batch" sequence="10"/>
+    <menuitem id="menu_coconut_stock_alerts" name="Stock Alerts" 
+              parent="menu_coconut_inventory" 
+              action="action_coconut_stock_alert_monitor" sequence="20"/>
+    
+    <!-- Production Module -->
+    <menuitem id="menu_coconut_production" name="Production" 
+              parent="menu_coconut_factory_main" sequence="40"/>
+    <menuitem id="menu_coconut_prod_orders" name="Production Orders" 
+              parent="menu_coconut_production" 
+              action="action_coconut_production_order" sequence="10"/>
+    <menuitem id="menu_coconut_work_orders" name="Work Orders" 
+              parent="menu_coconut_production" 
+              action="action_coconut_work_order" sequence="20"/>
+    <menuitem id="menu_coconut_bom" name="Bill of Materials" 
+              parent="menu_coconut_production" 
+              action="mrp.mrp_bom_action" sequence="30"/>
+    
+    <!-- Quality Module -->
+    <menuitem id="menu_coconut_quality" name="Quality Control" 
+              parent="menu_coconut_factory_main" sequence="50"/>
+    <menuitem id="menu_coconut_inspections" name="Inspections" 
+              parent="menu_coconut_quality" 
+              action="action_coconut_inspection" sequence="10"/>
+    
+    <!-- Integration & Configuration -->
+    <menuitem id="menu_coconut_configuration" name="Configuration" 
+              parent="menu_coconut_factory_main" sequence="80"/>
+    <menuitem id="menu_coconut_factory_settings" name="Factory Settings" 
+              parent="menu_coconut_configuration" 
+              action="action_coconut_factory_config" sequence="10"/>
+    <menuitem id="menu_coconut_notification_settings" name="Notification Settings" 
+              parent="menu_coconut_configuration" 
+              action="action_coconut_notification_settings" sequence="20"/>
+</odoo>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Action -->
+    <record id="action_coconut_dashboard" model="ir.actions.act_window">
+        <field name="name">Coconut Factory Dashboard</field>
+        <field name="res_model">coconut.dashboard</field>
+        <field name="view_mode">dashboard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_id" ref="view_coconut_dashboard"/>
+    </record>
+
+    <!-- Dashboard View -->
+    <record id="view_coconut_dashboard" model="ir.ui.view">
+        <field name="name">coconut.dashboard</field>
+        <field name="model">coconut.dashboard</field>
+        <field name="arch" type="xml">
+            <dashboard>
+                <!-- KPI Cards -->
+                <group name="kpi_cards">
+                    <group string="Inventory Overview" name="inventory_kpi" colspan="4">
+                        <field name="inventory" widget="statinfo" options="{
+                            'title': 'Total Stock (kg)',
+                            'value': 'total_stock_kg',
+                            'color': 'blue'
+                        }"/>
+                    </group>
+                    <group string="Production This Week" name="production_kpi" colspan="4">
+                        <field name="production" widget="statinfo" options="{
+                            'title': 'Produced (kg)',
+                            'value': 'weekly_production_kg',
+                            'color': 'green'
+                        }"/>
+                    </group>
+                    <group string="Quality Performance" name="quality_kpi" colspan="4">
+                        <field name="quality" widget="statinfo" options="{
+                            'title': 'Approval Rate (%)',
+                            'value': 'approval_rate',
+                            'color': 'orange'
+                        }"/>
+                    </group>
+                </group>
+
+                <!-- Charts Row 1 -->
+                <group name="charts_row1">
+                    <group string="Stock Levels by Location" name="stock_location" colspan="4">
+                        <field name="stock_by_location" widget="graph" type="pie" 
+                               options="{
+                                 'measure': 'current_stock',
+                                 'domain': [],
+                                 'group_by': ['location_id']
+                               }"/>
+                    </group>
+                    <group string="Daily Production Trend" name="prod_trend" colspan="4">
+                        <field name="daily_production" widget="graph" type="line" 
+                               options="{
+                                 'measure': 'actual_qty',
+                                 'domain': [],
+                                 'group_by': ['date']
+                               }"/>
+                    </group>
+                </group>
+
+                <!-- Charts Row 2 -->
+                <group name="charts_row2">
+                    <group string="Production vs Rejected" name="prod_quality" colspan="4">
+                        <field name="production_quality" widget="graph" type="bar" 
+                               options="{
+                                 'measure': ['actual_qty', 'rejected_qty'],
+                                 'domain': [],
+                                 'group_by': ['date']
+                               }"/>
+                    </group>
+                    <group string="Supplier Performance" name="supplier_perf" colspan="4">
+                        <field name="supplier_score" widget="graph" type="bar" 
+                               options="{
+                                 'measure': 'overall_score',
+                                 'domain': [],
+                                 'group_by': ['supplier_id']
+                               }"/>
+                    </group>
+                </group>
+
+                <!-- Quick Actions -->
+                <group name="actions" colspan="12">
+                    <button name="action_open_receipt" string="Receive Materials" type="action" 
+                            class="btn-primary" icon="fa-download"/>
+                    <button name="action_open_production" string="Create Production" type="action" 
+                            class="btn-primary" icon="fa-cogs"/>
+                    <button name="action_view_low_stock" string="Low Stock Alerts" type="action" 
+                            class="btn-secondary" icon="fa-exclamation-triangle"/>
+                    <button name="action_quality_inspection" string="Pending Inspections" type="action" 
+                            class="btn-secondary" icon="fa-check-circle"/>
+                </group>
+            </dashboard>
+        </field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_coconut_dashboard" name="Dashboard" 
+              parent="menu_coconut_root" action="action_coconut_dashboard" sequence="5"/>
+</odoo>
