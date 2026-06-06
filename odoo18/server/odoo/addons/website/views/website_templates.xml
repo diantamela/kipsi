@@ -1644,6 +1644,18 @@
 <template id="login_layout" inherit_id="web.login_layout" name="Website Login Layout" priority="20">
     <xpath expr="t" position="replace">
         <t t-call="website.layout">
+            <t t-set="head">
+                <style>
+                    body { background-color: #C9F3D2 !important; }
+                    .oe_website_login_container { min-height: 100vh; padding-top: 4rem; background: #C9F3D2; }
+                    .oe_website_login_container > .container {
+                        background-color: rgba(255, 255, 255, 0.95);
+                        border-radius: 1.25rem;
+                        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+                        padding: 2rem;
+                    }
+                </style>
+            </t>
             <div class="oe_website_login_container" t-out="0"/>
         </t>
     </xpath>

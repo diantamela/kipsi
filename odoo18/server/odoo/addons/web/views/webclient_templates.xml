@@ -111,6 +111,25 @@
 
     <template id="web.login_layout" name="Login Layout">
         <t t-call="web.frontend_layout">
+            <t t-set="head">
+                <style>
+                    body { background-color: #C9F3D2 !important; }
+                    .o_database_list {
+                        background-color: rgba(255, 255, 255, 0.92);
+                        border-radius: 1rem;
+                        box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08);
+                    }
+                    .oe_login_buttons .btn.btn-primary {
+                        background-color: #A2CB8B !important;
+                        border-color: #A2CB8B !important;
+                        color: #fff !important;
+                    }
+                    .oe_login_buttons .btn.btn-primary:hover {
+                        background-color: #8ab779 !important;
+                        border-color: #7aa265 !important;
+                    }
+                </style>
+            </t>
             <t t-set="html_data" t-value="{'style': 'height: 100%;'}"/>
             <t t-set="body_classname" t-value="'bg-100'"/>
             <t t-set="no_header" t-value="True"/>

@@ -1,0 +1,243 @@
+/* ==========================================
+   COCONUT THEME LOGIN - Hijau & Coklat
+   ========================================== */
+
+/* Body Background - Hijau sangat muda */
+body.o_web_client.o_ui_login {
+    background-color: #E8F5E9 !important;
+}
+
+/* Login Layout Background */
+html {
+    background-color: #E8F5E9;
+}
+
+/* Login Card Container */
+.o_database_list {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(76, 175, 80, 0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.1) !important;
+}
+
+/* Login Card Body */
+.o_database_list .card-body {
+    padding: 2rem !important;
+}
+
+/* Logo Section */
+.o_database_list .card-body > div:first-child {
+    padding-bottom: 1.5rem !important;
+    border-bottom: 2px solid #E8F5E9 !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.o_database_list img {
+    filter: drop-shadow(0 2px 4px rgba(76, 175, 80, 0.1));
+}
+
+/* Form Labels */
+.o_database_list .form-label {
+    color: #2c3e50 !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Form Input Fields */
+.o_database_list .form-control {
+    border: 2px solid #E8F5E9 !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    background-color: #fafafa !important;
+}
+
+.o_database_list .form-control:focus {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1) !important;
+    background-color: #fff !important;
+}
+
+.o_database_list .form-control::placeholder {
+    color: #999 !important;
+}
+
+/* Primary Button - Hijau Kelapa */
+.oe_login_buttons .btn.btn-primary {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 8px !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2) !important;
+}
+
+.oe_login_buttons .btn.btn-primary:hover {
+    background-color: #45a049 !important;
+    border-color: #45a049 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+.oe_login_buttons .btn.btn-primary:active {
+    background-color: #3d8b40 !important;
+    border-color: #3d8b40 !important;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2) !important;
+    transform: translateY(0) !important;
+}
+
+/* Secondary Button - Coklat */
+.oe_login_buttons .btn.btn-secondary,
+.o_database_list .btn-secondary {
+    background-color: #8B6F47 !important;
+    border-color: #8B6F47 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 8px rgba(139, 111, 71, 0.2) !important;
+}
+
+.oe_login_buttons .btn.btn-secondary:hover,
+.o_database_list .btn-secondary:hover {
+    background-color: #6d5a3a !important;
+    border-color: #6d5a3a !important;
+    box-shadow: 0 4px 12px rgba(139, 111, 71, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Link Button */
+.oe_login_buttons .btn.btn-link,
+.btn.btn-link {
+    color: #4CAF50 !important;
+    text-decoration: none !important;
+    font-size: 0.9rem !important;
+    transition: all 0.3s ease !important;
+}
+
+.oe_login_buttons .btn.btn-link:hover,
+.btn.btn-link:hover {
+    color: #45a049 !important;
+    text-decoration: underline !important;
+}
+
+/* Alert Messages */
+.alert-danger {
+    background-color: #ffebee !important;
+    border-color: #ef5350 !important;
+    color: #c62828 !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #ef5350 !important;
+}
+
+.alert-success {
+    background-color: #e8f5e9 !important;
+    border-color: #4CAF50 !important;
+    color: #1b5e20 !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #4CAF50 !important;
+}
+
+/* Footer Text */
+.o_database_list .text-center.small {
+    color: #666 !important;
+    font-size: 0.85rem !important;
+}
+
+.o_database_list .text-center.small a {
+    color: #4CAF50 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+}
+
+.o_database_list .text-center.small a:hover {
+    color: #45a049 !important;
+    text-decoration: underline !important;
+}
+
+/* Database Input */
+.o_database_list #db {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed !important;
+}
+
+/* Manage Databases Link */
+.o_database_list a[href*="database/manager"] {
+    color: #4CAF50 !important;
+    text-decoration: none !important;
+    transition: all 0.3s ease !important;
+    border-right: 1px solid #ddd;
+    padding-right: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.o_database_list a[href*="database/manager"]:hover {
+    color: #45a049 !important;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .o_database_list .card-body {
+        padding: 1.5rem !important;
+    }
+    
+    .o_database_list {
+        margin: 1rem !important;
+    }
+}
+
+/* ==========================================
+   DATABASE SELECTOR THEME
+   ========================================== */
+
+.o_database_selector_container {
+    background-color: #E8F5E9 !important;
+}
+
+.o_database_item {
+    border: 2px solid transparent !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.o_database_item:hover {
+    border-color: #4CAF50 !important;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15) !important;
+}
+
+/* ==========================================
+   SIGNUP/RESET PASSWORD THEME (if auth_signup enabled)
+   ========================================== */
+
+.o_signup_form .btn.btn-primary,
+.o_reset_password_form .btn.btn-primary {
+    background-color: #4CAF50 !important;
+    border-color: #4CAF50 !important;
+}
+
+.o_signup_form .btn.btn-primary:hover,
+.o_reset_password_form .btn.btn-primary:hover {
+    background-color: #45a049 !important;
+    border-color: #45a049 !important;
+}
+
+/* Login Card Border Top Accent */
+.o_database_list::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #4CAF50 0%, #8B6F47 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.o_database_list {
+    position: relative !important;
+}
