@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coconut_supplier_receipt_user,coconut.supplier.receipt.user,model_coconut_supplier_receipt,purchase.group_purchase_user,1,1,1,0
+access_coconut_supplier_receipt_manager,coconut.supplier.receipt.manager,model_coconut_supplier_receipt,purchase.group_purchase_manager,1,1,1,1

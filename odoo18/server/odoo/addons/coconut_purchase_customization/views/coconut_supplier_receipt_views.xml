@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ======================================================================
+         TREE VIEW - Daftar Penerimaan Kelapa
+         ====================================================================== -->
+    <record id="coconut_supplier_receipt_tree_view" model="ir.ui.view">
+        <field name="name">coconut.supplier.receipt.tree</field>
+        <field name="model">coconut.supplier.receipt</field>
+        <field name="arch" type="xml">
+            <tree string="Coconut Receipts" sample="1">
+                <field name="name" string="Receipt No."/>
+                <field name="supplier_id" string="CV Supplier"/>
+                <field name="date_received" string="Date"/>
+                <field name="time_in" string="Time In" widget="float_time"/>
+                <field name="total_weight_kg" string="Total (Kg)" sum="Total"/>
+                <field name="machine_cracked_kg" string="Machine (Kg)" sum="Total"/>
+                <field name="manual_cracked_kg" string="Manual (Kg)" sum="Total"/>
+                <field name="weight_validation_status" string="Status" widget="badge"
+                    decoration-success="weight_validation_status == 'valid'"
+                    decoration-danger="weight_validation_status == 'invalid'"/>
+                <field name="rmp_employee_id" string="RMP Employee"/>
+                <field name="state" string="State" widget="badge"
+                    decoration-success="state == 'done'"
+                    decoration-warning="state == 'confirmed'"
+                    decoration-info="state == 'draft'"
+                    decoration-secondary="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ======================================================================
+         FORM VIEW - Detail Penerimaan Kelapa
+         ====================================================================== -->
+    <record id="coconut_supplier_receipt_form_view" model="ir.ui.view">
+        <field name="name">coconut.supplier.receipt.form</field>
+        <field name="model">coconut.supplier.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Receipt">
+                <header>
+                    <button name="action_confirm" type="object"
+                        string="Confirm"
+                        class="oe_highlight"
+                        states="draft"
+                        data-hotkey="q"/>
+                    <button name="action_validate_stock" type="object"
+                        string="Validate Stock"
+                        class="oe_highlight"
+                        states="confirmed"
+                        data-hotkey="w"/>
+                    <button name="action_cancel" type="object"
+                        string="Cancel"
+                        states="draft,confirmed"/>
+                    <button name="action_draft" type="object"
+                        string="Set to Draft"
+                        states="cancelled"/>
+                    <field name="state" widget="statusbar"
+                        statusbar_visible="draft,confirmed,done"
+                        clickable="False"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_picking" type="object"
+                            class="oe_stat_button"
+                            icon="fa-truck"
+                            invisible="not picking_id"
+                            context="{'create': False}">
+                            <div class="o_field_statinfo">
+                                <span class="o_stat_text">Stock Picking</span>
+                            </div>
+                            <field name="picking_count" widget="statinfo" string="Picking"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <!-- DATA PEMASOK -->
+                        <group string="Supplier Data">
+                            <field name="supplier_id"
+                                widget="res_partner_many2one"
+                                context="{'res_partner_search_mode': 'supplier', 'show_vat': True}"
+                                placeholder="Search CV Supplier..."
+                                options="{'no_create_edit': True}"/>
+                            <field name="contact_person"/>
+                            <field name="supplier_phone"/>
+                            <field name="supplier_address"/>
+                        </group>
+
+                        <!-- DATA PENGIRIMAN -->
+                        <group string="Delivery Data">
+                            <field name="driver_name"/>
+                            <field name="driver_phone"/>
+                            <field name="vehicle_number"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <!-- DATA PENERIMAAN -->
+                        <group string="Receipt Data">
+                            <field name="date_received"/>
+                            <field name="time_in" widget="float_time"/>
+                            <field name="total_weight_kg"/>
+                            <field name="rmp_employee_id"/>
+                        </group>
+
+                        <!-- DATA KUALITAS -->
+                        <group string="Quality Data">
+                            <field name="machine_cracked_kg"/>
+                            <field name="manual_cracked_kg"/>
+                            <group>
+                                <field name="weight_validation_status" widget="badge"
+                                    decoration-success="weight_validation_status == 'valid'"
+                                    decoration-danger="weight_validation_status == 'invalid'"/>
+                                <field name="weight_difference" attrs="{'invisible': [('weight_validation_status', '=', 'valid')]}"/>
+                            </group>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Notes" name="notes">
+                            <field name="notes" nolabel="1" placeholder="Add notes about this coconut receipt..."/>
+                        </page>
+                        <page string="Inventory" name="inventory" invisible="not picking_id">
+                            <group>
+                                <group string="Stock Picking">
+                                    <field name="picking_id" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ======================================================================
+         SEARCH VIEW
+         ====================================================================== -->
+    <record id="coconut_supplier_receipt_search_view" model="ir.ui.view">
+        <field name="name">coconut.supplier.receipt.search</field>
+        <field name="model">coconut.supplier.receipt</field>
+        <field name="arch" type="xml">
+            <search string="Search Coconut Receipts">
+                <field name="name" string="Receipt No."/>
+                <field name="supplier_id" string="CV Supplier"/>
+                <field name="driver_name" string="Driver"/>
+                <field name="vehicle_number" string="Vehicle"/>
+                <field name="rmp_employee_id" string="RMP Employee"/>
+
+                <filter name="filter_draft" string="Draft"
+                    domain="[('state', '=', 'draft')]"/>
+                <filter name="filter_confirmed" string="Confirmed"
+                    domain="[('state', '=', 'confirmed')]"/>
+                <filter name="filter_done" string="Done"
+                    domain="[('state', '=', 'done')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                    domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+                <filter name="filter_today" string="Today"
+                    date="date_received"/>
+                <filter name="filter_this_week" string="This Week"
+                    date="date_received"/>
+                <filter name="filter_this_month" string="This Month"
+                    date="date_received"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_supplier" string="Supplier"
+                        context="{'group_by': 'supplier_id'}"/>
+                    <filter name="group_date" string="Receipt Date"
+                        context="{'group_by': 'date_received'}"/>
+                    <filter name="group_state" string="State"
+                        context="{'group_by': 'state'}"/>
+                    <filter name="group_employee" string="RMP Employee"
+                        context="{'group_by': 'rmp_employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ======================================================================
+         ACTION WINDOW
+         ====================================================================== -->
+    <record id="action_coconut_supplier_receipt" model="ir.actions.act_window">
+        <field name="name">Coconut Receipts</field>
+        <field name="res_model">coconut.supplier.receipt</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="coconut_supplier_receipt_search_view"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No coconut receipts yet. Create your first receipt!
+            </p>
+            <p>
+                Record coconut deliveries from suppliers including:
+                <ul>
+                    <li>Supplier and delivery data</li>
+                    <li>Receipt date, time, and total weight</li>
+                    <li>Quality sorting (machine cracked / manual cracked)</li>
+                    <li>Automatic inventory integration</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Sequence for auto-generating receipt numbers -->
+    <data noupdate="1">
+        <record id="seq_coconut_supplier_receipt" model="ir.sequence">
+            <field name="name">Coconut Supplier Receipt</field>
+            <field name="code">coconut.supplier.receipt</field>
+            <field name="prefix">RMP/%(year)s/%(month)s/</field>
+            <field name="suffix">%(counter)s</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+            <field name="implementation">standard</field>
+        </record>
+    </data>
+</odoo>

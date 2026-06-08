@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Product Category for Coconut Raw Materials -->
+        <record id="coconut_raw_material_category" model="product.category">
+            <field name="name">Coconut Raw Materials</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <!-- Product: Kelapa Cungkil Mesin (Machine Cracked Coconut) -->
+        <record id="product_coconut_machine_cracked" model="product.product">
+            <field name="name">Kelapa Cungkil Mesin</field>
+            <field name="default_code">RAW-COCO-MACH</field>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="coconut_raw_material_category"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="description">Kelapa yang sudah dicungkil menggunakan mesin. Bahan baku untuk pengolahan lebih lanjut.</field>
+            <field name="standard_price">0.0</field>
+            <field name="list_price">0.0</field>
+        </record>
+
+        <!-- Product: Kelapa Cungkil Manual (Manual Cracked Coconut) -->
+        <record id="product_coconut_manual_cracked" model="product.product">
+            <field name="name">Kelapa Cungkil Manual</field>
+            <field name="default_code">RAW-COCO-MAN</field>
+            <field name="type">consu</field>
+            <field name="categ_id" ref="coconut_raw_material_category"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="purchase_ok" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="description">Kelapa yang sudah dicungkil secara manual. Bahan baku untuk pengolahan lebih lanjut.</field>
+            <field name="standard_price">0.0</field>
+            <field name="list_price">0.0</field>
+        </record>
+    </data>
+</odoo>
