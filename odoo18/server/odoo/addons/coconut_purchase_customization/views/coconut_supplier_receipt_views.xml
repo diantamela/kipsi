@@ -40,19 +40,19 @@
                     <button name="action_confirm" type="object"
                         string="Confirm"
                         class="oe_highlight"
-                        states="draft"
+                        invisible="state != 'draft'"
                         data-hotkey="q"/>
                     <button name="action_validate_stock" type="object"
                         string="Validate Stock"
                         class="oe_highlight"
-                        states="confirmed"
+                        invisible="state != 'confirmed'"
                         data-hotkey="w"/>
                     <button name="action_cancel" type="object"
                         string="Cancel"
-                        states="draft,confirmed"/>
+                        invisible="state not in ('draft', 'confirmed')"/>
                     <button name="action_draft" type="object"
                         string="Set to Draft"
-                        states="cancelled"/>
+                        invisible="state != 'cancelled'"/>
                     <field name="state" widget="statusbar"
                         statusbar_visible="draft,confirmed,done"
                         clickable="False"/>

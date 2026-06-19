@@ -197,7 +197,7 @@
             <field name="create_date" eval="DateTime.today() - relativedelta(days=20)"/>
             <field name="date_order" eval="DateTime.today() - relativedelta(days=5)"/>
             <field name="date_approve" eval="DateTime.today() - relativedelta(days=9)"/>
-            <field name="order_line" model="purchase.order.line" eval="[(5, 0, 0),
+            <field name="order_line" model="purchase.order.line" eval="[
                 (0, 0, {
                     'product_id': ref('product.product_product_16'),
                     'name': 'Drawer Black',
@@ -222,7 +222,7 @@
             <field name="create_date" eval="DateTime.today() - relativedelta(days=20)"/>
             <field name="date_order" eval="DateTime.today() - relativedelta(days=15)"/>
             <field name="date_approve" eval="DateTime.today() - relativedelta(days=5)"/>
-            <field name="order_line" model="purchase.order.line" eval="[(5, 0, 0),
+            <field name="order_line" model="purchase.order.line" eval="[
                 (0, 0, {
                     'product_id': ref('product.product_product_8'),
                     'name': 'Large Desk',
@@ -247,7 +247,7 @@
             <field name="create_date" eval="DateTime.today() - relativedelta(days=20)"/>
             <field name="date_order" eval="DateTime.today() - relativedelta(days=15)"/>
             <field name="date_approve" eval="DateTime.today() - relativedelta(days=18)"/>
-            <field name="order_line" model="purchase.order.line" eval="[(5, 0, 0),
+            <field name="order_line" model="purchase.order.line" eval="[
                 (0, 0, {
                     'product_id': ref('product.product_product_12'),
                     'name': 'Office Chair Black',
