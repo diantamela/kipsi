@@ -1,6 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_coconut_stock_alert,coconut.stock.alert,model_coconut_stock_alert,base.group_user,1,1,1,0
-access_coconut_inventory_line,coconut.inventory.line,model_coconut_inventory_line,base.group_user,1,1,1,0
-access_coconut_stock_move,coconut.stock.move,model_coconut_stock_move,base.group_user,1,1,1,0
-access_coconut_stock_picking,coconut.stock.picking,model_coconut_stock_picking,base.group_user,1,1,1,0
-access_coconut_quality_check,coconut.quality.check,model_coconut_quality_check,base.group_user,1,1,1,0

@@ -1,5 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_coconut_production_order,coconut.production.order,model_coconut_production_order,base.group_user,1,1,1,0
-access_coconut_material_requirement,coconut.material.requirement,model_coconut_material_requirement,base.group_user,1,1,1,0
-access_coconut_work_order,coconut.work.order,model_coconut_work_order,base.group_user,1,1,1,0
-access_coconut_production_report,coconut.production.report,model_coconut_production_report,base.group_user,1,0,0,0
