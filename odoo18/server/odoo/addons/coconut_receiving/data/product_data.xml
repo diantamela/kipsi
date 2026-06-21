@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="product_coconut_with_shell" model="product.template">
+            <field name="name">Coconut with Shell</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="True"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="description">Raw material coconuts with shell purchased from suppliers.</field>
+        </record>
+
+        <record id="product_white_meat_with_brown_skin" model="product.template">
+            <field name="name">White Meat with Brown Skin</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="description">Intermediate product from coconut shelling process.</field>
+        </record>
+
+        <record id="product_white_meat" model="product.template">
+            <field name="name">White Meat</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="description">Finished product after paring process.</field>
+        </record>
+
+        <record id="product_brown_skin" model="product.template">
+            <field name="name">Brown Skin</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="description">By-product from white meat paring process.</field>
+        </record>
+
+    </data>
+</odoo>

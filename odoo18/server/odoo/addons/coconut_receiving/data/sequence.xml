@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sequence for Coconut Receipt -->
+        <record id="seq_coconut_receipt" model="ir.sequence">
+            <field name="name">Coconut Receipt</field>
+            <field name="code">coconut.receipt.seq</field>
+            <field name="prefix">CR/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

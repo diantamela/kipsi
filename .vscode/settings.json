@@ -1,0 +1,16 @@
+{
+    "python.analysis.extraPaths": [
+        "C:/odoo/odoo18/server",
+        "C:/odoo/odoo18/server/odoo",
+        "C:/odoo/odoo18/server/odoo/addons"
+    ],
+    "python.autoComplete.extraPaths": [
+        "C:/odoo/odoo18/server",
+        "C:/odoo/odoo18/server/odoo",
+        "C:/odoo/odoo18/server/odoo/addons"
+    ],
+    "odoo.addonsPath": [
+        "C:/odoo/odoo18/server/odoo/addons"
+    ],
+    "odoo.manifestPath": "C:/odoo/odoo18/server/odoo/addons/coconut_receiving/__manifest__.py"
+}

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View -->
+    <record id="view_coconut_receipt_form" model="ir.ui.view">
+        <field name="name">coconut.receipt.form</field>
+        <field name="model">coconut.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Coconut Receipt">
+                <header>
+                    <button name="action_start_inspection" string="Start Inspection" type="object" invisible="state != 'draft'" class="oe_highlight"/>
+                    <button name="action_approve" string="Approve" type="object" invisible="state != 'inspection'" class="oe_highlight"/>
+                    <button name="action_receive" string="Receive into Inventory" type="object" invisible="state != 'approved'" class="oe_highlight"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('received', 'cancelled')"/>
+                    <button name="action_reset_draft" string="Reset to Draft" type="object" invisible="state not in ('cancelled')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,inspection,approved,received"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="General Information">
+                            <field name="date_receipt" readonly="state != 'draft'"/>
+                            <field name="purchase_id" readonly="state != 'draft'"/>
+                            <field name="partner_id" readonly="state != 'draft'"/>
+                            <field name="partner_ref" readonly="state != 'draft'"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group string="Delivery Information">
+                            <field name="driver_name" readonly="state != 'draft'"/>
+                            <field name="driver_phone" readonly="state != 'draft'"/>
+                            <field name="vehicle_plate" readonly="state != 'draft'"/>
+                            <field name="delivery_note" readonly="state != 'draft'"/>
+                            <field name="origin" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Weights &amp; Sorting">
+                            <group>
+                                <group string="Weight Information">
+                                    <field name="gross_weight" readonly="state not in ('draft', 'inspection')"/>
+                                    <field name="total_count" readonly="state not in ('draft', 'inspection')"/>
+                                    <field name="avg_weight"/>
+                                    <field name="rejected_weight" readonly="state not in ('draft', 'inspection')"/>
+                                    <field name="reject_percentage"/>
+                                    <field name="net_weight"/>
+                                </group>
+                                <group string="Sorting Results">
+                                    <field name="machine_shelling_weight" readonly="state not in ('draft', 'inspection')"/>
+                                    <field name="manual_shelling_weight" readonly="state not in ('draft', 'inspection')"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Quality &amp; Receiving">
+                            <group>
+                                <group string="Quality Assessment">
+                                    <field name="quality_grade" readonly="state not in ('draft', 'inspection')"/>
+                                    <field name="quality_notes" readonly="state not in ('draft', 'inspection')"/>
+                                </group>
+                                <group string="Receiving Details">
+                                    <field name="receiving_employee_id" readonly="state != 'draft'"/>
+                                    <field name="receiving_time" readonly="1"/>
+                                    <field name="picking_id" invisible="not picking_id"/>
+                                </group>
+                            </group>
+                            <group string="Notes">
+                                <field name="notes" nolabel="1" readonly="state not in ('draft', 'inspection')"/>
+                            </group>
+                            <group string="Attachments">
+                                <field name="attachment_delivery" filename="delivery_note"/>
+                                <field name="attachment_weighing" filename="name"/>
+                            </group>
+                        </page>
+                        <page string="Inventory Moves" invisible="not move_ids">
+                            <field name="move_ids" readonly="1">
+                                <list>
+                                    <field name="product_id"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree View -->
+    <record id="view_coconut_receipt_tree" model="ir.ui.view">
+        <field name="name">coconut.receipt.tree</field>
+        <field name="model">coconut.receipt</field>
+        <field name="arch" type="xml">
+            <list string="Coconut Receipts" decoration-info="state == 'draft'" decoration-warning="state == 'inspection'" decoration-success="state == 'received'">
+                <field name="name"/>
+                <field name="date_receipt"/>
+                <field name="partner_id"/>
+                <field name="vehicle_plate"/>
+                <field name="gross_weight" sum="Total Gross"/>
+                <field name="net_weight" sum="Total Net"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'inspection'" decoration-success="state == 'received'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_coconut_receipt_search" model="ir.ui.view">
+        <field name="name">coconut.receipt.search</field>
+        <field name="model">coconut.receipt</field>
+        <field name="arch" type="xml">
+            <search string="Search Coconut Receipts">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="vehicle_plate"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="In Inspection" name="inspection" domain="[('state','=','inspection')]"/>
+                <filter string="Approved" name="approved" domain="[('state','=','approved')]"/>
+                <filter string="Received" name="received" domain="[('state','=','received')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Supplier" name="group_by_supplier" context="{'group_by':'partner_id'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by':'state'}"/>
+                    <filter string="Date" name="group_by_date" context="{'group_by':'date_receipt'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_coconut_receipt" model="ir.actions.act_window">
+        <field name="name">Coconut Receipts</field>
+        <field name="res_model">coconut.receipt</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_receipt_search"/>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Create a new Coconut Receipt
+          </p>
+          <p>
+            Manage the receiving, weighing, and sorting process for coconuts.
+          </p>
+        </field>
+    </record>
+
+    <!-- Menus -->
+    <menuitem id="menu_coconut_receiving_root" name="Coconut Receiving" sequence="40" web_icon="coconut_receiving,static/description/icon.png"/>
+    <menuitem id="menu_coconut_receipt" name="Receipts" parent="menu_coconut_receiving_root" action="action_coconut_receipt" sequence="10"/>
+
+    <!-- Also add to Purchase menu -->
+    <menuitem id="menu_purchase_coconut_receipt" name="Coconut Receipts" parent="purchase.menu_procurement_management" action="action_coconut_receipt" sequence="20"/>
+</odoo>
