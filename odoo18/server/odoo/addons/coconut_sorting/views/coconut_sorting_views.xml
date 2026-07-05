@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_coconut_sorting_form" model="ir.ui.view">
+            <field name="name">coconut.sorting.form</field>
+            <field name="model">coconut.sorting</field>
+            <field name="arch" type="xml">
+                <form string="Sortir Kelapa">
+                    <header>
+                        <button name="action_confirm" string="Konfirmasi" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                        <button name="action_done" string="Selesaikan Sortir" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                        <button name="action_cancel" string="Batalkan" type="object" invisible="state not in ('draft', 'confirmed')"/>
+                        <button name="action_reset_draft" string="Kembalikan ke Draft" type="object" invisible="state != 'cancelled'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done,cancelled"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="Informasi Penerimaan">
+                                <field name="receipt_id" readonly="state != 'draft'"/>
+                                <field name="date_sorting" readonly="state != 'draft'"/>
+                                <field name="supplier_id"/>
+                                <field name="coconut_origin"/>
+                                <field name="vehicle_plate"/>
+                                <field name="gross_weight_kg"/>
+                            </group>
+                            <group string="Hasil Sortiran Reject">
+                                <field name="broken_coconut_kg" readonly="state != 'draft'"/>
+                                <field name="small_coconut_kg" readonly="state != 'draft'"/>
+                                <field name="sprouted_coconut_kg" readonly="state != 'draft'"/>
+                                <field name="rotten_coconut_kg" readonly="state != 'draft'"/>
+                                <field name="young_coconut_kg" readonly="state != 'draft'"/>
+                                <field name="total_reject_kg"/>
+                            </group>
+                            <group string="Hasil Akhir">
+                                <field name="good_coconut_kg"/>
+                                <field name="notes" readonly="state != 'draft'"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- list View -->
+        <record id="view_coconut_sorting_list" model="ir.ui.view">
+            <field name="name">coconut.sorting.list</field>
+            <field name="model">coconut.sorting</field>
+            <field name="arch" type="xml">
+                <list string="Sortir Kelapa">
+                    <field name="name"/>
+                    <field name="date_sorting"/>
+                    <field name="receipt_id"/>
+                    <field name="supplier_id"/>
+                    <field name="coconut_origin"/>
+                    <field name="total_reject_kg"/>
+                    <field name="good_coconut_kg"/>
+                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'confirmed'" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Search View -->
+        <record id="view_coconut_sorting_search" model="ir.ui.view">
+            <field name="name">coconut.sorting.search</field>
+            <field name="model">coconut.sorting</field>
+            <field name="arch" type="xml">
+                <search string="Cari Sortir Kelapa">
+                    <field name="name" string="Nomor Sortir"/>
+                    <field name="supplier_id" string="Pemasok"/>
+                    <field name="receipt_id" string="Penerimaan Kelapa"/>
+                    <field name="state" string="Status"/>
+                    <field name="date_sorting" string="Tanggal Sortir"/>
+                    <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Dikonfirmasi" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Selesai" name="filter_done" domain="[('state', '=', 'done')]"/>
+                    <filter string="Dibatalkan" name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Pemasok" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                        <filter string="Status" name="group_state" context="{'group_by': 'state'}"/>
+                        <filter string="Tanggal Sortir" name="group_date" context="{'group_by': 'date_sorting'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_coconut_sorting" model="ir.actions.act_window">
+            <field name="name">Sortir Kelapa</field>
+            <field name="res_model">coconut.sorting</field>
+            <field name="view_mode">list,form</field>
+            <field name="search_view_id" ref="view_coconut_sorting_search"/>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Buat dokumen Sortir Kelapa pertama Anda!
+              </p>
+            </field>
+        </record>
+
+        <!-- Menus -->
+        <!-- Main menu: Manufaktur Kelapa -->
+        <menuitem id="menu_coconut_manufacturing_root" name="Manufaktur Kelapa" sequence="10"/>
+        
+        <!-- Submenu: Penerimaan & Sortir -->
+        <menuitem id="menu_coconut_receiving_sorting" name="Penerimaan &amp; Sortir" parent="menu_coconut_manufacturing_root" sequence="10"/>
+        
+        <!-- Menu item: Sortir Kelapa -->
+        <menuitem id="menu_coconut_sorting" name="Sortir Kelapa" parent="menu_coconut_receiving_sorting" action="action_coconut_sorting" sequence="20"/>
+
+    </data>
+</odoo>

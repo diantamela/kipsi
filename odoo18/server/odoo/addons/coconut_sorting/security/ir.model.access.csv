@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_coconut_sorting_user,coconut.sorting.user,model_coconut_sorting,base.group_user,1,1,1,1
