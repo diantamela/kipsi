@@ -3,7 +3,7 @@
     <data noupdate="1">
 
         <record id="product_coconut_with_shell" model="product.template">
-            <field name="name">Coconut with Shell</field>
+            <field name="name">Kelapa Bulat</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -11,11 +11,11 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="True"/>
             <field name="sale_ok" eval="False"/>
-            <field name="description">Raw material coconuts with shell purchased from suppliers.</field>
+            <field name="description">Bahan baku kelapa bulat yang dibeli dari pemasok.</field>
         </record>
 
         <record id="product_white_meat_with_brown_skin" model="product.template">
-            <field name="name">White Meat with Brown Skin</field>
+            <field name="name">Daging Putih dengan Kulit Ari</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -23,11 +23,11 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
-            <field name="description">Intermediate product from coconut shelling process.</field>
+            <field name="description">Produk setengah jadi dari proses pencungkilan kelapa.</field>
         </record>
 
         <record id="product_white_meat" model="product.template">
-            <field name="name">White Meat</field>
+            <field name="name">Daging Putih</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -35,11 +35,11 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="True"/>
-            <field name="description">Finished product after paring process.</field>
+            <field name="description">Produk jadi setelah proses pengupasan kulit ari.</field>
         </record>
 
         <record id="product_brown_skin" model="product.template">
-            <field name="name">Brown Skin</field>
+            <field name="name">Kulit Ari</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -47,7 +47,7 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
-            <field name="description">By-product from white meat paring process.</field>
+            <field name="description">Produk sampingan dari proses pengupasan kulit ari daging putih.</field>
         </record>
 
     </data>

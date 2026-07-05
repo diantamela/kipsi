@@ -3,7 +3,7 @@
     <data noupdate="1">
         <!-- Sequence for Coconut Receipt -->
         <record id="seq_coconut_receipt" model="ir.sequence">
-            <field name="name">Coconut Receipt</field>
+            <field name="name">Penerimaan Kelapa</field>
             <field name="code">coconut.receipt.seq</field>
             <field name="prefix">CR/%(year)s/%(month)s/</field>
             <field name="padding">5</field>

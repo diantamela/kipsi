@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Coconut Receiving',
+    'name': 'Penerimaan Kelapa',
     'version': '18.0.1.0.0',
-    'summary': 'Manage coconut raw material receiving process',
+    'summary': 'Mengelola proses penerimaan bahan baku kelapa',
     'description': """
-        Custom module for PT Coco Murni Prima Jaya to manage the receiving process
-        of coconuts with shell. Includes weighing, sorting, quality inspection,
-        and integration with Inventory, Purchase, and HR modules.
+        Modul kustom untuk PT Coco Murni Prima Jaya untuk mengelola proses penerimaan
+        kelapa bulat. Mencakup penimbangan, penyortiran, pemeriksaan kualitas,
+        dan integrasi dengan modul Persediaan, Pembelian, dan SDM.
     """,
     'author': 'PT Coco Murni Prima Jaya / Custom',
-    'category': 'Inventory/Purchase',
+    'category': 'Inventaris/Pembelian',
     'depends': ['base', 'purchase', 'stock', 'mrp', 'hr'],
     'data': [
         'security/ir.model.access.csv',

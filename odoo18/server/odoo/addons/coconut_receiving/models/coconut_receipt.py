@@ -4,62 +4,62 @@ from odoo.exceptions import UserError, ValidationError
 
 class CoconutReceipt(models.Model):
     _name = 'coconut.receipt'
-    _description = 'Coconut Receipt'
+    _description = 'Penerimaan Kelapa'
     _order = 'date_receipt desc, id desc'
 
     # General Information
-    name = fields.Char(string='Receipt Number', required=True, copy=False, readonly=True, default=lambda self: _('New'))
-    date_receipt = fields.Datetime(string='Receipt Date', default=fields.Datetime.now, required=True)
+    name = fields.Char(string='Nomor Penerimaan', required=True, copy=False, readonly=True, default=lambda self: _('Baru'))
+    date_receipt = fields.Datetime(string='Tanggal Penerimaan', default=fields.Datetime.now, required=True)
     purchase_id = fields.Many2one('purchase.order', string='Purchase Order')
-    partner_id = fields.Many2one('res.partner', string='Supplier', related='purchase_id.partner_id', store=True)
-    partner_ref = fields.Char(string='Supplier Company Name', related='partner_id.name')
-    driver_name = fields.Char(string='Driver Name')
-    driver_phone = fields.Char(string='Driver Phone Number')
-    vehicle_plate = fields.Char(string='Vehicle Plate Number')
-    delivery_note = fields.Char(string='Delivery Note Number')
-    origin = fields.Char(string='Coconut Origin')
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.company)
+    partner_id = fields.Many2one('res.partner', string='Pemasok', related='purchase_id.partner_id', store=True)
+    partner_ref = fields.Char(string='Nama Perusahaan Pemasok', related='partner_id.name')
+    driver_name = fields.Char(string='Nama Supir')
+    driver_phone = fields.Char(string='Nomor Telepon Supir')
+    vehicle_plate = fields.Char(string='Nomor Polisi Kendaraan')
+    delivery_note = fields.Char(string='Nomor Surat Jalan')
+    origin = fields.Char(string='Asal Kelapa')
+    company_id = fields.Many2one('res.company', string='Perusahaan', required=True, default=lambda self: self.env.company)
 
     # Weight Information
-    gross_weight = fields.Float(string='Gross Weight (KG)', required=True)
-    total_count = fields.Integer(string='Total Coconut Count', default=0)
-    avg_weight = fields.Float(string='Average Weight per Coconut (KG)', compute='_compute_avg_weight', store=True)
-    rejected_weight = fields.Float(string='Rejected Weight (KG)', default=0.0)
-    reject_percentage = fields.Float(string='Reject Percentage (%)', compute='_compute_weights', store=True)
-    net_weight = fields.Float(string='Net Weight (KG)', compute='_compute_weights', store=True)
+    gross_weight = fields.Float(string='Berat Kotor (KG)', required=True)
+    total_count = fields.Integer(string='Total Jumlah Kelapa', default=0)
+    avg_weight = fields.Float(string='Berat Rata-rata per Kelapa (KG)', compute='_compute_avg_weight', store=True)
+    rejected_weight = fields.Float(string='Berat Ditolak (KG)', default=0.0)
+    reject_percentage = fields.Float(string='Persentase Ditolak (%)', compute='_compute_weights', store=True)
+    net_weight = fields.Float(string='Berat Bersih (KG)', compute='_compute_weights', store=True)
 
     # Sorting Results
-    machine_shelling_weight = fields.Float(string='Machine Shelling Weight (KG)', default=0.0)
-    manual_shelling_weight = fields.Float(string='Manual Shelling Weight (KG)', default=0.0)
+    machine_shelling_weight = fields.Float(string='Berat Cungkil Mesin (KG)', default=0.0)
+    manual_shelling_weight = fields.Float(string='Berat Cungkil Manual (KG)', default=0.0)
 
     # Quality Assessment
     quality_grade = fields.Selection([
-        ('excellent', 'Excellent'),
-        ('good', 'Good'),
-        ('average', 'Average'),
-        ('poor', 'Poor')
-    ], string='Quality Grade', default='average')
-    quality_notes = fields.Text(string='Quality Notes')
+        ('excellent', 'Sangat Baik'),
+        ('good', 'Baik'),
+        ('average', 'Rata-rata'),
+        ('poor', 'Buruk')
+    ], string='Nilai Kualitas', default='average')
+    quality_notes = fields.Text(string='Catatan Kualitas')
 
     # Receiving Information
-    receiving_employee_id = fields.Many2one('hr.employee', string='Receiving Employee', default=lambda self: self.env.user.employee_id)
-    receiving_time = fields.Datetime(string='Receiving Time')
-    notes = fields.Text(string='Notes')
-    attachment_delivery = fields.Binary(string='Delivery Note Attachment', attachment=True)
-    attachment_weighing = fields.Binary(string='Weighing Slip Attachment', attachment=True)
+    receiving_employee_id = fields.Many2one('hr.employee', string='Karyawan Penerima', default=lambda self: self.env.user.employee_id)
+    receiving_time = fields.Datetime(string='Waktu Penerimaan')
+    notes = fields.Text(string='Catatan')
+    attachment_delivery = fields.Binary(string='Lampiran Surat Jalan', attachment=True)
+    attachment_weighing = fields.Binary(string='Lampiran Slip Timbangan', attachment=True)
 
     # Workflow
     state = fields.Selection([
         ('draft', 'Draft'),
-        ('inspection', 'Inspection'),
-        ('approved', 'Approved'),
-        ('received', 'Received'),
-        ('cancelled', 'Cancelled')
+        ('inspection', 'Pemeriksaan'),
+        ('approved', 'Disetujui'),
+        ('received', 'Diterima'),
+        ('cancelled', 'Dibatalkan')
     ], string='Status', default='draft', required=True, tracking=True)
 
     # Inventory References
-    picking_id = fields.Many2one('stock.picking', string='Stock Picking', readonly=True, copy=False)
-    move_ids = fields.One2many('stock.move', related='picking_id.move_ids_without_package', string='Stock Moves')
+    picking_id = fields.Many2one('stock.picking', string='Pengambilan Stok', readonly=True, copy=False)
+    move_ids = fields.One2many('stock.move', related='picking_id.move_ids_without_package', string='Pergerakan Stok')
 
     @api.depends('gross_weight', 'total_count')
     def _compute_avg_weight(self):
@@ -82,11 +82,11 @@ class CoconutReceipt(models.Model):
     def _check_weights(self):
         for rec in self:
             if rec.gross_weight is None or rec.gross_weight <= 0:
-                raise ValidationError(_("Gross Weight KG must be greater than zero."))
+                raise ValidationError(_("Berat Kotor KG harus lebih besar dari nol."))
             if rec.rejected_weight > rec.gross_weight:
-                raise ValidationError(_("Rejected Weight KG cannot be greater than Gross Weight KG."))
+                raise ValidationError(_("Berat Ditolak KG tidak boleh lebih besar dari Berat Kotor KG."))
             if rec.net_weight < 0:
-                raise ValidationError(_("Net Weight KG cannot be negative."))
+                raise ValidationError(_("Berat Bersih KG tidak boleh negatif."))
 
     @api.constrains('machine_shelling_weight', 'manual_shelling_weight', 'net_weight')
     def _check_sorting_weights(self):
@@ -96,23 +96,23 @@ class CoconutReceipt(models.Model):
             net_rounded = round(rec.net_weight, 2)
             # Only validate if state is approved or beyond to allow drafting
             if rec.state in ['approved', 'received'] and total_sorting != net_rounded:
-                raise ValidationError(_("Machine Shelling Weight KG + Manual Shelling Weight KG must equal Net Weight KG."))
+                raise ValidationError(_("Berat Cungkil Mesin KG + Berat Cungkil Manual KG harus sama dengan Berat Bersih KG."))
 
     @api.constrains('rejected_weight', 'machine_shelling_weight', 'manual_shelling_weight')
     def _check_non_negative_weights(self):
         for rec in self:
             if rec.rejected_weight < 0:
-                raise ValidationError(_("Rejected Weight KG cannot be negative."))
+                raise ValidationError(_("Berat Ditolak KG tidak boleh negatif."))
             if rec.machine_shelling_weight < 0:
-                raise ValidationError(_("Machine Shelling Weight KG cannot be negative."))
+                raise ValidationError(_("Berat Cungkil Mesin KG tidak boleh negatif."))
             if rec.manual_shelling_weight < 0:
-                raise ValidationError(_("Manual Shelling Weight KG cannot be negative."))
+                raise ValidationError(_("Berat Cungkil Manual KG tidak boleh negatif."))
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if vals.get('name', _('New')) == _('New'):
-                vals['name'] = self.env['ir.sequence'].next_by_code('coconut.receipt.seq') or _('New')
+            if vals.get('name', _('Baru')) == _('Baru') or vals.get('name', _('New')) == _('New'):
+                vals['name'] = self.env['ir.sequence'].next_by_code('coconut.receipt.seq') or _('Baru')
         return super(CoconutReceipt, self).create(vals_list)
 
     def action_start_inspection(self):
@@ -128,23 +128,23 @@ class CoconutReceipt(models.Model):
     def action_receive(self):
         for rec in self:
             if rec.state != 'approved':
-                raise UserError(_("Only approved receipts can be received into inventory."))
+                raise UserError(_("Hanya penerimaan yang disetujui yang dapat diterima ke dalam persediaan."))
 
-            product = self.env['product.product'].search([('name', '=', 'Coconut with Shell')], limit=1)
+            product = self.env['product.product'].search([('name', '=', 'Kelapa Bulat')], limit=1)
             if not product:
-                raise UserError(_("Product 'Coconut with Shell' not found in the system."))
+                raise UserError(_("Produk 'Kelapa Bulat' tidak ditemukan di sistem."))
 
             picking_type = self.env['stock.picking.type'].search([
                 ('code', '=', 'incoming'),
                 ('company_id', '=', rec.company_id.id)
             ], limit=1)
             if not picking_type:
-                raise UserError(_("No incoming picking type found for the company."))
+                raise UserError(_("Tipe pengambilan barang masuk tidak ditemukan untuk perusahaan."))
 
             location_dest_id = picking_type.default_location_dest_id
             location_src_id = self.env.ref('stock.stock_location_suppliers', raise_if_not_found=False)
             if not location_dest_id:
-                raise UserError(_("No default destination location found on the picking type."))
+                raise UserError(_("Lokasi tujuan default tidak ditemukan pada tipe pengambilan."))
             if not location_src_id:
                 # Fallback if XML ID is missing
                 location_src_id = self.env['stock.location'].search([('usage', '=', 'supplier')], limit=1)
@@ -193,5 +193,5 @@ class CoconutReceipt(models.Model):
     def action_reset_draft(self):
         for rec in self:
             if rec.picking_id and rec.picking_id.state not in ('draft', 'cancel'):
-                raise UserError(_("Cannot reset to draft because the associated stock picking is already processed."))
+                raise UserError(_("Tidak dapat mengembalikan ke draft karena pengambilan stok terkait sudah diproses."))
             rec.state = 'draft'

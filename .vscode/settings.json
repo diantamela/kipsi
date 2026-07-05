@@ -1,13 +1,10 @@
 {
+    "python.defaultInterpreterPath": "C:/odoo/venv/Scripts/python.exe",
     "python.analysis.extraPaths": [
-        "C:/odoo/odoo18/server",
-        "C:/odoo/odoo18/server/odoo",
-        "C:/odoo/odoo18/server/odoo/addons"
+        "C:/odoo/odoo18/server"
     ],
     "python.autoComplete.extraPaths": [
-        "C:/odoo/odoo18/server",
-        "C:/odoo/odoo18/server/odoo",
-        "C:/odoo/odoo18/server/odoo/addons"
+        "C:/odoo/odoo18/server"
     ],
     "odoo.addonsPath": [
         "C:/odoo/odoo18/server/odoo/addons"
