@@ -42,6 +42,11 @@
                                 <field name="notes" readonly="state != 'draft'"/>
                             </group>
                         </group>
+                        <group string="Pergerakan Stok" invisible="not raw_move_id and not good_move_id and not reject_move_id">
+                            <field name="raw_move_id"/>
+                            <field name="good_move_id"/>
+                            <field name="reject_move_id"/>
+                        </group>
                     </sheet>
                 </form>
             </field>

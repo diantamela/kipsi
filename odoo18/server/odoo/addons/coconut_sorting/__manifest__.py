@@ -10,6 +10,7 @@
         'security/ir.model.access.csv',
         'data/sequence.xml',
         'data/product_data.xml',
+        'data/location_data.xml',
         'views/coconut_sorting_views.xml',
     ],
     'installable': True,
