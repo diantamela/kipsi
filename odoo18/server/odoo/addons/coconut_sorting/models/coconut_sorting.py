@@ -1,5 +1,8 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class CoconutSorting(models.Model):
     _name = 'coconut.sorting'
@@ -80,24 +83,13 @@ class CoconutSorting(models.Model):
                 raise UserError('Hanya dokumen yang dikonfirmasi yang dapat diselesaikan.')
             
             # Inventory Integration
-            Product = self.env['product.product']
-            
-            # Use 'is_storable' instead of deprecated detailed_type
-            good_product = Product.search([('name', '=', 'Kelapa Layak Produksi')], limit=1)
+            good_product = self.env.ref('coconut_sorting.product_kelapa_layak', raise_if_not_found=False)
             if not good_product:
-                good_product = Product.create({
-                    'name': 'Kelapa Layak Produksi',
-                    'is_storable': True,
-                    'type': 'consu',
-                })
+                raise UserError('Data produk Kelapa Layak Produksi tidak ditemukan. Harap perbarui modul.')
                 
-            reject_product = Product.search([('name', '=', 'Kelapa Reject')], limit=1)
+            reject_product = self.env.ref('coconut_sorting.product_kelapa_reject', raise_if_not_found=False)
             if not reject_product:
-                reject_product = Product.create({
-                    'name': 'Kelapa Reject',
-                    'is_storable': True,
-                    'type': 'consu',
-                })
+                raise UserError('Data produk Kelapa Reject tidak ditemukan. Harap perbarui modul.')
 
             location_dest_id = self.env['stock.warehouse'].search([('company_id', '=', record.company_id.id)], limit=1).lot_stock_id
             if not location_dest_id:
@@ -108,14 +100,14 @@ class CoconutSorting(models.Model):
                 location_src_id = self.env['stock.location'].search([('usage', '=', 'inventory')], limit=1)
 
             moves = self.env['stock.move']
-            uom_kg = self.env.ref('uom.product_uom_kgm', raise_if_not_found=False)
             
             if record.good_coconut_kg > 0:
+                _logger.info("DEBUG MOVE GOOD PRODUCT: uom_id=%s (%s)", good_product.uom_id.id, good_product.uom_id.name)
                 moves |= self.env['stock.move'].create({
                     'name': good_product.name,
                     'product_id': good_product.id,
                     'product_uom_qty': record.good_coconut_kg,
-                    'product_uom': uom_kg.id if uom_kg else good_product.uom_id.id,
+                    'product_uom': good_product.uom_id.id,
                     'location_id': location_src_id.id,
                     'location_dest_id': location_dest_id.id,
                     'company_id': record.company_id.id,
@@ -126,7 +118,7 @@ class CoconutSorting(models.Model):
                     'name': reject_product.name,
                     'product_id': reject_product.id,
                     'product_uom_qty': record.total_reject_kg,
-                    'product_uom': uom_kg.id if uom_kg else reject_product.uom_id.id,
+                    'product_uom': reject_product.uom_id.id,
                     'location_id': location_src_id.id,
                     'location_dest_id': location_dest_id.id,
                     'company_id': record.company_id.id,
