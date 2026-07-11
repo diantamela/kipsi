@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
-        <record id="product_coconut_with_shell" model="product.template">
-            <field name="name">Kelapa Bulat</field>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="uom_id" ref="uom.product_uom_kgm"/>
-            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
-            <field name="tracking">none</field>
-            <field name="purchase_ok" eval="True"/>
-            <field name="sale_ok" eval="False"/>
-            <field name="description">Bahan baku kelapa bulat yang dibeli dari pemasok.</field>
-        </record>
-
-        <record id="product_white_meat_with_brown_skin" model="product.template">
-            <field name="name">Daging Putih dengan Kulit Ari</field>
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Utama: Kelapa Bulat Belum Sortir
+             Produk ini digunakan sebagai hasil penerimaan dari pemasok.
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_kelapa_bulat" model="product.template">
+            <field name="name">Kelapa Bulat Belum Sortir</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -23,11 +15,64 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
-            <field name="description">Produk setengah jadi dari proses pencungkilan kelapa.</field>
+            <field name="active" eval="True"/>
+            <field name="description">Bahan baku kelapa bulat yang diterima dari pemasok dan belum melalui proses sortir.</field>
         </record>
 
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Hasil Sortir: Kelapa Layak Produksi
+             Dihasilkan setelah proses sortir dari Kelapa Bulat Belum Sortir.
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_kelapa_layak" model="product.template">
+            <field name="name">Kelapa Layak Produksi</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Kelapa bulat yang telah disortir dan layak untuk proses produksi selanjutnya.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Hasil Sortir: Kelapa Reject
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_kelapa_reject" model="product.template">
+            <field name="name">Kelapa Reject</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Kelapa yang dipisahkan saat sortir karena tidak memenuhi standar kualitas produksi.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Setengah Jadi: Daging Kelapa Hasil Cungkil
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_white_meat_with_brown_skin" model="product.template">
+            <field name="name">Daging Kelapa Hasil Cungkil</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Daging kelapa yang dihasilkan dari proses pencungkilan (shelling), masih mengandung kulit ari.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Jadi: Daging Kelapa Bersih
+             ═══════════════════════════════════════════════════════════ -->
         <record id="product_white_meat" model="product.template">
-            <field name="name">Daging Putih</field>
+            <field name="name">Daging Kelapa Bersih</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -35,11 +80,15 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="True"/>
-            <field name="description">Produk jadi setelah proses pengupasan kulit ari.</field>
+            <field name="active" eval="True"/>
+            <field name="description">Daging kelapa bersih setelah proses pengupasan kulit ari (paring).</field>
         </record>
 
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Sampingan: Kulit Ari Kelapa (Testa)
+             ═══════════════════════════════════════════════════════════ -->
         <record id="product_brown_skin" model="product.template">
-            <field name="name">Kulit Ari</field>
+            <field name="name">Kulit Ari Kelapa</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -47,7 +96,24 @@
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
-            <field name="description">Produk sampingan dari proses pengupasan kulit ari daging putih.</field>
+            <field name="active" eval="True"/>
+            <field name="description">Kulit ari (testa) yang dihasilkan dari proses pengupasan daging kelapa.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             Produk Sampingan: Tempurung Kelapa
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_coconut_shell" model="product.template">
+            <field name="name">Tempurung Kelapa</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Tempurung kelapa yang dihasilkan sebagai produk sampingan dari proses pencungkilan.</field>
         </record>
 
     </data>

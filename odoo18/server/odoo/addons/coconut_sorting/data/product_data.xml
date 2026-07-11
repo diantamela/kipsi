@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Product: Kelapa Layak Produksi -->
-        <record id="product_kelapa_layak" model="product.product">
-            <field name="name">Kelapa Layak Produksi</field>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="uom_id" ref="uom.product_uom_kgm"/>
-            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
-        </record>
-
-        <!-- Product: Kelapa Reject -->
-        <record id="product_kelapa_reject" model="product.product">
-            <field name="name">Kelapa Reject</field>
-            <field name="type">consu</field>
-            <field name="is_storable" eval="True"/>
-            <field name="uom_id" ref="uom.product_uom_kgm"/>
-            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
-        </record>
     </data>
 </odoo>

@@ -1,11 +1,21 @@
 {
     'name': 'Sortir Kelapa',
-    'version': '1.0',
+    'version': '18.0.2.0.0',
     'summary': 'Modul untuk mensortir kelapa setelah penerimaan',
-    'description': 'Modul untuk mensortir kelapa berdasarkan Laporan Hasil Sortiran Kelapa.',
+    'description': """
+        Modul untuk mensortir kelapa berdasarkan Laporan Hasil Sortiran Kelapa.
+
+        Proses:
+          Kelapa Bulat Belum Sortir
+            → Kelapa Layak Produksi
+            → Kelapa Reject
+            → Susut Sortir (scrap)
+
+        Modul ini meng-extend coconut.receipt untuk menampilkan ringkasan sortir.
+    """,
     'author': 'PT Coco Murni Prima Jaya',
     'category': 'Manufacturing',
-    'depends': ['base', 'stock', 'product', 'coconut_receiving'],
+    'depends': ['base', 'stock', 'product', 'mail', 'coconut_receiving'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequence.xml',
