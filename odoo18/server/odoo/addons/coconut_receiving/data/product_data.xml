@@ -3,11 +3,12 @@
     <data noupdate="0">
 
         <!-- ═══════════════════════════════════════════════════════════
-             Produk Utama: Kelapa Bulat Belum Sortir
-             Produk ini digunakan sebagai hasil penerimaan dari pemasok.
+             BAHAN BAKU 1: Kelapa Bulat
+             Diterima dari pemasok, masuk ke Kelapa Bulat inventory.
+             XML ID stable: coconut_receiving.product_kelapa_bulat
              ═══════════════════════════════════════════════════════════ -->
         <record id="product_kelapa_bulat" model="product.template">
-            <field name="name">Kelapa Bulat Belum Sortir</field>
+            <field name="name">Kelapa Bulat</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
@@ -16,12 +17,13 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Bahan baku kelapa bulat yang diterima dari pemasok dan belum melalui proses sortir.</field>
+            <field name="description">Kelapa bulat utuh yang diterima dari pemasok. Stok ditambah saat Penerimaan Kelapa divalidasi berdasarkan Berat Bersih Diterima.</field>
         </record>
 
         <!-- ═══════════════════════════════════════════════════════════
-             Produk Hasil Sortir: Kelapa Layak Produksi
-             Dihasilkan setelah proses sortir dari Kelapa Bulat Belum Sortir.
+             BAHAN BAKU 2: Kelapa Layak Produksi
+             Dihasilkan dari proses Sortir (Coconut Manufacturing).
+             XML ID stable: coconut_receiving.product_kelapa_layak
              ═══════════════════════════════════════════════════════════ -->
         <record id="product_kelapa_layak" model="product.template">
             <field name="name">Kelapa Layak Produksi</field>
@@ -33,11 +35,13 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Kelapa bulat yang telah disortir dan layak untuk proses produksi selanjutnya.</field>
+            <field name="description">Kelapa bulat yang telah disortir dan dinyatakan layak untuk proses Machine Sheller.</field>
         </record>
 
         <!-- ═══════════════════════════════════════════════════════════
-             Produk Hasil Sortir: Kelapa Reject
+             BAHAN BAKU 3: Kelapa Reject
+             Dihasilkan dari proses Sortir (Coconut Manufacturing).
+             XML ID stable: coconut_receiving.product_kelapa_reject
              ═══════════════════════════════════════════════════════════ -->
         <record id="product_kelapa_reject" model="product.template">
             <field name="name">Kelapa Reject</field>
@@ -49,11 +53,50 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Kelapa yang dipisahkan saat sortir karena tidak memenuhi standar kualitas produksi.</field>
+            <field name="description">Kelapa yang tidak memenuhi standar kualitas saat sortir. Diproses oleh Manual Sheller.</field>
         </record>
 
         <!-- ═══════════════════════════════════════════════════════════
-             Produk Setengah Jadi: Daging Kelapa Hasil Cungkil
+             BARANG DALAM PROSES 4: Kelapa Sheller
+             Dihasilkan dari Machine Sheller (dari Kelapa Layak) dan
+             Manual Sheller (dari Kelapa Reject).
+             Input untuk proses Parer.
+             XML ID stable: coconut_receiving.product_kelapa_sheller
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_kelapa_sheller" model="product.template">
+            <field name="name">Kelapa Sheller</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Kelapa yang telah diproses Machine Sheller atau Manual Sheller. Merupakan input untuk proses Parer.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             BARANG DALAM PROSES 5: Kelapa Parer
+             Dihasilkan dari proses Parer (dari Kelapa Sheller).
+             XML ID stable: coconut_receiving.product_kelapa_parer
+             ═══════════════════════════════════════════════════════════ -->
+        <record id="product_kelapa_parer" model="product.template">
+            <field name="name">Kelapa Parer</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Kelapa yang telah dikupas kulitnya melalui proses Parer dari Kelapa Sheller. Produk akhir proses manufaktur kelapa.</field>
+        </record>
+
+        <!-- ═══════════════════════════════════════════════════════════
+             PRODUK LAINNYA (tidak digunakan dalam alur utama manufaktur)
+             Dipertahankan agar tidak merusak data historis.
              ═══════════════════════════════════════════════════════════ -->
         <record id="product_white_meat_with_brown_skin" model="product.template">
             <field name="name">Daging Kelapa Hasil Cungkil</field>
@@ -65,12 +108,9 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Daging kelapa yang dihasilkan dari proses pencungkilan (shelling), masih mengandung kulit ari.</field>
+            <field name="description">Data historis – Daging kelapa hasil cungkil (shelling) sebelum paring.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             Produk Jadi: Daging Kelapa Bersih
-             ═══════════════════════════════════════════════════════════ -->
         <record id="product_white_meat" model="product.template">
             <field name="name">Daging Kelapa Bersih</field>
             <field name="type">consu</field>
@@ -81,12 +121,9 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="True"/>
             <field name="active" eval="True"/>
-            <field name="description">Daging kelapa bersih setelah proses pengupasan kulit ari (paring).</field>
+            <field name="description">Data historis – Daging kelapa bersih setelah paring.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             Produk Sampingan: Kulit Ari Kelapa (Testa)
-             ═══════════════════════════════════════════════════════════ -->
         <record id="product_brown_skin" model="product.template">
             <field name="name">Kulit Ari Kelapa</field>
             <field name="type">consu</field>
@@ -97,12 +134,9 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Kulit ari (testa) yang dihasilkan dari proses pengupasan daging kelapa.</field>
+            <field name="description">Data historis – Kulit ari (testa) hasil proses paring.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             Produk Sampingan: Tempurung Kelapa
-             ═══════════════════════════════════════════════════════════ -->
         <record id="product_coconut_shell" model="product.template">
             <field name="name">Tempurung Kelapa</field>
             <field name="type">consu</field>
@@ -113,7 +147,7 @@
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Tempurung kelapa yang dihasilkan sebagai produk sampingan dari proses pencungkilan.</field>
+            <field name="description">Data historis – Tempurung kelapa hasil shelling.</field>
         </record>
 
     </data>

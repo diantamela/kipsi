@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_coconut_receipt_user,coconut.receipt.user,model_coconut_receipt,base.group_user,1,1,1,1
+access_coconut_receipt_user,coconut.receipt user,model_coconut_receipt,base.group_user,1,1,1,0
+access_coconut_receipt_manager,coconut.receipt manager,model_coconut_receipt,base.group_system,1,1,1,1

@@ -1,0 +1,88 @@
+2026-07-12 15:37:49,425 8376 INFO ? odoo: Odoo version 18.0-20260415 
+2026-07-12 15:37:49,425 8376 INFO ? odoo: Using configuration file at C:\odoo\odoo.conf 
+2026-07-12 15:37:49,425 8376 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-07-12 15:37:49,425 8376 INFO ? odoo: database: openpg@localhost:5432 
+2026-07-12 15:37:49,646 8376 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-07-12 15:37:49,669 8376 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-07-12 15:37:50,162 8376 INFO diansukses odoo.modules.loading: loading 1 modules... 
+2026-07-12 15:37:50,164 8376 INFO diansukses odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-07-12 15:37:50,197 8376 INFO diansukses odoo.modules.loading: updating modules list 
+2026-07-12 15:37:50,202 8376 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-12 15:37:51,995 8376 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Penerimaan Kelapa', 'Manufaktur Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:37:51,996 8376 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Penerimaan Kelapa', 'Manufaktur Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:37:52,976 8376 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-07-12 15:37:53,397 8376 INFO diansukses odoo.modules.loading: loading 92 modules... 
+2026-07-12 15:37:55,197 8376 INFO diansukses odoo.modules.loading: Loading module coconut_receiving (76/92) 
+2026-07-12 15:37:55,532 8376 INFO diansukses odoo.modules.registry: module coconut_receiving: creating or updating database tables 
+2026-07-12 15:37:55,579 8376 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'partner_id' 
+2026-07-12 15:37:55,581 8376 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'gross_vehicle_weight' 
+2026-07-12 15:37:55,581 8376 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'tare_vehicle_weight' 
+2026-07-12 15:37:55,647 8376 INFO diansukses odoo.modules.loading: loading coconut_receiving/security/ir.model.access.csv 
+2026-07-12 15:37:55,665 8376 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/sequence.xml 
+2026-07-12 15:37:55,677 8376 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/product_data.xml 
+2026-07-12 15:37:55,879 8376 INFO diansukses odoo.modules.loading: loading coconut_receiving/views/coconut_receipt_views.xml 
+2026-07-12 15:37:55,947 8376 INFO diansukses odoo.addons.base.models.ir_module: module coconut_receiving: no translation for language id_ID 
+2026-07-12 15:37:55,980 8376 INFO diansukses odoo.modules.loading: Module coconut_receiving loaded in 0.78s, 240 queries (+240 other) 
+2026-07-12 15:37:56,077 8376 INFO diansukses odoo.modules.loading: Loading module coconut_sorting (87/92) 
+2026-07-12 15:37:56,482 8376 INFO diansukses odoo.modules.registry: module coconut_sorting: creating or updating database tables 
+2026-07-12 15:37:56,780 8376 INFO diansukses odoo.modules.loading: loading coconut_sorting/security/ir.model.access.csv 
+2026-07-12 15:37:56,799 8376 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/sequence.xml 
+2026-07-12 15:37:56,813 8376 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/location_data.xml 
+2026-07-12 15:37:56,829 8376 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_manufacturing_views.xml 
+2026-07-12 15:37:56,880 8376 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_stock_report_views.xml 
+2026-07-12 15:37:56,910 8376 WARNING diansukses odoo.modules.loading: Transient module states were reset 
+2026-07-12 15:37:56,911 8376 ERROR diansukses odoo.modules.registry: Failed to load registry 
+2026-07-12 15:37:56,911 8376 CRITICAL diansukses odoo.service.server: Failed to initialize database `diansukses`. 
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\service\server.py", line 1366, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 129, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 485, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 365, in load_marked_modules
+    loaded, processed = load_module_graph(
+                        ^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 228, in load_module_graph
+    load_data(env, idref, mode, kind='data', package=package)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 72, in load_data
+    tools.convert_file(env, package.name, filename, idref, mode, noupdate, kind)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 662, in convert_file
+    convert_xml_import(env, module, fp, idref, mode, noupdate)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 733, in convert_xml_import
+    obj.parse(doc.getroot())
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 648, in parse
+    self._tag_root(de)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 601, in _tag_root
+    raise ParseError(msg) from None  # Restart with "--log-handler odoo.tools.convert:DEBUG" for complete traceback
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+odoo.tools.convert.ParseError: while parsing file:/c:/odoo/odoo18/server/odoo/addons/coconut_sorting/views/coconut_stock_report_views.xml:6
+Error selagi validasi tampilan dekat:
+
+                <group string="Laporan Stok Kelapa Harian" invisible="not line_ids">
+                    <field name="line_ids" nolabel="1" readonly="1">
+                        </field>
+                </group>
+            </form>
+Atribut "editable" di tampilan list harus di "top" atau "bottom", menerima False
+
+View error context:
+{'file': 'c:\\odoo\\odoo18\\server\\odoo\\addons\\coconut_sorting\\views\\coconut_stock_report_views.xml',
+ 'line': 16,
+ 'name': 'coconut.stock.report.form',
+ 'view': ir.ui.view(1869,),
+ 'view.model': 'coconut.stock.report',
+ 'view.parent': ir.ui.view(),
+ 'xmlid': 'view_coconut_stock_report_form'}
+
+2026-07-12 15:37:56,913 8376 INFO diansukses odoo.service.server: Initiating shutdown 
+2026-07-12 15:37:56,913 8376 INFO diansukses odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-12 15:37:56,913 8376 INFO diansukses odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

@@ -1,0 +1,137 @@
+2026-07-12 15:34:27,518 30536 INFO ? odoo: Odoo version 18.0-20260415 
+2026-07-12 15:34:27,518 30536 INFO ? odoo: Using configuration file at C:\odoo\odoo.conf 
+2026-07-12 15:34:27,518 30536 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-07-12 15:34:27,518 30536 INFO ? odoo: database: openpg@localhost:5432 
+2026-07-12 15:34:27,738 30536 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-07-12 15:34:27,767 30536 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-07-12 15:34:28,227 30536 INFO diansukses odoo.modules.loading: loading 1 modules... 
+2026-07-12 15:34:28,233 30536 INFO diansukses odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2026-07-12 15:34:28,265 30536 INFO diansukses odoo.modules.loading: updating modules list 
+2026-07-12 15:34:28,273 30536 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-12 15:34:30,266 30536 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:34:30,266 30536 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:34:31,449 30536 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-07-12 15:34:31,877 30536 INFO diansukses odoo.modules.loading: loading 92 modules... 
+2026-07-12 15:34:33,484 30536 INFO diansukses odoo.modules.loading: Loading module coconut_receiving (59/92) 
+2026-07-12 15:34:33,823 30536 WARNING diansukses odoo.fields: Field coconut.receipt.purchase_id with unknown comodel_name 'purchase.order' 
+2026-07-12 15:34:33,847 30536 INFO diansukses odoo.modules.registry: module coconut_receiving: creating or updating database tables 
+2026-07-12 15:34:33,881 30536 INFO diansukses odoo.models: Prepare computation of coconut.receipt.net_received_weight 
+2026-07-12 15:34:33,881 30536 INFO diansukses odoo.models: Prepare computation of coconut.receipt.avg_weight_per_coconut 
+2026-07-12 15:34:33,964 30536 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'partner_id' 
+2026-07-12 15:34:33,964 30536 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'gross_vehicle_weight' 
+2026-07-12 15:34:33,964 30536 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'tare_vehicle_weight' 
+2026-07-12 15:34:34,030 30536 WARNING diansukses odoo.modules.loading: Transient module states were reset 
+2026-07-12 15:34:34,030 30536 ERROR diansukses odoo.modules.registry: Failed to load registry 
+2026-07-12 15:34:34,030 30536 CRITICAL diansukses odoo.service.server: Failed to initialize database `diansukses`. 
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\service\server.py", line 1366, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 129, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 485, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 365, in load_marked_modules
+    loaded, processed = load_module_graph(
+                        ^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 206, in load_module_graph
+    registry.init_models(env.cr, model_names, {'module': package.name}, new_install)
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 623, in init_models
+    env.flush_all()
+  File "C:\odoo\odoo18\server\odoo\api.py", line 857, in flush_all
+    self._recompute_all()
+  File "C:\odoo\odoo18\server\odoo\api.py", line 850, in _recompute_all
+    self[field.model_name]._recompute_field(field)
+  File "C:\odoo\odoo18\server\odoo\models.py", line 7365, in _recompute_field
+    field.recompute(records)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1471, in recompute
+    apply_except_missing(self.compute_value, recs)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1444, in apply_except_missing
+    func(records)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1493, in compute_value
+    records._compute_field_value(self)
+  File "C:\odoo\odoo18\server\odoo\addons\mail\models\mail_thread.py", line 443, in _compute_field_value
+    return super()._compute_field_value(field)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\models.py", line 5307, in _compute_field_value
+    self.filtered('id')._validate_fields(fnames)
+  File "C:\odoo\odoo18\server\odoo\models.py", line 1636, in _validate_fields
+    check(self)
+  File "C:\odoo\odoo18\server\odoo\addons\coconut_receiving\models\coconut_receipt.py", line 307, in _check_weighbridge_fields
+    raise ValidationError(_(
+odoo.exceptions.ValidationError: Berat Kotor Kendaraan harus lebih besar dari nol.
+2026-07-12 15:34:34,052 30536 INFO diansukses odoo.service.server: Initiating shutdown 
+2026-07-12 15:34:34,052 30536 INFO diansukses odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-12 15:34:34,052 30536 INFO diansukses odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  
+2026-07-12 15:35:26,387 27996 INFO ? odoo: Odoo version 18.0-20260415 
+2026-07-12 15:35:26,387 27996 INFO ? odoo: Using configuration file at C:\odoo\odoo.conf 
+2026-07-12 15:35:26,387 27996 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-07-12 15:35:26,387 27996 INFO ? odoo: database: openpg@localhost:5432 
+2026-07-12 15:35:26,587 27996 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-07-12 15:35:26,612 27996 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-07-12 15:35:27,053 27996 INFO diansukses odoo.modules.loading: loading 1 modules... 
+2026-07-12 15:35:27,069 27996 INFO diansukses odoo.modules.loading: 1 modules loaded in 0.02s, 0 queries (+0 extra) 
+2026-07-12 15:35:27,087 27996 INFO diansukses odoo.modules.loading: updating modules list 
+2026-07-12 15:35:27,087 27996 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-12 15:35:28,846 27996 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:35:28,846 27996 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:35:29,818 27996 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-07-12 15:35:30,202 27996 INFO diansukses odoo.modules.loading: loading 92 modules... 
+2026-07-12 15:35:31,695 27996 INFO diansukses odoo.modules.loading: Loading module coconut_receiving (59/92) 
+2026-07-12 15:35:32,057 27996 INFO diansukses odoo.modules.registry: module coconut_receiving: creating or updating database tables 
+2026-07-12 15:35:32,084 27996 WARNING diansukses odoo.modules.loading: Transient module states were reset 
+2026-07-12 15:35:32,084 27996 ERROR diansukses odoo.modules.registry: Failed to load registry 
+2026-07-12 15:35:32,084 27996 CRITICAL diansukses odoo.service.server: Failed to initialize database `diansukses`. 
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\service\server.py", line 1366, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 129, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 485, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 365, in load_marked_modules
+    loaded, processed = load_module_graph(
+                        ^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 206, in load_module_graph
+    registry.init_models(env.cr, model_names, {'module': package.name}, new_install)
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 605, in init_models
+    model._auto_init()
+  File "C:\odoo\odoo18\server\odoo\models.py", line 3474, in _auto_init
+    new = field.update_db(self, columns)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1097, in update_db
+    self.update_db_column(model, column)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 2113, in update_db_column
+    super().update_db_column(model, column)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1133, in update_db_column
+    self._convert_db_column(model, column)
+  File "C:\odoo\odoo18\server\odoo\fields.py", line 1825, in _convert_db_column
+    sql.convert_column(model._cr, model._table, self.name, self.column_type[1])
+  File "C:\odoo\odoo18\server\odoo\tools\sql.py", line 347, in convert_column
+    _convert_column(cr, tablename, columnname, columntype, using)
+  File "C:\odoo\odoo18\server\odoo\tools\sql.py", line 371, in _convert_column
+    cr.execute(query, log_exceptions=False)
+  File "C:\odoo\odoo18\server\odoo\sql_db.py", line 371, in execute
+    res = self._obj.execute(query, params)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+psycopg2.errors.DatatypeMismatch: foreign key constraint "coconut_receipt_purchase_id_fkey" cannot be implemented
+DETAIL:  Key columns "purchase_id" and "id" are of incompatible types: character varying and integer.
+
+2026-07-12 15:35:32,096 27996 INFO diansukses odoo.service.server: Initiating shutdown 
+2026-07-12 15:35:32,096 27996 INFO diansukses odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-12 15:35:32,096 27996 INFO diansukses odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

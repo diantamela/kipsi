@@ -2,7 +2,7 @@
 <odoo>
     <data>
         <!-- ═══════════════════════════════════════════════════
-             Inherited View: inject Sorting tab into coconut.receipt form
+             Inherited View: inject Manufacturing & Sorting tabs into coconut.receipt form
              Owned by: coconut_sorting
              ═══════════════════════════════════════════════════ -->
         <record id="view_coconut_receipt_form_sorting_inherit" model="ir.ui.view">
@@ -10,16 +10,44 @@
             <field name="model">coconut.receipt</field>
             <field name="inherit_id" ref="coconut_receiving.view_coconut_receipt_form"/>
             <field name="arch" type="xml">
-                <!-- Insert sorting summary tab at the end of the notebook -->
                 <notebook position="inside">
-                    <page string="Informasi Sortir">
-                        <group string="Ringkasan Sortir">
+                    <!-- Manufacturing documents tab -->
+                    <page string="Dokumen Manufaktur" name="tab_mfg"
+                          invisible="not manufacturing_ids">
+                        <group string="Ringkasan Manufaktur">
                             <field name="total_sorting_input_weight"
-                                   string="Total Input Sortir (Kg)" readonly="1"/>
-                            <field name="remaining_unsorted_weight" readonly="1"/>
+                                   string="Total Kelapa Diproses (Kg)"
+                                   readonly="1"/>
+                            <field name="remaining_unsorted_weight"
+                                   string="Sisa Kelapa Bulat Belum Diproses (Kg)"
+                                   readonly="1"/>
                         </group>
+                        <field name="manufacturing_ids" readonly="1">
+                            <list string="Dokumen Manufaktur"
+                                  decoration-success="state == 'done'"
+                                  decoration-warning="state == 'confirmed'"
+                                  decoration-muted="state == 'cancelled'">
+                                <field name="name" string="Kode"/>
+                                <field name="production_date" string="Tgl Produksi"/>
+                                <field name="raw_coconut_processed" string="Diproses (Kg)"/>
+                                <field name="good_coconut_weight" string="Layak (Kg)"/>
+                                <field name="reject_coconut_weight" string="Reject (Kg)"/>
+                                <field name="total_sheller_output" string="Sheller (Kg)"/>
+                                <field name="parer_output" string="Parer (Kg)"/>
+                                <field name="state"
+                                       widget="badge"
+                                       decoration-success="state == 'done'"
+                                       decoration-warning="state == 'confirmed'"
+                                       decoration-muted="state == 'cancelled'"/>
+                            </list>
+                        </field>
+                    </page>
+
+                    <!-- Legacy sorting tab (historical data, read-only) -->
+                    <page string="Riwayat Sortir (Lama)" name="tab_sort_legacy"
+                          invisible="not sorting_ids">
                         <field name="sorting_ids" readonly="1">
-                            <list string="Riwayat Sortir"
+                            <list string="Riwayat Sortir Lama"
                                   decoration-success="state == 'done'"
                                   decoration-warning="state == 'confirmed'"
                                   decoration-muted="state == 'cancelled'">
@@ -42,32 +70,15 @@
         </record>
 
         <!-- ═══════════════════════════════════════════════════
-             Form View – coconut.sorting
+             Form View – coconut.sorting (LEGACY – read-only access for audit)
+             The menu is hidden; this view is only accessible if needed for history.
              ═══════════════════════════════════════════════════ -->
         <record id="view_coconut_sorting_form" model="ir.ui.view">
             <field name="name">coconut.sorting.form</field>
             <field name="model">coconut.sorting</field>
             <field name="arch" type="xml">
-                <form string="Sortir Kelapa">
+                <form string="Sortir Kelapa (Arsip Lama)">
                     <header>
-                        <button name="action_confirm"
-                                string="Konfirmasi"
-                                type="object"
-                                class="oe_highlight"
-                                invisible="state != 'draft'"/>
-                        <button name="action_done"
-                                string="Selesaikan Sortir"
-                                type="object"
-                                class="oe_highlight"
-                                invisible="state != 'confirmed'"/>
-                        <button name="action_cancel"
-                                string="Batalkan"
-                                type="object"
-                                invisible="state not in ('draft', 'confirmed')"/>
-                        <button name="action_reset_draft"
-                                string="Kembalikan ke Draft"
-                                type="object"
-                                invisible="state != 'cancelled'"/>
                         <field name="state"
                                widget="statusbar"
                                statusbar_visible="draft,confirmed,done"/>
@@ -78,56 +89,34 @@
                                 <field name="name" readonly="1"/>
                             </h1>
                         </div>
-
-                        <!-- ─── Section 1: Sumber Penerimaan ─── -->
                         <group>
                             <group string="Sumber Penerimaan">
-                                <field name="receipt_id" readonly="state != 'draft'"/>
-                                <field name="date_sorting" readonly="state != 'draft'"/>
-                                <field name="supplier_id"/>
-                                <field name="coconut_origin"/>
-                                <field name="vehicle_plate"/>
-                                <field name="remaining_unsorted_weight"
-                                       string="Sisa Belum Tersortir (Kg)"
-                                       readonly="1"/>
+                                <field name="receipt_id" readonly="1"/>
+                                <field name="date_sorting" readonly="1"/>
+                                <field name="supplier_id" readonly="1"/>
+                                <field name="coconut_origin" readonly="1"/>
+                                <field name="vehicle_plate" readonly="1"/>
                             </group>
                             <group string="Berat Input Sortir">
-                                <field name="input_weight_kg"
-                                       string="Berat Input (Kg)"
-                                       readonly="state != 'draft'"/>
+                                <field name="input_weight_kg" string="Berat Input (Kg)" readonly="1"/>
+                                <field name="remaining_unsorted_weight"
+                                       string="Sisa Belum Tersortir (Kg)" readonly="1"/>
                             </group>
                         </group>
-
-                        <!-- ─── Section 2: Hasil Sortir ─── -->
                         <group string="Hasil Sortir">
                             <group>
-                                <field name="good_coconut_kg"
-                                       string="Kelapa Layak Produksi (Kg)"
-                                       readonly="state != 'draft'"/>
-                                <field name="reject_coconut_kg"
-                                       string="Kelapa Reject (Kg)"
-                                       readonly="state != 'draft'"/>
-                                <field name="loss_kg"
-                                       string="Susut Sortir (Kg)"
-                                       readonly="state != 'draft'"/>
+                                <field name="good_coconut_kg" string="Kelapa Layak Produksi (Kg)" readonly="1"/>
+                                <field name="reject_coconut_kg" string="Kelapa Reject (Kg)" readonly="1"/>
+                                <field name="loss_kg" string="Susut Sortir (Kg)" readonly="1"/>
                             </group>
-                            <group string="Rekonsiliasi Berat">
-                                <field name="balance_diff"
-                                       string="Selisih (Kg)"
-                                       readonly="1"/>
-                                <field name="is_balanced"
-                                       string="Neraca Seimbang"
-                                       widget="boolean"
-                                       readonly="1"/>
+                            <group>
+                                <field name="balance_diff" string="Selisih (Kg)" readonly="1"/>
+                                <field name="is_balanced" string="Neraca Seimbang" readonly="1"/>
                             </group>
                         </group>
-
-                        <!-- ─── Section 3: Catatan ─── -->
                         <group>
-                            <field name="notes" readonly="state != 'draft'"/>
+                            <field name="notes" readonly="1"/>
                         </group>
-
-                        <!-- ─── Section 4: Pergerakan Stok ─── -->
                         <group string="Pergerakan Stok"
                                invisible="not raw_move_id and not good_move_id and not reject_move_id">
                             <field name="raw_move_id" readonly="1"/>
@@ -147,13 +136,13 @@
         </record>
 
         <!-- ═══════════════════════════════════════════════════
-             List View – coconut.sorting
+             List View – coconut.sorting (LEGACY)
              ═══════════════════════════════════════════════════ -->
         <record id="view_coconut_sorting_list" model="ir.ui.view">
             <field name="name">coconut.sorting.list</field>
             <field name="model">coconut.sorting</field>
             <field name="arch" type="xml">
-                <list string="Sortir Kelapa"
+                <list string="Sortir Kelapa (Arsip)"
                       decoration-success="state == 'done'"
                       decoration-warning="state == 'confirmed'"
                       decoration-muted="state == 'cancelled'">
@@ -175,66 +164,59 @@
         </record>
 
         <!-- ═══════════════════════════════════════════════════
-             Search View – coconut.sorting
+             Search View – coconut.sorting (LEGACY)
              ═══════════════════════════════════════════════════ -->
         <record id="view_coconut_sorting_search" model="ir.ui.view">
             <field name="name">coconut.sorting.search</field>
             <field name="model">coconut.sorting</field>
             <field name="arch" type="xml">
-                <search string="Cari Sortir Kelapa">
+                <search string="Cari Sortir Kelapa (Arsip)">
                     <field name="name" string="Nomor Sortir"/>
                     <field name="supplier_id" string="Pemasok"/>
                     <field name="receipt_id" string="Penerimaan Kelapa"/>
-                    <field name="state" string="Status"/>
-                    <field name="date_sorting" string="Tanggal Sortir"/>
-                    <filter string="Draft"       name="filter_draft"     domain="[('state', '=', 'draft')]"/>
-                    <filter string="Dikonfirmasi" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
-                    <filter string="Selesai"     name="filter_done"      domain="[('state', '=', 'done')]"/>
-                    <filter string="Dibatalkan"  name="filter_cancelled" domain="[('state', '=', 'cancelled')]"/>
+                    <filter string="Selesai" name="filter_done" domain="[('state', '=', 'done')]"/>
                     <group expand="0" string="Kelompokkan Berdasarkan">
-                        <filter string="Pemasok"      name="group_supplier" context="{'group_by': 'supplier_id'}"/>
-                        <filter string="Status"       name="group_state"    context="{'group_by': 'state'}"/>
-                        <filter string="Tanggal Sortir" name="group_date"   context="{'group_by': 'date_sorting'}"/>
+                        <filter string="Pemasok" name="group_supplier" context="{'group_by': 'supplier_id'}"/>
+                        <filter string="Status"  name="group_state"   context="{'group_by': 'state'}"/>
                     </group>
                 </search>
             </field>
         </record>
 
         <!-- ═══════════════════════════════════════════════════
-             Action
+             Action – coconut.sorting (LEGACY, kept for audit access)
              ═══════════════════════════════════════════════════ -->
         <record id="action_coconut_sorting" model="ir.actions.act_window">
-            <field name="name">Sortir Kelapa</field>
+            <field name="name">Sortir Kelapa (Arsip Lama)</field>
             <field name="res_model">coconut.sorting</field>
             <field name="view_mode">list,form</field>
             <field name="search_view_id" ref="view_coconut_sorting_search"/>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">
-                    Buat dokumen Sortir Kelapa pertama Anda!
-                </p>
-            </field>
         </record>
 
         <!-- ═══════════════════════════════════════════════════
-             Menus
+             LEGACY MENUS (hidden – preserved so existing XML IDs don't break)
              ═══════════════════════════════════════════════════ -->
-        <!-- Main menu: Manufaktur Kelapa -->
-        <menuitem id="menu_coconut_manufacturing_root"
-                  name="Manufaktur Kelapa"
-                  sequence="10"/>
-
-        <!-- Submenu: Penerimaan &amp; Sortir -->
+        <!-- Old root menu is replaced by the one in coconut_manufacturing_views.xml -->
+        <!-- This menu is intentionally inactive to hide from UI -->
         <menuitem id="menu_coconut_receiving_sorting"
-                  name="Penerimaan dan Sortir"
+                  name="Penerimaan dan Sortir (Arsip)"
                   parent="menu_coconut_manufacturing_root"
-                  sequence="10"/>
+                  sequence="90"
+                  active="False"/>
 
-        <!-- Menu item: Sortir Kelapa -->
         <menuitem id="menu_coconut_sorting"
-                  name="Sortir Kelapa"
-                  parent="menu_coconut_receiving_sorting"
+                  name="Sortir Kelapa (Arsip)"
+                  parent="menu_coconut_manufacturing_root"
                   action="action_coconut_sorting"
-                  sequence="20"/>
+                  sequence="91"
+                  active="False"/>
+
+        <!-- Sub-menu under Manufacturing root: Laporan Stok Harian -->
+        <menuitem id="menu_coconut_daily_report"
+                  name="Stok Kelapa Harian"
+                  parent="menu_coconut_manufacturing_root"
+                  action="action_coconut_stock_report"
+                  sequence="50"/>
 
     </data>
 </odoo>

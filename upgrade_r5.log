@@ -1,0 +1,63 @@
+2026-07-12 15:39:06,440 7864 INFO ? odoo: Odoo version 18.0-20260415 
+2026-07-12 15:39:06,440 7864 INFO ? odoo: Using configuration file at C:\odoo\odoo.conf 
+2026-07-12 15:39:06,440 7864 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-07-12 15:39:06,440 7864 INFO ? odoo: database: openpg@localhost:5432 
+2026-07-12 15:39:06,660 7864 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-07-12 15:39:06,673 7864 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-07-12 15:39:07,125 7864 INFO diansukses odoo.modules.loading: loading 1 modules... 
+2026-07-12 15:39:07,125 7864 INFO diansukses odoo.modules.loading: 1 modules loaded in 0.00s, 0 queries (+0 extra) 
+2026-07-12 15:39:07,158 7864 INFO diansukses odoo.modules.loading: updating modules list 
+2026-07-12 15:39:07,163 7864 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-12 15:39:08,938 7864 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Penerimaan Kelapa', 'Manufaktur Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:39:08,938 7864 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Penerimaan Kelapa', 'Manufaktur Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:39:09,888 7864 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-07-12 15:39:10,308 7864 INFO diansukses odoo.modules.loading: loading 92 modules... 
+2026-07-12 15:39:12,087 7864 INFO diansukses odoo.modules.loading: Loading module coconut_receiving (76/92) 
+2026-07-12 15:39:12,426 7864 INFO diansukses odoo.modules.registry: module coconut_receiving: creating or updating database tables 
+2026-07-12 15:39:12,455 7864 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'partner_id' 
+2026-07-12 15:39:12,470 7864 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'gross_vehicle_weight' 
+2026-07-12 15:39:12,470 7864 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'tare_vehicle_weight' 
+2026-07-12 15:39:12,537 7864 INFO diansukses odoo.modules.loading: loading coconut_receiving/security/ir.model.access.csv 
+2026-07-12 15:39:12,554 7864 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/sequence.xml 
+2026-07-12 15:39:12,554 7864 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/product_data.xml 
+2026-07-12 15:39:12,753 7864 INFO diansukses odoo.modules.loading: loading coconut_receiving/views/coconut_receipt_views.xml 
+2026-07-12 15:39:12,836 7864 INFO diansukses odoo.addons.base.models.ir_module: module coconut_receiving: no translation for language id_ID 
+2026-07-12 15:39:12,870 7864 INFO diansukses odoo.modules.loading: Module coconut_receiving loaded in 0.78s, 240 queries (+240 other) 
+2026-07-12 15:39:12,970 7864 INFO diansukses odoo.modules.loading: Loading module coconut_sorting (87/92) 
+2026-07-12 15:39:13,370 7864 INFO diansukses odoo.modules.registry: module coconut_sorting: creating or updating database tables 
+2026-07-12 15:39:13,686 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/security/ir.model.access.csv 
+2026-07-12 15:39:13,722 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/sequence.xml 
+2026-07-12 15:39:13,729 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/location_data.xml 
+2026-07-12 15:39:13,738 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_manufacturing_views.xml 
+2026-07-12 15:39:13,786 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_stock_report_views.xml 
+2026-07-12 15:39:13,803 7864 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_sorting_views.xml 
+2026-07-12 15:39:13,886 7864 INFO diansukses odoo.addons.base.models.ir_module: module coconut_sorting: no translation for language id_ID 
+2026-07-12 15:39:13,906 7864 INFO diansukses odoo.modules.loading: Module coconut_sorting loaded in 0.94s, 324 queries (+324 other) 
+2026-07-12 15:39:13,984 7864 INFO diansukses odoo.modules.loading: 92 modules loaded in 3.68s, 564 queries (+564 extra) 
+2026-07-12 15:39:14,319 7864 WARNING diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'partner_id' 
+2026-07-12 15:39:14,321 7864 WARNING diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'gross_vehicle_weight' 
+2026-07-12 15:39:14,323 7864 WARNING diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'tare_vehicle_weight' 
+2026-07-12 15:39:14,679 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 368@ir.ui.menu (coconut_receiving.menu_purchase_coconut_receipt) 
+2026-07-12 15:39:14,741 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62288] 
+2026-07-12 15:39:14,742 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.ui.menu records with IDs: [368] 
+2026-07-12 15:39:14,742 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 2395@ir.model.fields.selection (coconut_receiving.selection__coconut_receipt__state__received) 
+2026-07-12 15:39:14,752 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62274] 
+2026-07-12 15:39:14,752 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.fields.selection records with IDs: [2395] 
+2026-07-12 15:39:14,752 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 2394@ir.model.fields.selection (coconut_receiving.selection__coconut_receipt__state__approved) 
+2026-07-12 15:39:14,765 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62273] 
+2026-07-12 15:39:14,765 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.fields.selection records with IDs: [2394] 
+2026-07-12 15:39:14,765 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 2393@ir.model.fields.selection (coconut_receiving.selection__coconut_receipt__state__inspection) 
+2026-07-12 15:39:14,772 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62272] 
+2026-07-12 15:39:14,772 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.fields.selection records with IDs: [2393] 
+2026-07-12 15:39:14,772 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 10532@ir.model.fields (coconut_receiving.field_coconut_receipt__avg_weight) 
+2026-07-12 15:39:14,819 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62245] 
+2026-07-12 15:39:14,819 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.fields records with IDs: [10532] 
+2026-07-12 15:39:14,819 7864 INFO diansukses odoo.addons.base.models.ir_model: Deleting 10527@ir.model.fields (coconut_receiving.field_coconut_receipt__delivery_note) 
+2026-07-12 15:39:14,963 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.data records with IDs: [62240] 
+2026-07-12 15:39:14,963 7864 INFO diansukses odoo.models.unlink: User #1 deleted ir.model.fields records with IDs: [10527] 
+2026-07-12 15:39:16,118 7864 INFO diansukses odoo.modules.loading: Modules loaded. 
+2026-07-12 15:39:16,119 7864 INFO diansukses odoo.modules.registry: Registry changed, signaling through the database 
+2026-07-12 15:39:16,119 7864 INFO diansukses odoo.modules.registry: Registry loaded in 9.084s 
+2026-07-12 15:39:16,119 7864 INFO diansukses odoo.service.server: Initiating shutdown 
+2026-07-12 15:39:16,119 7864 INFO diansukses odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-12 15:39:16,119 7864 INFO diansukses odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  

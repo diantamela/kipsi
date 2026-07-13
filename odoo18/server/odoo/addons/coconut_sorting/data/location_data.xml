@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
+        <!-- Virtual production location for sorting (legacy – keep for old records) -->
         <record id="stock_location_coconut_sorting" model="stock.location">
             <field name="name">Produksi Sortir Kelapa</field>
+            <field name="usage">production</field>
+        </record>
+
+        <!-- Virtual production location for coconut manufacturing (new) -->
+        <record id="stock_location_coconut_manufacturing" model="stock.location">
+            <field name="name">Produksi Manufaktur Kelapa</field>
             <field name="usage">production</field>
         </record>
     </data>

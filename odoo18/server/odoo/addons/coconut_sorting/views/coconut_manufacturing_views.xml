@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ═══════════════════════════════════════════════════════════════
+         Form View – coconut.manufacturing
+         Tabs: Sumber Penerimaan | Sortir Kelapa | Sheller | Parer |
+               Ringkasan Persediaan | Pergerakan Stok | Catatan
+         ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_coconut_manufacturing_form" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.form</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <form string="Manufaktur Kelapa">
+                <header>
+                    <button name="action_confirm"
+                            id="btn_confirm_mfg"
+                            string="Konfirmasi"
+                            type="object"
+                            invisible="state != 'draft'"
+                            class="oe_highlight"/>
+                    <button name="action_validate"
+                            id="btn_validate_mfg"
+                            string="Validasi &amp; Buat Pergerakan Stok"
+                            type="object"
+                            invisible="state != 'confirmed'"
+                            class="oe_highlight"/>
+                    <button name="action_cancel"
+                            id="btn_cancel_mfg"
+                            string="Batalkan"
+                            type="object"
+                            invisible="state in ('done', 'cancelled')"/>
+                    <button name="action_reset_draft"
+                            id="btn_reset_mfg"
+                            string="Kembalikan ke Draft"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- ─── Header Info ─── -->
+                    <group>
+                        <group string="Informasi Produksi">
+                            <field name="production_date"
+                                   readonly="state != 'draft'"/>
+                            <field name="responsible_id"
+                                   readonly="state != 'draft'"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                        <group string="Sumber Kelapa">
+                            <field name="receipt_id"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 1: Sumber Penerimaan
+                             ═══════════════════════════════════════════ -->
+                        <page string="Sumber Penerimaan" name="tab_sumber">
+                            <group>
+                                <group string="Data Penerimaan">
+                                    <field name="receipt_code"
+                                           string="Kode Penerimaan"
+                                           readonly="1"/>
+                                    <field name="supplier_id"
+                                           string="Pemasok"
+                                           readonly="1"/>
+                                    <field name="coconut_origin"
+                                           string="Asal Kelapa"
+                                           readonly="1"/>
+                                    <field name="receipt_date"
+                                           string="Tanggal Penerimaan"
+                                           readonly="1"/>
+                                    <field name="vehicle_number"
+                                           string="Nomor Polisi"
+                                           readonly="1"/>
+                                    <field name="driver_name"
+                                           string="Nama Supir"
+                                           readonly="1"/>
+                                </group>
+                                <group string="Stok Kelapa Bulat">
+                                    <field name="net_received_weight"
+                                           string="Total Diterima (Kg)"
+                                           readonly="1"/>
+                                    <field name="remaining_kelapa_bulat"
+                                           string="Sisa dari Penerimaan Ini (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 2: Sortir Kelapa
+                             ═══════════════════════════════════════════ -->
+                        <page string="Sortir Kelapa" name="tab_sortir">
+                            <group string="Input Sortir">
+                                <group>
+                                    <field name="raw_coconut_processed"
+                                           string="Kelapa Bulat Diproses (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="total_coconut_count"
+                                           string="Jumlah Kelapa (Butir)"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Ketersediaan">
+                                    <field name="remaining_kelapa_bulat"
+                                           string="Sisa Kelapa Bulat (Kg)"
+                                           readonly="1"/>
+                                    <field name="remaining_unsorted"
+                                           string="Sisa Setelah Proses Ini (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Hasil Sortir">
+                                <group>
+                                    <field name="good_coconut_weight"
+                                           string="Kelapa Layak Produksi (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="reject_coconut_weight"
+                                           string="Kelapa Reject (Kg)"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Statistik">
+                                    <field name="kg_per_coconut"
+                                           string="KG per Butir"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 3: Sheller
+                             ═══════════════════════════════════════════ -->
+                        <page string="Sheller" name="tab_sheller">
+                            <group string="Machine Sheller (dari Kelapa Layak Produksi)">
+                                <group>
+                                    <field name="machine_sheller_input"
+                                           string="Input Machine Sheller (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="machine_sheller_output"
+                                           string="Output Machine Sheller (Kg)"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Ketersediaan Kelapa Layak">
+                                    <field name="remaining_layak"
+                                           string="Sisa Kelapa Layak Setelah Proses Ini (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Manual Sheller (dari Kelapa Reject)">
+                                <group>
+                                    <field name="manual_sheller_input"
+                                           string="Input Manual Sheller (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="manual_sheller_output"
+                                           string="Output Manual Sheller (Kg)"
+                                           readonly="state != 'draft'"/>
+                                </group>
+                                <group string="Ketersediaan Kelapa Reject">
+                                    <field name="remaining_reject"
+                                           string="Sisa Kelapa Reject Setelah Proses Ini (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Ringkasan Sheller">
+                                <group>
+                                    <field name="total_sheller_input"
+                                           string="Total Input Sheller (Kg)"
+                                           readonly="1"/>
+                                    <field name="total_sheller_output"
+                                           string="Total Output Kelapa Sheller (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 4: Parer
+                             ═══════════════════════════════════════════ -->
+                        <page string="Parer" name="tab_parer">
+                            <group string="Proses Parer (dari Kelapa Sheller)">
+                                <group>
+                                    <field name="available_kelapa_sheller"
+                                           string="Kelapa Sheller Tersedia (Kg)"
+                                           readonly="1"/>
+                                    <field name="parer_input"
+                                           string="Input Parer (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="parer_output"
+                                           string="Output Parer / Kelapa Parer (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="remaining_kelapa_sheller"
+                                           string="Sisa Kelapa Sheller (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                            <group string="Catatan Parer">
+                                <field name="parer_notes"
+                                       nolabel="1"
+                                       readonly="state != 'draft'"/>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 5: Ringkasan Persediaan
+                             ═══════════════════════════════════════════ -->
+                        <page string="Ringkasan Persediaan" name="tab_ringkasan">
+                            <group string="Hasil Proses Manufaktur Ini">
+                                <group string="Sortir">
+                                    <field name="raw_coconut_processed"
+                                           string="Kelapa Bulat Diproses (Kg)"
+                                           readonly="1"/>
+                                    <field name="good_coconut_weight"
+                                           string="→ Kelapa Layak Produksi (Kg)"
+                                           readonly="1"/>
+                                    <field name="reject_coconut_weight"
+                                           string="→ Kelapa Reject (Kg)"
+                                           readonly="1"/>
+                                </group>
+                                <group string="Sheller">
+                                    <field name="machine_sheller_input"
+                                           string="Machine Sheller Input (Kg)"
+                                           readonly="1"/>
+                                    <field name="manual_sheller_input"
+                                           string="Manual Sheller Input (Kg)"
+                                           readonly="1"/>
+                                    <field name="total_sheller_output"
+                                           string="→ Total Kelapa Sheller (Kg)"
+                                           readonly="1"/>
+                                </group>
+                                <group string="Parer">
+                                    <field name="parer_input"
+                                           string="Parer Input (Kg)"
+                                           readonly="1"/>
+                                    <field name="parer_output"
+                                           string="→ Kelapa Parer (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 6: Pergerakan Stok
+                             ═══════════════════════════════════════════ -->
+                        <page string="Pergerakan Stok" name="tab_stok"
+                              invisible="not sort_raw_move_id and not shell_output_move_id and not parer_output_move_id">
+                            <group string="Sortir">
+                                <field name="sort_raw_move_id"
+                                       string="Konsumsi Kelapa Bulat"
+                                       readonly="1"/>
+                                <field name="sort_good_move_id"
+                                       string="Produksi Kelapa Layak"
+                                       readonly="1"/>
+                                <field name="sort_reject_move_id"
+                                       string="Produksi Kelapa Reject"
+                                       readonly="1"/>
+                            </group>
+                            <group string="Sheller"
+                                   invisible="not shell_output_move_id">
+                                <field name="shell_consume_layak_move_id"
+                                       string="Konsumsi Kelapa Layak (Machine)"
+                                       readonly="1"/>
+                                <field name="shell_consume_reject_move_id"
+                                       string="Konsumsi Kelapa Reject (Manual)"
+                                       readonly="1"/>
+                                <field name="shell_output_move_id"
+                                       string="Produksi Kelapa Sheller"
+                                       readonly="1"/>
+                            </group>
+                            <group string="Parer"
+                                   invisible="not parer_output_move_id">
+                                <field name="parer_consume_move_id"
+                                       string="Konsumsi Kelapa Sheller"
+                                       readonly="1"/>
+                                <field name="parer_output_move_id"
+                                       string="Produksi Kelapa Parer"
+                                       readonly="1"/>
+                            </group>
+                        </page>
+
+                        <!-- ═══════════════════════════════════════════
+                             Tab 7: Catatan
+                             ═══════════════════════════════════════════ -->
+                        <page string="Catatan" name="tab_catatan">
+                            <group>
+                                <field name="notes"
+                                       string="Catatan Produksi"
+                                       nolabel="1"
+                                       readonly="state == 'done'"/>
+                            </group>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         List View – coconut.manufacturing
+         ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_coconut_manufacturing_list" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.list</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <list string="Manufaktur Kelapa"
+                  decoration-info="state == 'draft'"
+                  decoration-warning="state == 'confirmed'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name" string="Kode Manufaktur"/>
+                <field name="production_date" string="Tgl Produksi"/>
+                <field name="receipt_id" string="Penerimaan"/>
+                <field name="supplier_id" string="Pemasok"/>
+                <field name="raw_coconut_processed" string="Kelapa Diproses (Kg)"
+                       sum="Total Diproses"/>
+                <field name="good_coconut_weight" string="Layak (Kg)"
+                       sum="Total Layak"/>
+                <field name="reject_coconut_weight" string="Reject (Kg)"
+                       sum="Total Reject"/>
+                <field name="total_sheller_output" string="Sheller (Kg)"
+                       sum="Total Sheller"/>
+                <field name="parer_output" string="Parer (Kg)"
+                       sum="Total Parer"/>
+                <field name="state"
+                       widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'confirmed'"
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Search View – coconut.manufacturing
+         ═══════════════════════════════════════════════════════════════ -->
+    <record id="view_coconut_manufacturing_search" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.search</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <search string="Cari Manufaktur Kelapa">
+                <field name="name" string="Kode Manufaktur"/>
+                <field name="receipt_id" string="Penerimaan Kelapa"/>
+                <field name="supplier_id" string="Pemasok"/>
+                <field name="production_date" string="Tanggal Produksi"/>
+                <separator/>
+                <filter string="Draft"        name="draft"     domain="[('state','=','draft')]"/>
+                <filter string="Dikonfirmasi" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Selesai"      name="done"      domain="[('state','=','done')]"/>
+                <filter string="Dibatalkan"   name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <group expand="0" string="Kelompokkan Berdasarkan">
+                    <filter string="Pemasok"        name="grp_supplier" context="{'group_by':'supplier_id'}"/>
+                    <filter string="Status"         name="grp_state"    context="{'group_by':'state'}"/>
+                    <filter string="Tanggal Produksi" name="grp_date"   context="{'group_by':'production_date:month'}"/>
+                    <filter string="Penerimaan"     name="grp_receipt"  context="{'group_by':'receipt_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Action – coconut.manufacturing
+         ═══════════════════════════════════════════════════════════════ -->
+    <record id="action_coconut_manufacturing" model="ir.actions.act_window">
+        <field name="name">Manufaktur Kelapa</field>
+        <field name="res_model">coconut.manufacturing</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_manufacturing_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Buat dokumen Manufaktur Kelapa baru
+            </p>
+            <p>
+                Dokumen ini mencakup proses Sortir, Machine/Manual Sheller, dan Parer
+                dalam satu alur manufaktur kelapa.
+            </p>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Menus – Manufaktur Kelapa
+         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- Root menu (new – replaces sorting's root menu) -->
+    <menuitem id="menu_coconut_manufacturing_root"
+              name="Manufaktur Kelapa"
+              sequence="45"/>
+
+    <!-- Sub-menu: Manufaktur -->
+    <menuitem id="menu_coconut_manufacturing"
+              name="Manufaktur Kelapa"
+              parent="menu_coconut_manufacturing_root"
+              action="action_coconut_manufacturing"
+              sequence="10"/>
+
+</odoo>

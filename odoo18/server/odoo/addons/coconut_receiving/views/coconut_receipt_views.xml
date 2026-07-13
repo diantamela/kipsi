@@ -2,7 +2,7 @@
 <odoo>
     <!-- ═══════════════════════════════════════════════════
          Form View – coconut.receipt
-         Owned by: coconut_receiving
+         Tabs: Data Timbangan | Penilaian Kualitas | Detail Penerimaan | Lampiran | Pergerakan Stok
          ═══════════════════════════════════════════════════ -->
     <record id="view_coconut_receipt_form" model="ir.ui.view">
         <field name="name">coconut.receipt.form</field>
@@ -10,32 +10,25 @@
         <field name="arch" type="xml">
             <form string="Penerimaan Kelapa">
                 <header>
-                    <button name="action_start_inspection"
-                            string="Mulai Pemeriksaan"
+                    <button name="action_validate"
+                            id="btn_validate_receipt"
+                            string="Validasi"
                             type="object"
                             invisible="state != 'draft'"
                             class="oe_highlight"/>
-                    <button name="action_approve"
-                            string="Setujui"
-                            type="object"
-                            invisible="state != 'inspection'"
-                            class="oe_highlight"/>
-                    <button name="action_receive"
-                            string="Terima ke Persediaan"
-                            type="object"
-                            invisible="state != 'approved'"
-                            class="oe_highlight"/>
                     <button name="action_cancel"
+                            id="btn_cancel_receipt"
                             string="Batalkan"
                             type="object"
-                            invisible="state in ('received', 'cancelled')"/>
+                            invisible="state in ('done', 'cancelled')"/>
                     <button name="action_reset_draft"
+                            id="btn_reset_receipt"
                             string="Kembalikan ke Draft"
                             type="object"
                             invisible="state != 'cancelled'"/>
                     <field name="state"
                            widget="statusbar"
-                           statusbar_visible="draft,inspection,approved,received"/>
+                           statusbar_visible="draft,done"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -44,110 +37,169 @@
                         </h1>
                     </div>
 
-                    <!-- ─── Section 1: Informasi Penerimaan ─── -->
+                    <!-- ─── Header Info ─── -->
                     <group>
-                        <group string="Informasi Penerimaan">
-                            <field name="date_receipt" readonly="state != 'draft'"/>
-                            <field name="purchase_id" readonly="state != 'draft'"/>
-                            <field name="partner_id" readonly="state != 'draft'"/>
-                            <field name="partner_ref" readonly="1"/>
+                        <group string="Informasi Umum">
+                            <field name="partner_id"
+                                   readonly="state == 'done'"/>
+                            <field name="origin"
+                                   string="Asal Kelapa"
+                                   readonly="state == 'done'"/>
                             <field name="company_id" invisible="1"/>
                         </group>
-                        <group string="Data Pemasok dan Sopir">
-                            <field name="driver_name" readonly="state != 'draft'"/>
-                            <field name="driver_phone" readonly="state != 'draft'"/>
-                            <field name="vehicle_plate" readonly="state != 'draft'"/>
-                            <field name="delivery_note" readonly="state != 'draft'"/>
-                            <field name="origin" readonly="state != 'draft'"/>
+                        <group string="Kendaraan &amp; Pengemudi">
+                            <field name="driver_name"
+                                   readonly="state == 'done'"/>
+                            <field name="driver_phone"
+                                   readonly="state == 'done'"/>
+                            <field name="vehicle_plate"
+                                   readonly="state == 'done'"/>
                         </group>
                     </group>
 
                     <notebook>
-                        <!-- ─── Tab 1: Penimbangan ─── -->
-                        <page string="Data Berat">
+                        <!-- ─── Tab 1: Data Timbangan ─── -->
+                        <page string="Data Timbangan" name="tab_timbangan">
                             <group>
-                                <group string="Informasi Berat">
+                                <group string="Waktu">
+                                    <field name="entry_datetime"
+                                           string="Tanggal &amp; Waktu Masuk"
+                                           readonly="state == 'done'"/>
+                                    <field name="exit_datetime"
+                                           string="Tanggal &amp; Waktu Keluar"
+                                           readonly="state == 'done'"/>
+                                </group>
+                                <group string="Dokumen Administrasi">
+                                    <field name="item_name"
+                                           string="Nama Barang"
+                                           readonly="state == 'done'"/>
+                                    <field name="reference_number"
+                                           string="Nomor Referensi"
+                                           readonly="state == 'done'"/>
+                                    <field name="npwp"
+                                           string="NPWP"
+                                           readonly="state == 'done'"/>
+                                    <field name="pphd2"
+                                           string="PPHD2"
+                                           readonly="state == 'done'"/>
+                                </group>
+                            </group>
+                            <group string="Data Penimbangan">
+                                <group string="Berat Kendaraan">
+                                    <field name="gross_vehicle_weight"
+                                           string="Berat Kotor Kendaraan (Kg)"
+                                           readonly="state == 'done'"/>
+                                    <field name="tare_vehicle_weight"
+                                           string="Berat Tara Kendaraan (Kg)"
+                                           readonly="state == 'done'"/>
+                                    <field name="pot_weight"
+                                           string="Berat Wadah/Pot (Kg)"
+                                           readonly="state == 'done'"/>
+                                </group>
+                                <group string="Hasil Penimbangan">
+                                    <field name="net_received_weight"
+                                           string="Berat Bersih Diterima (Kg)"
+                                           readonly="1"
+                                           class="o_field_highlight"/>
                                     <field name="total_count"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="net_weight"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                </group>
-                                <group string="Detail Reject (saat penerimaan)">
-                                    <field name="reject_pecah"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="reject_kecil"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="reject_tunas"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="reject_busuk"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="reject_muda"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                </group>
-                                <group string="Perhitungan">
-                                    <field name="total_reject"/>
-                                    <field name="gross_weight"/>
-                                    <field name="avg_weight" string="KG/Butir"/>
-                                </group>
-                                <!-- Historical sorting fields (legacy) -->
-                                <group string="Data Sortir Awal (Historis)"
-                                       invisible="not machine_shelling_weight and not manual_shelling_weight">
-                                    <field name="machine_shelling_weight"
-                                           string="Berat Kelapa Layak – Data Lama (Kg)"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="manual_shelling_weight"
-                                           string="Berat Kelapa Reject – Data Lama (Kg)"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="total_sorting_weight"
-                                           string="Total Data Sortir Lama (Kg)"/>
+                                           string="Jumlah Kelapa (Butir)"
+                                           readonly="state == 'done'"/>
+                                    <field name="avg_weight_per_coconut"
+                                           string="KG per Butir"
+                                           readonly="1"/>
                                 </group>
                             </group>
                         </page>
 
-                        <!-- ─── Tab 2: Kualitas &amp; Penerimaan ─── -->
-                        <page string="Kualitas dan Penerimaan">
+                        <!-- ─── Tab 2: Penilaian Kualitas ─── -->
+                        <page string="Penilaian Kualitas" name="tab_kualitas">
                             <group>
-                                <group string="Penilaian Kualitas">
+                                <group string="Penilaian">
                                     <field name="quality_grade"
-                                           readonly="state not in ('draft', 'inspection')"/>
-                                    <field name="quality_notes"
-                                           readonly="state not in ('draft', 'inspection')"/>
+                                           string="Nilai Kualitas"
+                                           readonly="state == 'done'"/>
+                                    <field name="avg_quality"
+                                           string="Rata-rata Kualitas"
+                                           readonly="state == 'done'"/>
                                 </group>
-                                <group string="Detail Penerimaan">
+                            </group>
+                            <group string="Catatan Kualitas">
+                                <field name="quality_notes"
+                                       nolabel="1"
+                                       readonly="state == 'done'"/>
+                            </group>
+                        </page>
+
+                        <!-- ─── Tab 3: Detail Penerimaan ─── -->
+                        <page string="Detail Penerimaan" name="tab_detail">
+                            <group>
+                                <group string="Personel">
                                     <field name="receiving_employee_id"
-                                           readonly="state != 'draft'"/>
-                                    <field name="receiving_time" readonly="1"/>
+                                           string="Karyawan Penerima"
+                                           readonly="state == 'done'"/>
+                                    <field name="administrator_id"
+                                           string="Administrator"
+                                           readonly="state == 'done'"/>
+                                    <field name="receiving_time"
+                                           string="Waktu Validasi"
+                                           readonly="1"/>
+                                </group>
+                                <group string="Referensi Stok">
                                     <field name="picking_id"
+                                           string="Penerimaan Stok (Picking)"
+                                           readonly="1"
                                            invisible="not picking_id"/>
                                 </group>
                             </group>
-                            <group string="Catatan">
+                            <group string="Catatan Umum">
                                 <field name="notes"
                                        nolabel="1"
-                                       readonly="state not in ('draft', 'inspection')"/>
-                            </group>
-                            <group string="Lampiran">
-                                <field name="attachment_delivery"
-                                       filename="delivery_note"/>
-                                <field name="attachment_weighing"
-                                       filename="name"/>
+                                       readonly="state == 'done'"/>
                             </group>
                         </page>
 
-                        <!-- ─── Tab 3: Informasi Stok ─── -->
-                        <page string="Pergerakan Persediaan" invisible="not move_ids">
+                        <!-- ─── Tab 4: Lampiran ─── -->
+                        <page string="Lampiran" name="tab_lampiran">
+                            <group>
+                                <group string="Dokumen">
+                                    <field name="attachment_delivery"
+                                           string="Surat Jalan"
+                                           filename="attachment_delivery_name"
+                                           widget="binary"/>
+                                    <field name="attachment_delivery_name"
+                                           invisible="1"/>
+                                    <field name="attachment_weighing"
+                                           string="Slip Timbangan"
+                                           filename="attachment_weighing_name"
+                                           widget="binary"/>
+                                    <field name="attachment_weighing_name"
+                                           invisible="1"/>
+                                    <field name="attachment_additional"
+                                           string="Lampiran Tambahan"
+                                           filename="attachment_additional_name"
+                                           widget="binary"/>
+                                    <field name="attachment_additional_name"
+                                           invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ─── Tab 5: Pergerakan Stok ─── -->
+                        <page string="Pergerakan Stok" name="tab_stok"
+                              invisible="not picking_id">
                             <field name="move_ids" readonly="1">
-                                <list>
-                                    <field name="product_id"/>
-                                    <field name="product_uom_qty"/>
-                                    <field name="product_uom"/>
-                                    <field name="state"/>
+                                <list string="Pergerakan Stok">
+                                    <field name="product_id" string="Produk"/>
+                                    <field name="product_uom_qty" string="Qty Diminta"/>
+                                    <field name="quantity" string="Qty Dilakukan"/>
+                                    <field name="product_uom" string="Satuan"/>
+                                    <field name="state" string="Status"
+                                           widget="badge"
+                                           decoration-success="state == 'done'"
+                                           decoration-warning="state == 'assigned'"/>
                                 </list>
                             </field>
                         </page>
-
-                        <!-- ─── Tab 4: Informasi Sortir (injected by coconut_sorting) ─── -->
-                        <!-- This tab is added by coconut_sorting via an inherited view. -->
 
                     </notebook>
                 </sheet>
@@ -169,19 +221,21 @@
         <field name="arch" type="xml">
             <list string="Penerimaan Kelapa"
                   decoration-info="state == 'draft'"
-                  decoration-warning="state == 'inspection'"
-                  decoration-success="state == 'received'">
-                <field name="name"/>
-                <field name="date_receipt"/>
-                <field name="partner_id"/>
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name" string="Kode Penerimaan"/>
+                <field name="entry_datetime" string="Tgl Masuk"/>
+                <field name="partner_id" string="Pemasok"/>
+                <field name="origin" string="Asal Kelapa"/>
                 <field name="vehicle_plate" string="No. Polisi"/>
-                <field name="gross_weight" sum="Total Kotor"/>
-                <field name="net_weight" sum="Total Bersih"/>
+                <field name="gross_vehicle_weight" string="Bruto (Kg)" sum="Total Bruto"/>
+                <field name="tare_vehicle_weight" string="Tara (Kg)" sum="Total Tara"/>
+                <field name="net_received_weight" string="Bersih (Kg)" sum="Total Bersih"/>
                 <field name="state"
                        widget="badge"
                        decoration-info="state == 'draft'"
-                       decoration-warning="state == 'inspection'"
-                       decoration-success="state == 'received'"/>
+                       decoration-success="state == 'done'"
+                       decoration-muted="state == 'cancelled'"/>
             </list>
         </field>
     </record>
@@ -194,17 +248,20 @@
         <field name="model">coconut.receipt</field>
         <field name="arch" type="xml">
             <search string="Cari Penerimaan Kelapa">
-                <field name="name"/>
-                <field name="partner_id"/>
-                <field name="vehicle_plate" string="Nomor Polisi Kendaraan"/>
-                <filter string="Draft"        name="draft"      domain="[('state','=','draft')]"/>
-                <filter string="Pemeriksaan"  name="inspection" domain="[('state','=','inspection')]"/>
-                <filter string="Disetujui"    name="approved"   domain="[('state','=','approved')]"/>
-                <filter string="Diterima"     name="received"   domain="[('state','=','received')]"/>
+                <field name="name" string="Kode Penerimaan"/>
+                <field name="partner_id" string="Pemasok"/>
+                <field name="vehicle_plate" string="Nomor Polisi"/>
+                <field name="origin" string="Asal Kelapa"/>
+                <separator/>
+                <filter string="Draft"     name="draft"    domain="[('state','=','draft')]"/>
+                <filter string="Selesai"   name="done"     domain="[('state','=','done')]"/>
+                <filter string="Dibatalkan" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
                 <group expand="0" string="Kelompokkan Berdasarkan">
-                    <filter string="Pemasok" name="group_by_supplier" context="{'group_by':'partner_id'}"/>
-                    <filter string="Status"  name="group_by_state"    context="{'group_by':'state'}"/>
-                    <filter string="Tanggal" name="group_by_date"     context="{'group_by':'date_receipt'}"/>
+                    <filter string="Pemasok"  name="grp_supplier" context="{'group_by':'partner_id'}"/>
+                    <filter string="Status"   name="grp_state"    context="{'group_by':'state'}"/>
+                    <filter string="Asal"     name="grp_origin"   context="{'group_by':'origin'}"/>
+                    <filter string="Tanggal"  name="grp_date"     context="{'group_by':'entry_datetime:month'}"/>
                 </group>
             </search>
         </field>
@@ -223,7 +280,8 @@
                 Buat Penerimaan Kelapa baru
             </p>
             <p>
-                Kelola proses penerimaan, penimbangan, dan penyortiran kelapa.
+                Catat data timbangan, penilaian kualitas, dan lakukan validasi
+                untuk menambah Kelapa Bulat ke persediaan gudang.
             </p>
         </field>
     </record>
@@ -233,18 +291,11 @@
          ═══════════════════════════════════════════════════ -->
     <menuitem id="menu_coconut_receiving_root"
               name="Penerimaan Kelapa"
-              sequence="40"
-              web_icon="coconut_receiving,static/description/icon.png"/>
+              sequence="40"/>
     <menuitem id="menu_coconut_receipt"
               name="Penerimaan"
               parent="menu_coconut_receiving_root"
               action="action_coconut_receipt"
               sequence="10"/>
 
-    <!-- Also available under Purchase menu -->
-    <menuitem id="menu_purchase_coconut_receipt"
-              name="Penerimaan Kelapa"
-              parent="purchase.menu_procurement_management"
-              action="action_coconut_receipt"
-              sequence="20"/>
 </odoo>

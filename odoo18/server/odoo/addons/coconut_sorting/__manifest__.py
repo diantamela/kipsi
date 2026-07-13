@@ -1,29 +1,35 @@
 {
-    'name': 'Sortir Kelapa',
-    'version': '18.0.2.0.0',
-    'summary': 'Modul untuk mensortir kelapa setelah penerimaan',
+    'name': 'Manufaktur Kelapa',
+    'version': '18.0.3.0.0',
+    'summary': 'Sortir, Sheller, dan Parer dalam satu dokumen manufaktur kelapa',
     'description': """
-        Modul untuk mensortir kelapa berdasarkan Laporan Hasil Sortiran Kelapa.
+        Modul Manufaktur Kelapa untuk PT Coco Murni Prima Jaya.
 
-        Proses:
-          Kelapa Bulat Belum Sortir
-            → Kelapa Layak Produksi
-            → Kelapa Reject
-            → Susut Sortir (scrap)
+        Proses yang tercakup dalam satu dokumen:
+          1. Sortir Kelapa  : Kelapa Bulat → Kelapa Layak + Kelapa Reject
+          2. Machine Sheller: Kelapa Layak → Kelapa Sheller
+          3. Manual Sheller : Kelapa Reject → Kelapa Sheller
+          4. Parer          : Kelapa Sheller → Kelapa Parer
 
-        Modul ini meng-extend coconut.receipt untuk menampilkan ringkasan sortir.
+        Laporan: Stok Kelapa Harian (Kelapa Bulat + Layak + Reject)
+
+        Menyimpan data sortir lama (coconut.sorting) sebagai arsip read-only.
     """,
     'author': 'PT Coco Murni Prima Jaya',
     'category': 'Manufacturing',
-    'depends': ['base', 'stock', 'product', 'mail', 'coconut_receiving'],
+    'depends': ['base', 'stock', 'product', 'mail', 'hr', 'uom', 'coconut_receiving'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequence.xml',
-        'data/product_data.xml',
         'data/location_data.xml',
+        'views/coconut_manufacturing_views.xml',
+        'views/coconut_stock_report_views.xml',
         'views/coconut_sorting_views.xml',
     ],
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
+    'tests': [
+        'tests/test_coconut_manufacturing.py',
+    ],
 }

@@ -1,0 +1,115 @@
+2026-07-12 15:36:42,464 14436 INFO ? odoo: Odoo version 18.0-20260415 
+2026-07-12 15:36:42,465 14436 INFO ? odoo: Using configuration file at C:\odoo\odoo.conf 
+2026-07-12 15:36:42,465 14436 INFO ? odoo: addons paths: ['C:\\odoo\\odoo18\\server\\odoo\\addons', 'c:\\odoo\\odoo18\\sessions\\addons\\18.0', 'c:\\odoo\\odoo18\\server\\odoo\\addons'] 
+2026-07-12 15:36:42,465 14436 INFO ? odoo: database: openpg@localhost:5432 
+2026-07-12 15:36:42,664 14436 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltopdf binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe 
+2026-07-12 15:36:42,701 14436 INFO ? odoo.addons.base.models.ir_actions_report: Will use the Wkhtmltoimage binary at C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe 
+2026-07-12 15:36:43,198 14436 INFO diansukses odoo.modules.loading: loading 1 modules... 
+2026-07-12 15:36:43,204 14436 INFO diansukses odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2026-07-12 15:36:43,237 14436 INFO diansukses odoo.modules.loading: updating modules list 
+2026-07-12 15:36:43,237 14436 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on [] to user __system__ #1 via n/a 
+2026-07-12 15:36:45,030 14436 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_upgrade on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:36:45,030 14436 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.update_list on ['Penerimaan Kelapa'] to user __system__ #1 via n/a 
+2026-07-12 15:36:46,062 14436 INFO diansukses odoo.addons.base.models.ir_module: ALLOW access to module.button_install on [] to user __system__ #1 via n/a 
+2026-07-12 15:36:46,495 14436 INFO diansukses odoo.modules.loading: loading 92 modules... 
+2026-07-12 15:36:48,412 14436 INFO diansukses odoo.modules.loading: Loading module coconut_receiving (76/92) 
+2026-07-12 15:36:48,745 14436 INFO diansukses odoo.modules.registry: module coconut_receiving: creating or updating database tables 
+2026-07-12 15:36:48,795 14436 INFO diansukses odoo.models: Prepare computation of coconut.receipt.net_received_weight 
+2026-07-12 15:36:48,795 14436 INFO diansukses odoo.models: Prepare computation of coconut.receipt.avg_weight_per_coconut 
+2026-07-12 15:36:48,828 14436 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'partner_id' 
+2026-07-12 15:36:48,828 14436 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'gross_vehicle_weight' 
+2026-07-12 15:36:48,828 14436 INFO diansukses odoo.schema: Table 'coconut_receipt': unable to set NOT NULL on column 'tare_vehicle_weight' 
+2026-07-12 15:36:48,945 14436 INFO diansukses odoo.modules.loading: loading coconut_receiving/security/ir.model.access.csv 
+2026-07-12 15:36:48,995 14436 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/sequence.xml 
+2026-07-12 15:36:49,026 14436 INFO diansukses odoo.modules.loading: loading coconut_receiving/data/product_data.xml 
+2026-07-12 15:36:49,511 14436 INFO diansukses odoo.modules.loading: loading coconut_receiving/views/coconut_receipt_views.xml 
+2026-07-12 15:36:49,660 14436 INFO diansukses odoo.addons.base.models.ir_module: module coconut_receiving: no translation for language id_ID 
+2026-07-12 15:36:49,688 14436 INFO diansukses odoo.modules.loading: Module coconut_receiving loaded in 1.28s, 371 queries (+371 other) 
+2026-07-12 15:36:49,977 14436 INFO diansukses odoo.modules.loading: Loading module coconut_sorting (87/92) 
+2026-07-12 15:36:50,327 14436 INFO diansukses odoo.modules.registry: module coconut_sorting: creating or updating database tables 
+2026-07-12 15:36:50,753 14436 INFO diansukses odoo.modules.loading: loading coconut_sorting/security/ir.model.access.csv 
+2026-07-12 15:36:50,782 14436 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/sequence.xml 
+2026-07-12 15:36:50,782 14436 INFO diansukses odoo.modules.loading: loading coconut_sorting/data/location_data.xml 
+2026-07-12 15:36:50,811 14436 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_manufacturing_views.xml 
+2026-07-12 15:36:50,894 14436 INFO diansukses odoo.modules.loading: loading coconut_sorting/views/coconut_sorting_views.xml 
+2026-07-12 15:36:50,994 14436 WARNING diansukses odoo.modules.loading: Transient module states were reset 
+2026-07-12 15:36:50,994 14436 ERROR diansukses odoo.modules.registry: Failed to load registry 
+2026-07-12 15:36:50,994 14436 CRITICAL diansukses odoo.service.server: Failed to initialize database `diansukses`. 
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\tools\cache.py", line 103, in lookup
+    r = d[key]
+        ~^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\lru.py", line 33, in __getitem__
+    a = self.d[obj]
+        ~~~~~~^^^^^
+KeyError: ('ir.model.data', <function IrModelData._xmlid_lookup at 0x0000016C886CE700>, 'coconut_sorting.action_coconut_stock_report')
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 590, in _tag_root
+    f(rec)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 293, in _tag_menuitem
+    act = self.env.ref(a_action).sudo()
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\api.py", line 660, in ref
+    res_model, res_id = self['ir.model.data']._xmlid_to_res_model_res_id(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_model.py", line 2292, in _xmlid_to_res_model_res_id
+    return self._xmlid_lookup(xmlid)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\cache.py", line 110, in lookup
+    value = d[key] = self.method(*args, **kwargs)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\addons\base\models\ir_model.py", line 2285, in _xmlid_lookup
+    raise ValueError('External ID not found in the system: %s' % xmlid)
+ValueError: External ID not found in the system: coconut_sorting.action_coconut_stock_report
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\odoo\odoo18\server\odoo\service\server.py", line 1366, in preload_registries
+    registry = Registry.new(dbname, update_module=update_module)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python312\Lib\site-packages\decorator.py", line 232, in fun
+    return caller(func, *(extras + args), **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\tools\func.py", line 97, in locked
+    return func(inst, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\registry.py", line 129, in new
+    odoo.modules.load_modules(registry, force_demo, status, update_module)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 485, in load_modules
+    processed_modules += load_marked_modules(env, graph,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 365, in load_marked_modules
+    loaded, processed = load_module_graph(
+                        ^^^^^^^^^^^^^^^^^^
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 228, in load_module_graph
+    load_data(env, idref, mode, kind='data', package=package)
+  File "C:\odoo\odoo18\server\odoo\modules\loading.py", line 72, in load_data
+    tools.convert_file(env, package.name, filename, idref, mode, noupdate, kind)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 662, in convert_file
+    convert_xml_import(env, module, fp, idref, mode, noupdate)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 733, in convert_xml_import
+    obj.parse(doc.getroot())
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 648, in parse
+    self._tag_root(de)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 590, in _tag_root
+    f(rec)
+  File "C:\odoo\odoo18\server\odoo\tools\convert.py", line 603, in _tag_root
+    raise ParseError('while parsing %s:%s, somewhere inside\n%s' % (
+odoo.tools.convert.ParseError: while parsing file:/c:/odoo/odoo18/server/odoo/addons/coconut_sorting/views/coconut_sorting_views.xml:219, somewhere inside
+<menuitem id="menu_coconut_daily_report" name="Stok Kelapa Harian" parent="menu_coconut_manufacturing_root" action="action_coconut_stock_report" sequence="50"/>
+2026-07-12 15:36:50,994 14436 INFO diansukses odoo.service.server: Initiating shutdown 
+2026-07-12 15:36:50,994 14436 INFO diansukses odoo.service.server: Hit CTRL-C again or send a second signal to force the shutdown. 
+2026-07-12 15:36:50,994 14436 INFO diansukses odoo.sql_db: ConnectionPool(read/write;used=0/count=0/max=64): Closed 1 connections  
