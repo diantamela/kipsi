@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Report Action -->
+    <record id="action_report_coconut_manufacturing" model="ir.actions.report">
+        <field name="name">Laporan Pemakaian Kelapa Produksi</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_sorting.report_coconut_manufacturing_template</field>
+        <field name="report_file">coconut_sorting.report_coconut_manufacturing_template</field>
+        <field name="binding_model_id" ref="model_coconut_manufacturing"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- QWeb Template -->
+    <template id="report_coconut_manufacturing_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333;">
+                        <!-- Custom CSS/Style for beautiful appearance -->
+                        <style>
+                            .report-title {
+                                font-size: 22px;
+                                font-weight: bold;
+                                text-transform: uppercase;
+                                color: #1e3a1e;
+                                border-bottom: 2px solid #A2CB8B;
+                                padding-bottom: 8px;
+                                margin-bottom: 20px;
+                                text-align: center;
+                            }
+                            .company-name {
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #555;
+                                text-align: center;
+                            }
+                            .section-title {
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: #fff;
+                                background-color: #4a7c59;
+                                padding: 6px 10px;
+                                margin-top: 25px;
+                                margin-bottom: 10px;
+                                text-transform: uppercase;
+                                border-radius: 3px;
+                            }
+                            .info-table td {
+                                padding: 4px 8px;
+                                border: none;
+                            }
+                            .info-label {
+                                font-weight: bold;
+                                width: 180px;
+                            }
+                            .data-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-top: 8px;
+                                margin-bottom: 15px;
+                            }
+                            .data-table th {
+                                background-color: #f2f2f2;
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                                text-align: left;
+                                font-weight: bold;
+                            }
+                            .data-table td {
+                                border: 1px solid #ddd;
+                                padding: 8px;
+                            }
+                            .signature-container {
+                                margin-top: 50px;
+                                width: 100%;
+                            }
+                            .signature-box {
+                                text-align: center;
+                                width: 33%;
+                                float: left;
+                            }
+                            .signature-line {
+                                margin-top: 60px;
+                                font-weight: bold;
+                            }
+                            .clear-fix {
+                                clear: both;
+                            }
+                        </style>
+
+                        <!-- Header -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="company-name">PT Coco Murni Prima Jaya</div>
+                                <div class="report-title">LAPORAN PEMAKAIAN KELAPA PRODUKSI</div>
+                            </div>
+                        </div>
+
+                        <!-- Document Information -->
+                        <table class="info-table" style="width: 100%; margin-bottom: 20px;">
+                            <tr>
+                                <td class="info-label">Kode Pemakaian:</td>
+                                <td><span t-field="doc.name"/></td>
+                                <td class="info-label">Operator:</td>
+                                <td><span t-field="doc.responsible_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Tanggal Produksi:</td>
+                                <td><span t-field="doc.production_date" t-options='{"widget": "date"}'/></td>
+                                <td class="info-label">Status:</td>
+                                <td>
+                                    <span t-if="doc.state == 'draft'">Draft</span>
+                                    <span t-elif="doc.state == 'confirmed'">Confirmed</span>
+                                    <span t-elif="doc.state == 'done'">Done</span>
+                                    <span t-elif="doc.state == 'cancelled'">Cancelled</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <t t-set="stock_data" t-value="doc.get_report_stock_data()"/>
+
+                        <!-- Section 1: Persediaan Awal -->
+                        <div class="section-title">SECTION 1: PERSEDIAAN AWAL</div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Stok Awal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Kelapa Layak Produksi</td>
+                                    <td><t t-esc="doc.format_kg(stock_data['layak']['awal'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Reject</td>
+                                    <td><t t-esc="doc.format_kg(stock_data['reject']['awal'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Sheller</td>
+                                    <td><t t-esc="doc.format_kg(stock_data['sheller']['awal'])"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Section 2: Pemakaian Sheller -->
+                        <div class="section-title">SECTION 2: PEMAKAIAN SHELLER</div>
+                        
+                        <div style="margin-left: 10px; margin-bottom: 15px;">
+                            <h6 style="font-weight: bold; color: #2e5a36; margin-top: 10px;">Cungkil Mesin:</h6>
+                            <div style="margin-left: 15px;">
+                                <div>Kelapa Layak Produksi Digunakan: <strong t-esc="doc.format_kg(doc.machine_sheller_input)"/></div>
+                                <div>Output Kelapa Sheller: <strong t-esc="doc.format_kg(doc.machine_sheller_output)"/></div>
+                            </div>
+
+                            <h6 style="font-weight: bold; color: #2e5a36; margin-top: 15px;">Cungkil Manual:</h6>
+                            <div style="margin-left: 15px;">
+                                <div>Kelapa Reject Digunakan: <strong t-esc="doc.format_kg(doc.manual_sheller_input)"/></div>
+                                <div>Output Kelapa Sheller: <strong t-esc="doc.format_kg(doc.manual_sheller_output)"/></div>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: Proses Parer -->
+                        <div class="section-title">SECTION 3: PROSES PARER</div>
+                        <div style="margin-left: 10px; margin-bottom: 15px; line-height: 1.6;">
+                            <div>Kelapa Sheller Digunakan: <strong t-esc="doc.format_kg(doc.parer_input)"/></div>
+                            <div>Output Kelapa Parer: <strong t-esc="doc.format_kg(doc.parer_output)"/></div>
+                        </div>
+
+                        <!-- Section 4: Ringkasan Persediaan -->
+                        <div class="section-title">SECTION 4: RINGKASAN PERSEDIAAN</div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th>Awal</th>
+                                    <th>Pemakaian</th>
+                                    <th>Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Kelapa Layak Produksi</td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['awal'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['used'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Reject</td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['awal'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['used'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Sheller</td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['awal'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['used'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Parer</td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['awal'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['used'])"/></td>
+                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['akhir'])"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Section 5: Stock Movement -->
+                        <div class="section-title">SECTION 5: STOCK MOVEMENT</div>
+                        <div style="margin-left: 10px; margin-bottom: 25px; line-height: 1.6;">
+                            <div><strong>Reference:</strong> <span t-field="doc.name"/></div>
+                            <div style="margin-top: 5px;"><strong>Generated Stock Moves:</strong></div>
+                            <ul style="margin-top: 5px; margin-left: 15px; padding-left: 10px;">
+                                <li>Kelapa Layak Produksi → Production</li>
+                                <li>Kelapa Reject → Production</li>
+                                <li>Kelapa Sheller → Warehouse</li>
+                                <li>Kelapa Parer → Warehouse</li>
+                            </ul>
+                        </div>
+
+                        <!-- Signature Area -->
+                        <div class="signature-container">
+                            <div class="signature-box">
+                                <div>Dibuat Oleh:</div>
+                                <div class="signature-line">(________________)</div>
+                            </div>
+                            <div class="signature-box">
+                                <div>Diperiksa Oleh:</div>
+                                <div class="signature-line">(________________)</div>
+                            </div>
+                            <div class="signature-box">
+                                <div>Disetujui Oleh:</div>
+                                <div class="signature-line">(________________)</div>
+                            </div>
+                            <div class="clear-fix"></div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

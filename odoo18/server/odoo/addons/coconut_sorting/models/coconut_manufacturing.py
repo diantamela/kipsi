@@ -21,7 +21,7 @@ class CoconutManufacturing(models.Model):
     Pergerakan stok direkam melalui stock.move standar Odoo.
     """
     _name = 'coconut.manufacturing'
-    _description = 'Manufaktur Kelapa'
+    _description = 'Pemakaian Kelapa Produksi'
     _order = 'production_date desc, name desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
@@ -61,11 +61,17 @@ class CoconutManufacturing(models.Model):
     receipt_id = fields.Many2one(
         'coconut.receipt',
         string='Penerimaan Kelapa',
-        required=True,
+        required=False,
         ondelete='restrict',
         domain=[('state', '=', 'done')],
         tracking=True,
     )
+
+    # Initial Stock stored fields
+    initial_stock_layak = fields.Float(string='Stok Awal Layak (Kg)', readonly=True, copy=False)
+    initial_stock_reject = fields.Float(string='Stok Awal Reject (Kg)', readonly=True, copy=False)
+    initial_stock_sheller = fields.Float(string='Stok Awal Sheller (Kg)', readonly=True, copy=False)
+    initial_stock_parer = fields.Float(string='Stok Awal Parer (Kg)', readonly=True, copy=False)
 
     # ─── Related / readonly display from receipt ───
     receipt_code = fields.Char(
@@ -379,6 +385,15 @@ class CoconutManufacturing(models.Model):
                 )
         return super().create(vals_list)
 
+    def write(self, vals):
+        for rec in self:
+            if rec.state == 'done':
+                # Allow chatter, activities, and workflow state updates, but block other edits
+                user_fields = [k for k in vals.keys() if k != 'state' and not k.startswith('message_') and not k.startswith('activity_') and k not in ('message_ids', 'message_follower_ids', 'activity_ids')]
+                if user_fields:
+                    raise UserError(_("Dokumen Pemakaian Kelapa Produksi yang sudah selesai tidak dapat diedit. Buat dokumen koreksi jika diperlukan."))
+        return super().write(vals)
+
     # ═══════════════════════════════════════════════════════════
     # WORKFLOW ACTIONS
     # ═══════════════════════════════════════════════════════════
@@ -389,11 +404,7 @@ class CoconutManufacturing(models.Model):
                 raise UserError(_(
                     "Hanya dokumen Draft yang dapat dikonfirmasi."
                 ))
-            if not rec.receipt_id:
-                raise UserError(_(
-                    "Pilih Penerimaan Kelapa sebelum mengkonfirmasi."
-                ))
-            if rec.receipt_id.state != 'done':
+            if rec.receipt_id and rec.receipt_id.state != 'done':
                 raise UserError(_(
                     "Penerimaan Kelapa yang dipilih belum divalidasi. "
                     "Selesaikan proses penerimaan terlebih dahulu."
@@ -403,18 +414,18 @@ class CoconutManufacturing(models.Model):
     def action_validate(self):
         """
         Validate the full manufacturing document.
-        Creates stock moves for all three processes:
-        1. Sorting: Kelapa Bulat → Layak + Reject
-        2. Sheller: Layak+Reject → Kelapa Sheller
-        3. Parer:   Kelapa Sheller → Kelapa Parer
+        Creates stock moves for all processes.
         """
+        if not self.env.user.has_group('base.group_system'):
+            raise UserError(_("Hanya Administrator yang dapat memvalidasi dokumen."))
+
         for rec in self:
             if rec.state != 'confirmed':
                 raise UserError(_(
                     "Hanya dokumen yang dikonfirmasi yang dapat divalidasi."
                 ))
             # ── Idempotency guard (duplicate validation) ──
-            if rec.sort_raw_move_id or rec.shell_output_move_id or rec.parer_output_move_id:
+            if rec.shell_output_move_id or rec.parer_output_move_id:
                 raise UserError(_(
                     "Dokumen '%s' sudah divalidasi dan pergerakan stok sudah tercatat. "
                     "Tidak dapat membuat pergerakan stok duplikat."
@@ -422,8 +433,15 @@ class CoconutManufacturing(models.Model):
 
             uom_kg = self.env.ref('uom.product_uom_kgm')
 
+            # Store initial stock levels before stock movements
+            rec.write({
+                'initial_stock_layak': rec._get_stock_qty('coconut_receiving.product_kelapa_layak'),
+                'initial_stock_reject': rec._get_stock_qty('coconut_receiving.product_kelapa_reject'),
+                'initial_stock_sheller': rec._get_stock_qty('coconut_receiving.product_kelapa_sheller'),
+                'initial_stock_parer': rec._get_stock_qty('coconut_receiving.product_kelapa_parer'),
+            })
+
             # ── Resolve products ──
-            p_bulat = rec._resolve_product('coconut_receiving.product_kelapa_bulat', 'Kelapa Bulat', uom_kg)
             p_layak = rec._resolve_product('coconut_receiving.product_kelapa_layak', 'Kelapa Layak Produksi', uom_kg)
             p_reject = rec._resolve_product('coconut_receiving.product_kelapa_reject', 'Kelapa Reject', uom_kg)
             p_sheller = rec._resolve_product('coconut_receiving.product_kelapa_sheller', 'Kelapa Sheller', uom_kg)
@@ -433,16 +451,7 @@ class CoconutManufacturing(models.Model):
             loc_wh = rec._get_warehouse_location()
             loc_prod = rec._get_production_location()
 
-            origin = f'{rec.name} / {rec.receipt_id.name}'
-
-            # ── SECTION 1: SORTIR ──
-            rec._validate_sorting(uom_kg, loc_wh, origin)
-            sort_moves = rec._create_sorting_moves(
-                p_bulat, p_layak, p_reject, loc_wh, loc_prod, uom_kg, origin
-            )
-            rec.sort_raw_move_id = sort_moves[0].id
-            rec.sort_good_move_id = sort_moves[1].id
-            rec.sort_reject_move_id = sort_moves[2].id
+            origin = f'{rec.name}' + (f' / {rec.receipt_id.name}' if rec.receipt_id else '')
 
             # ── SECTION 2: SHELLER ──
             rec._validate_sheller(uom_kg, loc_wh)
@@ -450,7 +459,6 @@ class CoconutManufacturing(models.Model):
                 p_layak, p_reject, p_sheller, loc_wh, loc_prod, uom_kg, origin
             )
             if shell_moves:
-                # shell_moves = [consume_layak?, consume_reject?, produce_sheller]
                 if shell_moves.get('consume_layak'):
                     rec.shell_consume_layak_move_id = shell_moves['consume_layak'].id
                 if shell_moves.get('consume_reject'):
@@ -472,6 +480,8 @@ class CoconutManufacturing(models.Model):
             rec.state = 'done'
 
     def action_cancel(self):
+        if not self.env.user.has_group('base.group_system'):
+            raise UserError(_("Hanya Administrator yang dapat membatalkan dokumen."))
         for rec in self:
             if rec.state == 'done':
                 raise UserError(_(
@@ -881,3 +891,48 @@ class CoconutManufacturing(models.Model):
             )
         except Exception:
             return 0.0
+
+    def get_report_stock_data(self):
+        """Returns dictionary of stock data for the report."""
+        # Determine Awal based on state
+        if self.state == 'done':
+            awal_layak = self.initial_stock_layak
+            awal_reject = self.initial_stock_reject
+            awal_sheller = self.initial_stock_sheller
+            awal_parer = self.initial_stock_parer
+        else:
+            awal_layak = self._get_stock_qty('coconut_receiving.product_kelapa_layak')
+            awal_reject = self._get_stock_qty('coconut_receiving.product_kelapa_reject')
+            awal_sheller = self._get_stock_qty('coconut_receiving.product_kelapa_sheller')
+            awal_parer = self._get_stock_qty('coconut_receiving.product_kelapa_parer')
+
+        # Pemakaian / Produced
+        used_layak = self.machine_sheller_input
+        used_reject = self.manual_sheller_input
+        used_sheller = self.parer_input
+        used_parer = 0.0
+
+        produced_sheller = self.machine_sheller_output + self.manual_sheller_output
+        produced_parer = self.parer_output
+
+        # Akhir
+        akhir_layak = awal_layak - used_layak
+        akhir_reject = awal_reject - used_reject
+        akhir_sheller = awal_sheller + produced_sheller - used_sheller
+        akhir_parer = awal_parer + produced_parer
+
+        return {
+            'layak': {'awal': awal_layak, 'used': used_layak, 'akhir': akhir_layak},
+            'reject': {'awal': awal_reject, 'used': used_reject, 'akhir': akhir_reject},
+            'sheller': {'awal': awal_sheller, 'used': used_sheller, 'akhir': akhir_sheller, 'produced': produced_sheller},
+            'parer': {'awal': awal_parer, 'used': used_parer, 'akhir': akhir_parer, 'produced': produced_parer},
+        }
+
+    def format_kg(self, value):
+        """Helper to format weight in Indonesian style: 20.000 Kg"""
+        return "{:,.0f} Kg".format(value).replace(',', '.')
+
+    def format_kg_raw(self, value):
+        """Helper to format weight in Indonesian style without Kg suffix: 20000 -> 20.000"""
+        return "{:,.0f}".format(value).replace(',', '.')
+

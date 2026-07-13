@@ -1,60 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ═══════════════════════════════════════════════════════════════
-         Form View – coconut.stock.report (wizard)
-         ═══════════════════════════════════════════════════════════════ -->
+
+    <!-- ================================================================
+         LIST VIEW - coconut.daily.stock
+         Kolom sesuai format Excel perusahaan:
+         Tanggal | Supplier | Asal Kelapa | Butir | Kg/Butir |
+         Tonase | Reject | Bruto | Total Stok | Pakai Hari Ini
+         ================================================================ -->
+    <record id="view_coconut_daily_stock_list" model="ir.ui.view">
+        <field name="name">coconut.daily.stock.list</field>
+        <field name="model">coconut.daily.stock</field>
+        <field name="arch" type="xml">
+            <list string="Stok Kelapa Harian"
+                  create="false"
+                  delete="false"
+                  edit="false"
+                  default_order="receipt_date desc">
+                <field name="receipt_date"        string="Tanggal"/>
+                <field name="supplier_id"         string="Supplier"/>
+                <field name="coconut_origin"      string="Asal Kelapa"/>
+                <field name="total_coconut_count" string="Butir"/>
+                <field name="kg_per_coconut"      string="Kg/Butir"
+                       digits="[16,3]"/>
+                <field name="tonase_layak"        string="Tonase (Kg)"
+                       sum="Total Tonase" digits="[16,3]"/>
+                <field name="reject_kg"           string="Reject (Kg)"
+                       sum="Total Reject" digits="[16,3]"/>
+                <field name="bruto_kg"            string="Bruto (Kg)"
+                       sum="Total Bruto" digits="[16,3]"/>
+                <field name="total_stok_kelapa"   string="Total Stok Kelapa (Kg)"
+                       digits="[16,3]"/>
+                <field name="pakai_kelapa_hari_ini" string="Pakai Hari Ini (Kg)"
+                       sum="Total Pakai" digits="[16,3]"/>
+                <!-- Hidden fields needed for display_name -->
+                <field name="receipt_id"          invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         FORM VIEW - coconut.daily.stock
+         ================================================================ -->
+    <record id="view_coconut_daily_stock_form" model="ir.ui.view">
+        <field name="name">coconut.daily.stock.form</field>
+        <field name="model">coconut.daily.stock</field>
+        <field name="arch" type="xml">
+            <form string="Stok Kelapa Harian" create="false" delete="false">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="receipt_date" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <!-- SECTION 1: INFORMASI PENERIMAAN -->
+                    <group string="Informasi Penerimaan">
+                        <group>
+                            <field name="receipt_id"         string="No. Penerimaan" readonly="1"/>
+                            <field name="supplier_id"        string="Supplier" readonly="1"/>
+                            <field name="coconut_origin"     string="Asal Kelapa" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_coconut_count" string="Jumlah Kelapa (Butir)" readonly="1"/>
+                            <field name="kg_per_coconut"     string="Kg per Butir" readonly="1" digits="[16,3]"/>
+                            <field name="bruto_kg"           string="Bruto (Kg)" readonly="1" digits="[16,3]"/>
+                        </group>
+                    </group>
+
+                    <!-- SECTION 2: HASIL SORTIR -->
+                    <group string="Hasil Sortir Kelapa">
+                        <group>
+                            <field name="tonase_layak"   string="Kelapa Layak / Tonase (Kg)" readonly="1" digits="[16,3]"/>
+                            <field name="reject_kg"      string="Kelapa Reject (Kg)" readonly="1" digits="[16,3]"/>
+                        </group>
+                    </group>
+
+                    <!-- SECTION 3: STOK REAL-TIME -->
+                    <group string="Total Stok Kelapa (Real-time)">
+                        <group>
+                            <field name="stok_kelapa_bulat"  string="Stok Kelapa Bulat (Kg)" readonly="1" digits="[16,3]"/>
+                            <field name="stok_kelapa_layak"  string="Stok Kelapa Layak (Kg)" readonly="1" digits="[16,3]"/>
+                            <field name="stok_kelapa_reject" string="Stok Kelapa Reject (Kg)" readonly="1" digits="[16,3]"/>
+                        </group>
+                        <group>
+                            <field name="total_stok_kelapa"  string="Total Stok Bahan Baku (Kg)" readonly="1" digits="[16,3]"/>
+                        </group>
+                    </group>
+
+                    <!-- SECTION 4: PEMAKAIAN PRODUKSI -->
+                    <group string="Pemakaian Produksi">
+                        <group>
+                            <field name="pakai_kelapa_hari_ini" string="Pakai Kelapa Hari Ini (Kg)" readonly="1" digits="[16,3]"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         SEARCH VIEW - coconut.daily.stock
+         ================================================================ -->
+    <record id="view_coconut_daily_stock_search" model="ir.ui.view">
+        <field name="name">coconut.daily.stock.search</field>
+        <field name="model">coconut.daily.stock</field>
+        <field name="arch" type="xml">
+            <search string="Cari Stok Kelapa Harian">
+                <field name="receipt_date" string="Tanggal"/>
+                <field name="supplier_id"  string="Supplier"/>
+                <field name="coconut_origin" string="Asal Kelapa"/>
+                <separator/>
+                <filter string="Hari Ini"  name="today"
+                        domain="[('receipt_date','=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter string="Bulan Ini" name="this_month"
+                        domain="[('receipt_date','&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter string="Tanggal Penerimaan" name="grp_date"
+                        date="receipt_date"/>
+                <group expand="0" string="Kelompokkan">
+                    <filter string="Supplier"    name="grp_supplier"
+                            context="{'group_by':'supplier_id'}"/>
+                    <filter string="Asal Kelapa" name="grp_origin"
+                            context="{'group_by':'coconut_origin'}"/>
+                    <filter string="Tanggal"     name="grp_date_g"
+                            context="{'group_by':'receipt_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ================================================================
+         FORM VIEW - coconut.stock.report (filter wizard)
+         Digunakan sebagai entry point pemilihan tanggal
+         ================================================================ -->
     <record id="view_coconut_stock_report_form" model="ir.ui.view">
         <field name="name">coconut.stock.report.form</field>
         <field name="model">coconut.stock.report</field>
         <field name="arch" type="xml">
             <form string="Stok Kelapa Harian">
-                <group>
-                    <group string="Filter Tanggal">
-                        <field name="date_from" string="Dari Tanggal"/>
-                        <field name="date_to" string="Sampai Tanggal"/>
-                    </group>
+                <group string="Filter Tanggal">
+                    <field name="date_from" string="Dari Tanggal"/>
+                    <field name="date_to"   string="Sampai Tanggal"/>
                 </group>
                 <footer>
-                    <button name="action_generate"
-                            id="btn_generate_report"
-                            string="Buat Laporan"
+                    <button name="action_open_report"
+                            id="btn_open_report"
+                            string="Lihat Laporan"
                             type="object"
                             class="oe_highlight"/>
+                    <button name="action_view_all"
+                            id="btn_view_all"
+                            string="Lihat Semua"
+                            type="object"
+                            class="btn-secondary"/>
                     <button string="Tutup" class="btn-secondary" special="cancel"/>
                 </footer>
-
-                <!-- Report lines (shown after generation) -->
-                <group string="Laporan Stok Kelapa Harian"
-                       invisible="not line_ids">
-                    <field name="line_ids" nolabel="1" readonly="1">
-                        <list string="Stok Kelapa Harian">
-                            <field name="receipt_date" string="Tgl Penerimaan"/>
-                            <field name="supplier_id" string="Pemasok"/>
-                            <field name="coconut_origin" string="Asal Kelapa"/>
-                            <field name="total_coconut_count" string="Jumlah (Butir)"/>
-                            <field name="kg_per_coconut" string="KG/Butir"/>
-                            <field name="good_coconut_tonase" string="Kelapa Layak / Tonase (Kg)"
-                                   sum="Total Layak"/>
-                            <field name="reject_coconut" string="Kelapa Reject (Kg)"
-                                   sum="Total Reject"/>
-                            <field name="total_coconut_processed" string="Total Diproses (Kg)"
-                                   sum="Total Diproses"/>
-                            <field name="beginning_raw_stock" string="Stok Awal (Kg)"/>
-                            <field name="coconut_received" string="Diterima (Kg)"
-                                   sum="Total Diterima"/>
-                            <field name="coconut_used_today" string="Terpakai (Kg)"
-                                   sum="Total Terpakai"/>
-                            <field name="ending_raw_stock" string="Stok Akhir (Kg)"/>
-                        </list>
-                    </field>
-                </group>
             </form>
         </field>
     </record>
 
-    <!-- ═══════════════════════════════════════════════════════════════
-         Action – open the stock report wizard
-         ═══════════════════════════════════════════════════════════════ -->
+    <!-- ================================================================
+         WINDOW ACTIONS
+         ================================================================ -->
+
+    <!-- Action: Stok Kelapa Harian (list view langsung) -->
+    <record id="action_coconut_daily_stock" model="ir.actions.act_window">
+        <field name="name">Stok Kelapa Harian</field>
+        <field name="res_model">coconut.daily.stock</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_daily_stock_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada data stok kelapa harian.
+            </p>
+            <p>
+                Data ini dibuat otomatis saat Sortir Kelapa divalidasi.
+                Lakukan Penerimaan Kelapa kemudian validasi Sortir Kelapa
+                untuk melihat laporan di sini.
+            </p>
+        </field>
+    </record>
+
+    <!-- Action: Filter wizard (popup) -->
     <record id="action_coconut_stock_report" model="ir.actions.act_window">
         <field name="name">Stok Kelapa Harian</field>
         <field name="res_model">coconut.stock.report</field>

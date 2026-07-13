@@ -6,25 +6,255 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
-class CoconutStockReport(models.TransientModel):
+class CoconutDailyStock(models.Model):
     """
-    Stok Kelapa Harian – Daily Coconut Stock Report
+    Stok Kelapa Harian -- Daily Coconut Stock Record
 
-    Displays:
-    - Receipt Date, Supplier, Origin, Coconut Count, KG/Coconut
-    - Good Coconut / Tonase (Kelapa Layak from sorting)
-    - Reject Coconut
-    - Total Coconut Processed (Good + Reject)
-    - Beginning Raw Coconut Stock
-    - Coconut Received Today
-    - Coconut Used Today (Machine Sheller Input + Manual Sheller Input)
-    - Ending Raw Coconut Stock
+    Setiap record mewakili SATU baris penerimaan kelapa pada suatu tanggal,
+    dilengkapi data sortir, produksi, dan ringkasan stok real-time.
 
-    Raw Coconut Stock = Kelapa Bulat + Kelapa Layak + Kelapa Reject
-    (NOT including Kelapa Sheller or Kelapa Parer)
+    Format sesuai Excel perusahaan:
+        Tanggal | Supplier | Asal Kelapa | Butir | Kg/Butir | Tonase | Reject | Bruto
+        + TOTAL STOK KELAPA (real-time dari stock.quant)
+        + PAKAI KELAPA HARI INI (dari coconut.manufacturing)
+    """
+    _name = 'coconut.daily.stock'
+    _description = 'Stok Kelapa Harian'
+    _order = 'receipt_date desc, id desc'
+    _rec_name = 'display_name'
+
+    # ===================================================================
+    # SOURCE LINK
+    # ===================================================================
+
+    receipt_id = fields.Many2one(
+        'coconut.receipt',
+        string='Penerimaan Kelapa',
+        ondelete='restrict',
+        required=True,
+        readonly=True,
+    )
+
+    # ===================================================================
+    # KOLOM EXCEL: INFORMASI PENERIMAAN
+    # ===================================================================
+
+    receipt_date = fields.Date(
+        string='Tanggal',
+        readonly=True,
+    )
+    supplier_id = fields.Many2one(
+        'res.partner',
+        string='Supplier',
+        readonly=True,
+    )
+    coconut_origin = fields.Char(
+        string='Asal Kelapa',
+        readonly=True,
+    )
+    total_coconut_count = fields.Integer(
+        string='Butir',
+        readonly=True,
+        help='Jumlah buah kelapa yang diterima.',
+    )
+    kg_per_coconut = fields.Float(
+        string='Kg/Butir',
+        digits=(16, 3),
+        readonly=True,
+    )
+    # Tonase = berat kelapa layak dari sortir (diisi dari coconut.sorting)
+    tonase_layak = fields.Float(
+        string='Tonase (Kg Layak)',
+        digits=(16, 3),
+        readonly=True,
+        help='Berat Kelapa Layak Produksi hasil sortir.',
+    )
+    # Reject = berat kelapa reject dari sortir
+    reject_kg = fields.Float(
+        string='Reject (Kg)',
+        digits=(16, 3),
+        readonly=True,
+        help='Berat Kelapa Reject hasil sortir.',
+    )
+    # Bruto = gross_vehicle_weight dari slip timbangan
+    bruto_kg = fields.Float(
+        string='Bruto (Kg)',
+        digits=(16, 3),
+        readonly=True,
+        help='Berat kotor kendaraan + muatan dari slip timbangan.',
+    )
+
+    # ===================================================================
+    # KOLOM EXCEL: TOTAL STOK KELAPA (real-time dari stock.quant)
+    # ===================================================================
+
+    stok_kelapa_bulat = fields.Float(
+        string='Stok Kelapa Bulat (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+        help='Stok Kelapa Bulat saat ini di gudang.',
+    )
+    stok_kelapa_layak = fields.Float(
+        string='Stok Kelapa Layak (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+        help='Stok Kelapa Layak Produksi saat ini di gudang.',
+    )
+    stok_kelapa_reject = fields.Float(
+        string='Stok Kelapa Reject (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+        help='Stok Kelapa Reject saat ini di gudang.',
+    )
+    total_stok_kelapa = fields.Float(
+        string='Total Stok Kelapa (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+        help='Total stok bahan baku: Kelapa Bulat + Layak + Reject.',
+    )
+
+    # ===================================================================
+    # KOLOM EXCEL: PAKAI KELAPA HARI INI (dari coconut.manufacturing)
+    # ===================================================================
+
+    pakai_kelapa_hari_ini = fields.Float(
+        string='Pakai Kelapa Hari Ini (Kg)',
+        digits=(16, 3),
+        compute='_compute_pakai_hari_ini',
+        store=False,
+        help='Total input Sheller (Machine + Manual) pada tanggal penerimaan ini.',
+    )
+
+    # ===================================================================
+    # DISPLAY NAME
+    # ===================================================================
+
+    display_name = fields.Char(
+        string='Nama',
+        compute='_compute_display_name',
+        store=False,
+    )
+
+    @api.depends('receipt_id', 'receipt_date', 'supplier_id')
+    def _compute_display_name(self):
+        for rec in self:
+            date_str = str(rec.receipt_date) if rec.receipt_date else '-'
+            supplier = rec.supplier_id.name if rec.supplier_id else '-'
+            rec.display_name = f'{date_str} | {supplier}'
+
+    # ===================================================================
+    # COMPUTED: STOK REAL-TIME
+    # ===================================================================
+
+    def _get_stock_qty(self, xml_id):
+        """Helper: get current on-hand qty for a product template XML ID."""
+        tmpl = self.env.ref(xml_id, raise_if_not_found=False)
+        if not tmpl:
+            return 0.0
+        product = tmpl.product_variant_ids[:1]
+        if not product:
+            return 0.0
+        wh = self.env['stock.warehouse'].search(
+            [('company_id', '=', self.env.company.id)], limit=1
+        )
+        if not wh:
+            return 0.0
+        location = wh.lot_stock_id
+        quant = self.env['stock.quant'].search([
+            ('product_id', '=', product.id),
+            ('location_id', '=', location.id),
+        ], limit=1)
+        return quant.quantity if quant else 0.0
+
+    @api.depends()
+    def _compute_stok_real_time(self):
+        # Fetch once per compute call (same value for all records)
+        bulat = self._get_stock_qty('coconut_receiving.product_kelapa_bulat')
+        layak = self._get_stock_qty('coconut_receiving.product_kelapa_layak')
+        reject = self._get_stock_qty('coconut_receiving.product_kelapa_reject')
+        total = bulat + layak + reject
+        for rec in self:
+            rec.stok_kelapa_bulat = bulat
+            rec.stok_kelapa_layak = layak
+            rec.stok_kelapa_reject = reject
+            rec.total_stok_kelapa = total
+
+    # ===================================================================
+    # COMPUTED: PAKAI KELAPA HARI INI
+    # ===================================================================
+
+    @api.depends('receipt_date')
+    def _compute_pakai_hari_ini(self):
+        for rec in self:
+            if not rec.receipt_date:
+                rec.pakai_kelapa_hari_ini = 0.0
+                continue
+            mfg_docs = self.env['coconut.manufacturing'].search([
+                ('production_date', '=', rec.receipt_date),
+                ('state', '=', 'done'),
+            ])
+            total_input = sum(mfg_docs.mapped('machine_sheller_input')) + \
+                          sum(mfg_docs.mapped('manual_sheller_input'))
+            rec.pakai_kelapa_hari_ini = total_input
+
+    # ===================================================================
+    # ORM: CREATE FROM RECEIPT
+    # ===================================================================
+
+    @api.model
+    def _sync_from_receipt(self, receipt):
+        """
+        Create or update the daily stock record for a validated receipt.
+        Called from coconut.receipt.action_validate (via post-validate hook).
+        """
+        existing = self.search([('receipt_id', '=', receipt.id)], limit=1)
+
+        # Resolve sortir data (from coconut.sorting linked to this receipt)
+        sorting = self.env['coconut.sorting'].search([
+            ('receipt_id', '=', receipt.id),
+            ('state', '=', 'done'),
+        ], limit=1)
+        tonase_layak = sorting.good_coconut_kg if sorting else 0.0
+        reject_kg = sorting.reject_coconut_kg if sorting else 0.0
+
+        kg_per_butir = (
+            receipt.net_received_weight / receipt.total_count
+            if receipt.total_count and receipt.total_count > 0
+            else 0.0
+        )
+
+        vals = {
+            'receipt_id': receipt.id,
+            'receipt_date': (
+                receipt.entry_datetime.date() if receipt.entry_datetime else fields.Date.today()
+            ),
+            'supplier_id': receipt.partner_id.id,
+            'coconut_origin': receipt.origin or '',
+            'total_coconut_count': receipt.total_count or 0,
+            'kg_per_coconut': kg_per_butir,
+            'tonase_layak': tonase_layak,
+            'reject_kg': reject_kg,
+            'bruto_kg': receipt.gross_vehicle_weight or 0.0,
+        }
+
+        if existing:
+            existing.write(vals)
+            return existing
+        else:
+            return self.create(vals)
+
+
+class CoconutDailyStockWizard(models.TransientModel):
+    """
+    Wizard untuk melihat laporan Stok Kelapa Harian dengan filter tanggal.
+    Menggantikan peran lama coconut.stock.report sebagai entry point filter.
     """
     _name = 'coconut.stock.report'
-    _description = 'Laporan Stok Kelapa Harian'
+    _description = 'Laporan Stok Kelapa Harian (Filter)'
 
     date_from = fields.Date(
         string='Dari Tanggal',
@@ -36,137 +266,34 @@ class CoconutStockReport(models.TransientModel):
         required=True,
         default=fields.Date.context_today,
     )
-    line_ids = fields.One2many(
-        'coconut.stock.report.line',
-        'report_id',
-        string='Baris Laporan',
-        readonly=True,
-    )
 
-    def action_generate(self):
-        """Generate report lines from validated documents."""
+    def action_open_report(self):
+        """Open the daily stock list filtered by selected date range."""
         self.ensure_one()
         if self.date_from > self.date_to:
             raise UserError(_("Tanggal Dari tidak boleh lebih besar dari Tanggal Sampai."))
-
-        # Clear existing lines
-        self.line_ids.unlink()
-
-        # ── Resolve products ──
-        def _get_product(xml_id):
-            tmpl = self.env.ref(xml_id, raise_if_not_found=False)
-            return tmpl.product_variant_ids[:1] if tmpl else False
-
-        p_bulat = _get_product('coconut_receiving.product_kelapa_bulat')
-        p_layak = _get_product('coconut_receiving.product_kelapa_layak')
-        p_reject = _get_product('coconut_receiving.product_kelapa_reject')
-
-        # ── Get warehouse location ──
-        loc_wh = self.env['stock.warehouse'].search(
-            [('company_id', '=', self.env.company.id)], limit=1,
-        )
-        location = loc_wh.lot_stock_id if loc_wh else False
-
-        # ── Fetch done receipts in date range ──
-        receipts = self.env['coconut.receipt'].search([
-            ('state', '=', 'done'),
-            ('entry_datetime', '>=', fields.Datetime.to_datetime(str(self.date_from))),
-            ('entry_datetime', '<=', fields.Datetime.to_datetime(str(self.date_to) + ' 23:59:59')),
-        ], order='entry_datetime asc')
-
-        lines = []
-        for receipt in receipts:
-            # Done manufacturing docs for this receipt on this date range
-            mfg_docs = self.env['coconut.manufacturing'].search([
-                ('receipt_id', '=', receipt.id),
-                ('state', '=', 'done'),
-                ('production_date', '>=', self.date_from),
-                ('production_date', '<=', self.date_to),
-            ])
-
-            good_total = sum(mfg_docs.mapped('good_coconut_weight'))
-            reject_total = sum(mfg_docs.mapped('reject_coconut_weight'))
-            total_processed = good_total + reject_total
-            machine_input = sum(mfg_docs.mapped('machine_sheller_input'))
-            manual_input = sum(mfg_docs.mapped('manual_sheller_input'))
-            coconut_used_today = machine_input + manual_input
-            kg_per_coconut = (
-                receipt.avg_weight_per_coconut
-                if receipt.total_count > 0 else 0.0
-            )
-
-            lines.append({
-                'report_id': self.id,
-                'receipt_date': receipt.entry_datetime.date() if receipt.entry_datetime else False,
-                'supplier_id': receipt.partner_id.id,
-                'coconut_origin': receipt.origin or '',
-                'total_coconut_count': receipt.total_count,
-                'kg_per_coconut': kg_per_coconut,
-                'good_coconut_tonase': good_total,
-                'reject_coconut': reject_total,
-                'total_coconut_processed': total_processed,
-                'coconut_received': receipt.net_received_weight,
-                'coconut_used_today': coconut_used_today,
-                'receipt_id': receipt.id,
-            })
-
-        if lines:
-            # Compute beginning/ending stock for each line
-            # Beginning stock = Kelapa Bulat + Layak + Reject at start of day
-            for line_vals in lines:
-                d = line_vals['receipt_date']
-                begin_bulat = self._get_qty_at_date(p_bulat, location, d) if p_bulat and location else 0.0
-                begin_layak = self._get_qty_at_date(p_layak, location, d) if p_layak and location else 0.0
-                begin_reject = self._get_qty_at_date(p_reject, location, d) if p_reject and location else 0.0
-                line_vals['beginning_raw_stock'] = begin_bulat + begin_layak + begin_reject
-                line_vals['ending_raw_stock'] = (
-                    line_vals['beginning_raw_stock']
-                    + line_vals['coconut_received']
-                    - line_vals['coconut_used_today']
-                )
-
-            self.env['coconut.stock.report.line'].create(lines)
-
         return {
             'type': 'ir.actions.act_window',
-            'res_model': 'coconut.stock.report',
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'new',
+            'name': _('Stok Kelapa Harian'),
+            'res_model': 'coconut.daily.stock',
+            'view_mode': 'list,form',
+            'domain': [
+                ('receipt_date', '>=', self.date_from),
+                ('receipt_date', '<=', self.date_to),
+            ],
+            'context': {
+                'search_default_date_from': str(self.date_from),
+                'search_default_date_to': str(self.date_to),
+            },
+            'target': 'main',
         }
 
-    def _get_qty_at_date(self, product, location, date):
-        """
-        Approximate on-hand quantity at the beginning of `date`
-        using current quant qty. For precise historical reporting, use
-        stock.move history.
-        """
-        if not product or not location:
-            return 0.0
-        quant = self.env['stock.quant'].search([
-            ('product_id', '=', product.id),
-            ('location_id', '=', location.id),
-        ], limit=1)
-        return quant.quantity if quant else 0.0
-
-
-class CoconutStockReportLine(models.TransientModel):
-    _name = 'coconut.stock.report.line'
-    _description = 'Baris Laporan Stok Kelapa Harian'
-    _order = 'receipt_date asc, id asc'
-
-    report_id = fields.Many2one('coconut.stock.report', required=True, ondelete='cascade')
-    receipt_id = fields.Many2one('coconut.receipt', string='Penerimaan', readonly=True)
-
-    receipt_date = fields.Date(string='Tanggal Penerimaan', readonly=True)
-    supplier_id = fields.Many2one('res.partner', string='Pemasok', readonly=True)
-    coconut_origin = fields.Char(string='Asal Kelapa', readonly=True)
-    total_coconut_count = fields.Integer(string='Jumlah Kelapa (Butir)', readonly=True)
-    kg_per_coconut = fields.Float(string='KG per Butir', readonly=True)
-    good_coconut_tonase = fields.Float(string='Kelapa Layak / Tonase (Kg)', readonly=True)
-    reject_coconut = fields.Float(string='Kelapa Reject (Kg)', readonly=True)
-    total_coconut_processed = fields.Float(string='Total Kelapa Diproses (Kg)', readonly=True)
-    beginning_raw_stock = fields.Float(string='Stok Awal Kelapa Mentah (Kg)', readonly=True)
-    coconut_received = fields.Float(string='Kelapa Diterima (Kg)', readonly=True)
-    coconut_used_today = fields.Float(string='Kelapa Terpakai (Kg)', readonly=True)
-    ending_raw_stock = fields.Float(string='Stok Akhir Kelapa Mentah (Kg)', readonly=True)
+    def action_view_all(self):
+        """Open all daily stock records without date filter."""
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Stok Kelapa Harian'),
+            'res_model': 'coconut.daily.stock',
+            'view_mode': 'list,form',
+            'target': 'main',
+        }

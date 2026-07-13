@@ -193,30 +193,6 @@
             <field name="search_view_id" ref="view_coconut_sorting_search"/>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════
-             LEGACY MENUS (hidden – preserved so existing XML IDs don't break)
-             ═══════════════════════════════════════════════════ -->
-        <!-- Old root menu is replaced by the one in coconut_manufacturing_views.xml -->
-        <!-- This menu is intentionally inactive to hide from UI -->
-        <menuitem id="menu_coconut_receiving_sorting"
-                  name="Penerimaan dan Sortir (Arsip)"
-                  parent="menu_coconut_manufacturing_root"
-                  sequence="90"
-                  active="False"/>
-
-        <menuitem id="menu_coconut_sorting"
-                  name="Sortir Kelapa (Arsip)"
-                  parent="menu_coconut_manufacturing_root"
-                  action="action_coconut_sorting"
-                  sequence="91"
-                  active="False"/>
-
-        <!-- Sub-menu under Manufacturing root: Laporan Stok Harian -->
-        <menuitem id="menu_coconut_daily_report"
-                  name="Stok Kelapa Harian"
-                  parent="menu_coconut_manufacturing_root"
-                  action="action_coconut_stock_report"
-                  sequence="50"/>
-
+        <!-- Legacy menu definitions removed to avoid overriding new menu hierarchy in coconut_manufacturing_views.xml -->
     </data>
 </odoo>

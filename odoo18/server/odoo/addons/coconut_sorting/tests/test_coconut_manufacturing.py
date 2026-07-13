@@ -7,7 +7,7 @@ class TestCoconutManufacturing(TransactionCase):
     """
     Tests for coconut_sorting module (coconut.manufacturing model).
 
-    TEST 2: Sorting transformation (Kelapa Bulat → Layak + Reject)
+    TEST 2: Edit Done Blocker
     TEST 3: Partial machine consumption (remaining Layak preserved)
     TEST 4: Manual sheller consumption (remaining Reject preserved)
     TEST 5: Parer validation (exceeding stock blocked)
@@ -54,23 +54,17 @@ class TestCoconutManufacturing(TransactionCase):
             return 0.0
         return self.env['stock.quant']._get_available_quantity(product, self.location_wh)
 
-    def _create_validated_receipt(self, gross, tare, pot=0.0):
-        """Create and validate a coconut receipt, returning it."""
-        receipt = self.env['coconut.receipt'].create({
-            'partner_id': self.partner.id,
-            'gross_vehicle_weight': gross,
-            'tare_vehicle_weight': tare,
-            'pot_weight': pot,
-            'origin': 'Test Origin',
-            'company_id': self.company.id,
-        })
-        receipt.action_validate()
-        return receipt
+    def _adjust_stock(self, product, quantity):
+        """Helper to set product stock in warehouse."""
+        self.env['stock.quant'].with_context(inventory_mode=True).create({
+            'product_id': product.id,
+            'location_id': self.location_wh.id,
+            'inventory_quantity': quantity,
+        }).action_apply_inventory()
 
-    def _create_mfg(self, receipt, **kwargs):
+    def _create_mfg(self, **kwargs):
         """Create and confirm a manufacturing document."""
         mfg = self.env['coconut.manufacturing'].create({
-            'receipt_id': receipt.id,
             'company_id': self.company.id,
             **kwargs,
         })
@@ -78,244 +72,135 @@ class TestCoconutManufacturing(TransactionCase):
         return mfg
 
     # ─────────────────────────────────────────────────────────────
-    # TEST 2: Sorting transformation
+    # TEST 2: Edit Done Blocker
     # ─────────────────────────────────────────────────────────────
-    def test_02_sorting_transformation(self):
+    def test_02_edit_done_blocker(self):
         """
-        Kelapa Bulat available = 11410
-        Sorting: good=10900, reject=510
-        After validation:
-          Kelapa Bulat: -11410
-          Kelapa Layak Produksi: +10900
-          Kelapa Reject: +510
+        Editing a completed production document must raise UserError.
         """
         self._skip_if_no_products()
 
-        # Create receipt to add 11410 kg Kelapa Bulat
-        receipt = self._create_validated_receipt(gross=16440.0, tare=5030.0)
-
-        qty_bulat_before = self._get_qty(self.p_bulat)
-        qty_layak_before = self._get_qty(self.p_layak)
-        qty_reject_before = self._get_qty(self.p_reject)
-
         mfg = self._create_mfg(
-            receipt,
-            raw_coconut_processed=11410.0,
-            good_coconut_weight=10900.0,
-            reject_coconut_weight=510.0,
-            total_coconut_count=0,
             machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
             machine_sheller_output=0.0,
+            manual_sheller_input=0.0,
             manual_sheller_output=0.0,
             parer_input=0.0,
             parer_output=0.0,
         )
+        # Edit in confirmed state (should be fine at model level)
+        mfg.write({'notes': 'Catatan Confirmed'})
+
+        # Validate
         mfg.action_validate()
         self.assertEqual(mfg.state, 'done')
 
-        qty_bulat_after = self._get_qty(self.p_bulat)
-        qty_layak_after = self._get_qty(self.p_layak)
-        qty_reject_after = self._get_qty(self.p_reject)
-
-        self.assertAlmostEqual(
-            qty_bulat_before - qty_bulat_after, 11410.0, places=2,
-            msg="Kelapa Bulat must decrease by 11410 kg"
-        )
-        self.assertAlmostEqual(
-            qty_layak_after - qty_layak_before, 10900.0, places=2,
-            msg="Kelapa Layak Produksi must increase by 10900 kg"
-        )
-        self.assertAlmostEqual(
-            qty_reject_after - qty_reject_before, 510.0, places=2,
-            msg="Kelapa Reject must increase by 510 kg"
-        )
+        # Edit in done state (should raise UserError)
+        with self.assertRaises(UserError, msg="Completed production document must not be editable"):
+            mfg.write({'notes': 'Catatan Baru Setelah Done'})
 
     # ─────────────────────────────────────────────────────────────
     # TEST 3: Partial Machine Sheller consumption
     # ─────────────────────────────────────────────────────────────
     def test_03_partial_machine_sheller(self):
         """
-        Kelapa Layak available ≥ 20000
+        Kelapa Layak available = 25000
         Machine Sheller Input = 18000
-        Expected remaining Kelapa Layak = available - 18000 (i.e. ≥ 2000)
+        Expected remaining Kelapa Layak = 7000
         """
         self._skip_if_no_products()
 
-        # First, get enough Kelapa Layak by doing a sorting pass
-        receipt = self._create_validated_receipt(gross=30000.0, tare=5000.0)
-        mfg1 = self._create_mfg(
-            receipt,
-            raw_coconut_processed=25000.0,
-            good_coconut_weight=24500.0,
-            reject_coconut_weight=500.0,
-            total_coconut_count=0,
-            machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
-        )
-        mfg1.action_validate()
+        self._adjust_stock(self.p_layak, 25000.0)
+        self._adjust_stock(self.p_sheller, 0.0)
 
         qty_layak_before = self._get_qty(self.p_layak)
-        self.assertGreaterEqual(qty_layak_before, 18000.0,
-                                "Need at least 18000 kg Kelapa Layak for this test")
+        self.assertEqual(qty_layak_before, 25000.0)
 
-        # Now run sheller with partial consumption
-        receipt2 = self._create_validated_receipt(gross=10000.0, tare=3000.0)
-        mfg2 = self._create_mfg(
-            receipt2,
-            raw_coconut_processed=7000.0,
-            good_coconut_weight=6800.0,
-            reject_coconut_weight=200.0,
-            total_coconut_count=0,
+        mfg = self._create_mfg(
             machine_sheller_input=18000.0,
-            manual_sheller_input=0.0,
             machine_sheller_output=17500.0,
+            manual_sheller_input=0.0,
             manual_sheller_output=0.0,
             parer_input=0.0,
             parer_output=0.0,
         )
-        mfg2.action_validate()
+        mfg.action_validate()
 
         qty_layak_after = self._get_qty(self.p_layak)
-        consumed = qty_layak_before - qty_layak_after
-        self.assertAlmostEqual(consumed, 18000.0, places=2,
-                               msg="18000 kg Kelapa Layak must be consumed by Machine Sheller")
-        # Remaining must be correct
-        remaining = qty_layak_after
-        self.assertGreaterEqual(remaining, 0.0, "Remaining Kelapa Layak must not be negative")
+        self.assertAlmostEqual(qty_layak_after, 7000.0, places=2)
+        
+        qty_sheller = self._get_qty(self.p_sheller)
+        self.assertAlmostEqual(qty_sheller, 17500.0, places=2)
 
     # ─────────────────────────────────────────────────────────────
     # TEST 4: Manual Sheller consumption
     # ─────────────────────────────────────────────────────────────
     def test_04_manual_sheller_consumption(self):
         """
-        Kelapa Reject available ≥ 570
+        Kelapa Reject available = 570
         Manual Sheller Input = 300
-        Remaining Kelapa Reject = available - 300
+        Remaining Kelapa Reject = 270
         """
         self._skip_if_no_products()
 
-        # Create reject stock
-        receipt = self._create_validated_receipt(gross=10000.0, tare=2000.0)
-        mfg1 = self._create_mfg(
-            receipt,
-            raw_coconut_processed=8000.0,
-            good_coconut_weight=7430.0,
-            reject_coconut_weight=570.0,
-            total_coconut_count=0,
+        self._adjust_stock(self.p_reject, 570.0)
+        self._adjust_stock(self.p_sheller, 0.0)
+
+        mfg = self._create_mfg(
             machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
             machine_sheller_output=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
-        )
-        mfg1.action_validate()
-
-        qty_reject_before = self._get_qty(self.p_reject)
-        self.assertGreaterEqual(qty_reject_before, 300.0,
-                                "Need at least 300 kg Kelapa Reject for this test")
-
-        # Manual sheller: consume 300 kg
-        receipt2 = self._create_validated_receipt(gross=5000.0, tare=2000.0)
-        mfg2 = self._create_mfg(
-            receipt2,
-            raw_coconut_processed=3000.0,
-            good_coconut_weight=2900.0,
-            reject_coconut_weight=100.0,
-            total_coconut_count=0,
-            machine_sheller_input=0.0,
             manual_sheller_input=300.0,
-            machine_sheller_output=0.0,
             manual_sheller_output=290.0,
             parer_input=0.0,
             parer_output=0.0,
         )
-        mfg2.action_validate()
+        mfg.action_validate()
 
         qty_reject_after = self._get_qty(self.p_reject)
-        consumed = qty_reject_before - qty_reject_after
-        self.assertAlmostEqual(consumed, 300.0, places=2,
-                               msg="300 kg Kelapa Reject must be consumed by Manual Sheller")
+        self.assertAlmostEqual(qty_reject_after, 270.0, places=2)
 
     # ─────────────────────────────────────────────────────────────
     # TEST 5: Parer validation – exceed stock blocked
     # ─────────────────────────────────────────────────────────────
     def test_05_parer_exceeds_sheller_stock_blocked(self):
         """
-        Kelapa Sheller available = some amount
-        Parer Input = available + 1 → must raise UserError
+        Kelapa Sheller available = 100
+        Parer Input = 101 → must raise UserError
         """
         self._skip_if_no_products()
 
-        qty_sheller = self._get_qty(self.p_sheller)
-        parer_input_exceed = qty_sheller + 1.0  # exceeds stock by 1 kg
+        self._adjust_stock(self.p_sheller, 100.0)
 
-        receipt = self._create_validated_receipt(gross=10000.0, tare=3000.0)
         mfg = self._create_mfg(
-            receipt,
-            raw_coconut_processed=7000.0,
-            good_coconut_weight=6900.0,
-            reject_coconut_weight=100.0,
-            total_coconut_count=0,
             machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
             machine_sheller_output=0.0,
+            manual_sheller_input=0.0,
             manual_sheller_output=0.0,
-            parer_input=parer_input_exceed,
-            parer_output=parer_input_exceed - 100.0,
+            parer_input=101.0,
+            parer_output=99.0,
         )
         with self.assertRaises(UserError, msg="Parer exceeding Kelapa Sheller stock must be blocked"):
             mfg.action_validate()
 
     def test_05b_parer_exactly_18001_blocked(self):
         """
-        Spec example: Kelapa Sheller = 18000, Parer Input = 18001 → blocked.
-        We inject exactly this scenario.
+        Kelapa Sheller = 18000, Parer Input = 18001 → blocked.
         """
         self._skip_if_no_products()
 
-        # Set up 18000 kg Kelapa Sheller via a full manufacturing pass
-        receipt = self._create_validated_receipt(gross=28000.0, tare=5000.0)
-        mfg1 = self._create_mfg(
-            receipt,
-            raw_coconut_processed=23000.0,
-            good_coconut_weight=22500.0,
-            reject_coconut_weight=500.0,
-            total_coconut_count=0,
-            machine_sheller_input=22500.0,
-            manual_sheller_input=500.0,
-            machine_sheller_output=17500.0,
-            manual_sheller_output=500.0,
-            parer_input=0.0,
-            parer_output=0.0,
-        )
-        mfg1.action_validate()
+        self._adjust_stock(self.p_sheller, 18000.0)
 
-        qty_sheller = self._get_qty(self.p_sheller)
-        # Now try to use 1 kg more than available
-        receipt2 = self._create_validated_receipt(gross=5000.0, tare=2000.0)
-        mfg2 = self._create_mfg(
-            receipt2,
-            raw_coconut_processed=3000.0,
-            good_coconut_weight=2900.0,
-            reject_coconut_weight=100.0,
-            total_coconut_count=0,
+        mfg = self._create_mfg(
             machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
             machine_sheller_output=0.0,
+            manual_sheller_input=0.0,
             manual_sheller_output=0.0,
-            parer_input=qty_sheller + 1.0,
-            parer_output=qty_sheller,
+            parer_input=18001.0,
+            parer_output=17500.0,
         )
         with self.assertRaises(UserError):
-            mfg2.action_validate()
+            mfg.action_validate()
 
-    # ─────────────────────────────────────────────────────────────
     # TEST 6: Duplicate validation blocked (manufacturing)
     # ─────────────────────────────────────────────────────────────
     def test_06_duplicate_manufacturing_validation_blocked(self):
@@ -323,17 +208,12 @@ class TestCoconutManufacturing(TransactionCase):
         Validating a 'done' manufacturing document again must raise UserError.
         """
         self._skip_if_no_products()
+        self._adjust_stock(self.p_layak, 100.0)
 
-        receipt = self._create_validated_receipt(gross=10000.0, tare=3000.0)
         mfg = self._create_mfg(
-            receipt,
-            raw_coconut_processed=7000.0,
-            good_coconut_weight=6800.0,
-            reject_coconut_weight=200.0,
-            total_coconut_count=0,
-            machine_sheller_input=0.0,
+            machine_sheller_input=10.0,
+            machine_sheller_output=10.0,
             manual_sheller_input=0.0,
-            machine_sheller_output=0.0,
             manual_sheller_output=0.0,
             parer_input=0.0,
             parer_output=0.0,
@@ -341,13 +221,11 @@ class TestCoconutManufacturing(TransactionCase):
         mfg.action_validate()
         self.assertEqual(mfg.state, 'done')
 
-        # Reset to confirmed to attempt second validation
-        # (Should raise because moves already exist)
-        mfg.write({'state': 'confirmed'})
+        # Reset state to confirmed to simulate duplicate validate trigger
+        mfg.state = 'confirmed'
         with self.assertRaises(UserError, msg="Duplicate manufacturing validation must be blocked"):
             mfg.action_validate()
 
-    # ─────────────────────────────────────────────────────────────
     # TEST 7: Invalid UoM (manufacturing)
     # ─────────────────────────────────────────────────────────────
     def test_07_invalid_uom_in_manufacturing_blocked(self):
@@ -356,21 +234,26 @@ class TestCoconutManufacturing(TransactionCase):
         """
         self._skip_if_no_products()
 
-        p_layak_tmpl = self.env.ref('coconut_receiving.product_kelapa_layak')
         uom_unit = self.env.ref('uom.product_uom_unit')
-        original_uom = p_layak_tmpl.uom_id
+        dummy_variant = self.env['product.product'].create({
+            'name': 'Dummy Unit Variant',
+            'type': 'consu',
+            'uom_id': uom_unit.id,
+            'uom_po_id': uom_unit.id,
+        })
+
+        xml_record = self.env['ir.model.data'].search([
+            ('module', '=', 'coconut_receiving'),
+            ('name', '=', 'product_kelapa_layak'),
+        ], limit=1)
+        original_res_id = xml_record.res_id
+
         try:
-            p_layak_tmpl.write({'uom_id': uom_unit.id})
-            receipt = self._create_validated_receipt(gross=10000.0, tare=3000.0)
+            xml_record.write({'res_id': dummy_variant.product_tmpl_id.id})
             mfg = self._create_mfg(
-                receipt,
-                raw_coconut_processed=7000.0,
-                good_coconut_weight=6800.0,
-                reject_coconut_weight=200.0,
-                total_coconut_count=0,
                 machine_sheller_input=0.0,
-                manual_sheller_input=0.0,
                 machine_sheller_output=0.0,
+                manual_sheller_input=0.0,
                 manual_sheller_output=0.0,
                 parer_input=0.0,
                 parer_output=0.0,
@@ -378,7 +261,9 @@ class TestCoconutManufacturing(TransactionCase):
             with self.assertRaises(UserError):
                 mfg.action_validate()
         finally:
-            p_layak_tmpl.write({'uom_id': original_uom.id})
+            xml_record.write({'res_id': original_res_id})
+
+
 
     # ─────────────────────────────────────────────────────────────
     # TEST 8: Removed processes not in active manufacturing
@@ -396,26 +281,3 @@ class TestCoconutManufacturing(TransactionCase):
                     kw, field_name.lower(),
                     msg=f"Field '{field_name}' referencing '{kw}' must not exist in coconut.manufacturing"
                 )
-
-    def test_08b_sorting_balance_validation(self):
-        """
-        good + reject ≠ raw_coconut_processed must raise UserError.
-        """
-        self._skip_if_no_products()
-
-        receipt = self._create_validated_receipt(gross=10000.0, tare=3000.0)
-        mfg = self._create_mfg(
-            receipt,
-            raw_coconut_processed=7000.0,
-            good_coconut_weight=5000.0,  # intentionally wrong
-            reject_coconut_weight=200.0,  # total = 5200 ≠ 7000
-            total_coconut_count=0,
-            machine_sheller_input=0.0,
-            manual_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
-        )
-        with self.assertRaises(UserError, msg="Imbalanced sorting must be blocked"):
-            mfg.action_validate()

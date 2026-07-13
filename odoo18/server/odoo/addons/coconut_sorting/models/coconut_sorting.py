@@ -393,6 +393,9 @@ class CoconutSorting(models.Model):
 
             record.state = 'done'
 
+            # Sync Stok Kelapa Harian record
+            self.env['coconut.daily.stock']._sync_from_receipt(record.receipt_id)
+
     def action_cancel(self):
         for record in self:
             if record.state == 'done' or record.raw_move_id or record.good_move_id:
