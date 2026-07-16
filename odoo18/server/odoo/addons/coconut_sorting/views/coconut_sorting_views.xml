@@ -49,7 +49,7 @@
                                        readonly="state != 'draft'"/>
                                 <field name="company_id" invisible="1"/>
                             </group>
-                            <group string="Sumber Kelapa (Opsional)">
+                            <group string="Sumber Kelapa">
                                 <field name="receipt_id"
                                        readonly="state != 'draft'"/>
                                 <field name="supplier_id"
@@ -66,7 +66,7 @@
                             <group>
                                 <field name="input_weight_kg"
                                        string="Kelapa Bulat Diproses (Kg)"
-                                       readonly="state != 'draft'"/>
+                                       force_save="1"/>
                             </group>
                         </group>
 

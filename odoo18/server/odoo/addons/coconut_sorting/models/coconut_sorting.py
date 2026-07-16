@@ -31,12 +31,12 @@ class CoconutSorting(models.Model):
         default='Baru', readonly=True, copy=False,
     )
 
-    # ───────────────────────────────── Links (optional) ────────────────────────
+    # ───────────────────────────────── Links ───────────────────────────────────
     receipt_id = fields.Many2one(
-        'coconut.receipt', string='Sumber Penerimaan (Opsional)',
-        required=False, ondelete='restrict',
+        'coconut.receipt', string='Sumber Penerimaan',
+        required=True, ondelete='restrict',
         domain=[('state', '=', 'done')],
-        help='Opsional. Pilih penerimaan kelapa jika ingin melacak asal kelapa yang disortir.',
+        help='Penerimaan kelapa sebagai referensi utama data berat bersih penerimaan.',
     )
     date_sorting = fields.Date(
         string='Tanggal Sortir',
@@ -60,8 +60,10 @@ class CoconutSorting(models.Model):
     # ───────────────────────────────── Weight Input ─────────────────────────────
     input_weight_kg = fields.Float(
         string='Kelapa Bulat Diproses (Kg)',
-        required=True, default=0.0,
-        help='Jumlah Kelapa Bulat yang akan diproses dalam batch sortir ini.',
+        compute='_compute_input_weight_kg',
+        store=True,
+        readonly=True,
+        help='Jumlah Kelapa Bulat yang diproses diambil dari berat bersih penerimaan.',
     )
 
     # ───────────────────────────────── Sorting Outputs ─────────────────────────
@@ -137,6 +139,18 @@ class CoconutSorting(models.Model):
 
     # ═══════════════════════════════ Compute Methods ═══════════════════════════
 
+    @api.depends('receipt_id', 'receipt_id.net_received_weight')
+    def _compute_input_weight_kg(self):
+        for rec in self:
+            rec.input_weight_kg = rec.receipt_id.net_received_weight if rec.receipt_id else 0.0
+
+    @api.onchange('receipt_id')
+    def _onchange_receipt_id(self):
+        if self.receipt_id:
+            self.input_weight_kg = self.receipt_id.net_received_weight
+        else:
+            self.input_weight_kg = 0.0
+
     @api.depends('reject_pecah_kg', 'reject_busuk_kg', 'reject_kecil_kg', 'reject_tunas_kg', 'reject_muda_kg')
     def _compute_reject_coconut_kg(self):
         for rec in self:
@@ -173,11 +187,12 @@ class CoconutSorting(models.Model):
             ]):
                 raise ValidationError(_('Detail Kelapa Reject (Kg) tidak boleh negatif.'))
 
-    @api.constrains('good_coconut_kg', 'receipt_id')
-    def _check_good_coconut_vs_receipt(self):
+    @api.constrains('good_coconut_kg', 'reject_pecah_kg', 'reject_busuk_kg', 'reject_kecil_kg', 'reject_tunas_kg', 'reject_muda_kg', 'input_weight_kg')
+    def _check_total_output_vs_input(self):
         for rec in self:
-            if rec.receipt_id and rec.good_coconut_kg > rec.receipt_id.net_received_weight:
-                raise ValidationError(_('Kelapa Layak Produksi tidak boleh melebihi berat bersih penerimaan.'))
+            total_out = rec.good_coconut_kg + rec.reject_coconut_kg
+            if total_out > rec.input_weight_kg:
+                raise ValidationError(_('Total hasil sortir tidak boleh melebihi berat kelapa yang diproses.'))
 
     @api.constrains('input_weight_kg')
     def _check_input_weight(self):
