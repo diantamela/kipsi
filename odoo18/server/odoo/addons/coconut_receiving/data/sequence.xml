@@ -9,5 +9,23 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+
+        <!-- Sequence for Coconut Sorting (standalone) -->
+        <record id="seq_coconut_sorting" model="ir.sequence">
+            <field name="name">Sequence Sortir Kelapa</field>
+            <field name="code">coconut.sorting</field>
+            <field name="prefix">SORT/%(year)s/%(month)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for Coconut Manufacturing (new) -->
+        <record id="seq_coconut_manufacturing" model="ir.sequence">
+            <field name="name">Sequence Pemakaian Kelapa Produksi</field>
+            <field name="code">coconut.manufacturing</field>
+            <field name="prefix">PKK/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>

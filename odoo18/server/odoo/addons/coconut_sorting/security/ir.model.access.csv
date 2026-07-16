@@ -1,8 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_coconut_sorting_user,coconut.sorting user,model_coconut_sorting,base.group_user,1,1,1,0
-access_coconut_sorting_manager,coconut.sorting manager,model_coconut_sorting,base.group_system,1,1,1,1
-access_coconut_manufacturing_user,coconut.manufacturing user,model_coconut_manufacturing,base.group_user,1,1,1,0
-access_coconut_manufacturing_manager,coconut.manufacturing manager,model_coconut_manufacturing,base.group_system,1,1,1,1
-access_coconut_daily_stock_user,coconut.daily.stock user,model_coconut_daily_stock,base.group_user,1,0,0,0
-access_coconut_daily_stock_manager,coconut.daily.stock manager,model_coconut_daily_stock,base.group_system,1,1,1,1
-access_coconut_stock_report,coconut.stock.report user,model_coconut_stock_report,base.group_user,1,1,1,1
