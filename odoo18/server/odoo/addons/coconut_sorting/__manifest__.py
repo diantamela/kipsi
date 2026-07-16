@@ -1,7 +1,7 @@
 {
     'name': 'Manufaktur Kelapa',
-    'version': '18.0.3.0.0',
-    'summary': 'Sortir, Sheller, dan Parer dalam satu dokumen manufaktur kelapa',
+    'version': '18.0.3.1.0',
+    'summary': 'Sortir Kelapa mandiri + Sheller + Parer (Pemakaian Kelapa Produksi)',
     'description': """
         Modul Manufaktur Kelapa untuk PT Coco Murni Prima Jaya.
 

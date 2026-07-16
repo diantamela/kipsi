@@ -11,15 +11,14 @@ TOLERANCE = 0.01  # kg rounding tolerance for mass-balance
 
 class CoconutSorting(models.Model):
     """
-    Proses Sortir Kelapa
+    Proses Sortir Kelapa – Modul Mandiri
 
-    Mengonsumsi Kelapa Bulat Belum Sortir dari persediaan dan menghasilkan:
+    Mengonsumsi Kelapa Bulat dari persediaan gudang dan menghasilkan:
       • Kelapa Layak Produksi
       • Kelapa Reject
-      • Susut Sortir (loss – dicatat via scrap)
 
     Mass-balance rule:
-      good_coconut_kg + reject_coconut_kg + loss_kg == input_weight_kg  (± TOLERANCE)
+      good_coconut_kg + reject_coconut_kg == input_weight_kg  (± TOLERANCE)
     """
     _name = 'coconut.sorting'
     _description = 'Sortir Kelapa'
@@ -32,11 +31,12 @@ class CoconutSorting(models.Model):
         default='Baru', readonly=True, copy=False,
     )
 
-    # ───────────────────────────────── Links ───────────────────────────────────
+    # ───────────────────────────────── Links (optional) ────────────────────────
     receipt_id = fields.Many2one(
-        'coconut.receipt', string='Penerimaan Kelapa',
-        required=True, ondelete='restrict',
-        domain=[('state', '=', 'received')],
+        'coconut.receipt', string='Sumber Penerimaan (Opsional)',
+        required=False, ondelete='restrict',
+        domain=[('state', '=', 'done')],
+        help='Opsional. Pilih penerimaan kelapa jika ingin melacak asal kelapa yang disortir.',
     )
     date_sorting = fields.Date(
         string='Tanggal Sortir',
@@ -59,9 +59,9 @@ class CoconutSorting(models.Model):
 
     # ───────────────────────────────── Weight Input ─────────────────────────────
     input_weight_kg = fields.Float(
-        string='Berat Input Sortir (Kg)',
+        string='Kelapa Bulat Diproses (Kg)',
         required=True, default=0.0,
-        help='Jumlah Kelapa Bulat Belum Sortir yang akan diproses dalam batch sortir ini.',
+        help='Jumlah Kelapa Bulat yang akan diproses dalam batch sortir ini.',
     )
 
     # ───────────────────────────────── Sorting Outputs ─────────────────────────
@@ -71,13 +71,15 @@ class CoconutSorting(models.Model):
     )
     reject_coconut_kg = fields.Float(
         string='Kelapa Reject (Kg)',
-        required=True, default=0.0,
+        compute='_compute_reject_coconut_kg',
+        store=True,
     )
-    loss_kg = fields.Float(
-        string='Susut Sortir (Kg)',
-        required=True, default=0.0,
-        help='Berat yang hilang atau tidak dapat diidentifikasi selama proses sortir.',
-    )
+    
+    reject_pecah_kg = fields.Float(string='Kelapa Pecah (Kg)', default=0.0)
+    reject_busuk_kg = fields.Float(string='Kelapa Busuk (Kg)', default=0.0)
+    reject_kecil_kg = fields.Float(string='Kelapa Kecil (Kg)', default=0.0)
+    reject_tunas_kg = fields.Float(string='Kelapa Tunas (Kg)', default=0.0)
+    reject_muda_kg = fields.Float(string='Kelapa Muda (Kg)', default=0.0)
 
     # ───────────────────────────────── Balance Check ────────────────────────────
     balance_diff = fields.Float(
@@ -91,12 +93,12 @@ class CoconutSorting(models.Model):
         store=False,
     )
 
-    # ───────────────────────────────── Remaining unsorted ───────────────────────
-    remaining_unsorted_weight = fields.Float(
-        string='Sisa Berat Belum Tersortir (Kg)',
-        compute='_compute_remaining_unsorted',
+    # ───────────────────────────────── Stok tersedia ────────────────────────────
+    available_kelapa_bulat = fields.Float(
+        string='Kelapa Bulat Tersedia di Gudang (Kg)',
+        compute='_compute_available_kelapa_bulat',
         store=False,
-        help='Berat Kelapa Bulat yang masih tersisa dari penerimaan ini (belum diproses sortir).',
+        help='Stok Kelapa Bulat yang tersedia di gudang saat ini.',
     )
 
     # ───────────────────────────────── Notes ────────────────────────────────────
@@ -131,41 +133,51 @@ class CoconutSorting(models.Model):
         'stock.move', string='Pergerakan Kelapa Reject',
         readonly=True, copy=False,
     )
-    # Scrap for loss (stored as Many2one to stock.scrap)
-    scrap_id = fields.Many2one(
-        'stock.scrap', string='Catatan Susut Sortir',
-        readonly=True, copy=False,
-    )
+
 
     # ═══════════════════════════════ Compute Methods ═══════════════════════════
 
-    @api.depends('good_coconut_kg', 'reject_coconut_kg', 'loss_kg', 'input_weight_kg')
+    @api.depends('reject_pecah_kg', 'reject_busuk_kg', 'reject_kecil_kg', 'reject_tunas_kg', 'reject_muda_kg')
+    def _compute_reject_coconut_kg(self):
+        for rec in self:
+            rec.reject_coconut_kg = sum([
+                rec.reject_pecah_kg, rec.reject_busuk_kg, rec.reject_kecil_kg,
+                rec.reject_tunas_kg, rec.reject_muda_kg
+            ])
+
+    @api.depends('good_coconut_kg', 'reject_coconut_kg', 'input_weight_kg')
     def _compute_balance(self):
         for rec in self:
-            total_out = rec.good_coconut_kg + rec.reject_coconut_kg + rec.loss_kg
+            total_out = rec.good_coconut_kg + rec.reject_coconut_kg
             diff = round(total_out - rec.input_weight_kg, 4)
             rec.balance_diff = diff
             rec.is_balanced = abs(diff) <= TOLERANCE
 
-    @api.depends('receipt_id', 'receipt_id.remaining_unsorted_weight')
-    def _compute_remaining_unsorted(self):
+    @api.depends()
+    def _compute_available_kelapa_bulat(self):
         for rec in self:
-            if not rec.receipt_id:
-                rec.remaining_unsorted_weight = 0.0
-            else:
-                rec.remaining_unsorted_weight = rec.receipt_id.remaining_unsorted_weight
+            rec.available_kelapa_bulat = rec._get_stock_qty(
+                'coconut_receiving.product_kelapa_bulat'
+            )
 
     # ═══════════════════════════════ Constraints ═══════════════════════════════
 
-    @api.constrains('good_coconut_kg', 'reject_coconut_kg', 'loss_kg')
+    @api.constrains('good_coconut_kg', 'reject_pecah_kg', 'reject_busuk_kg', 'reject_kecil_kg', 'reject_tunas_kg', 'reject_muda_kg')
     def _check_non_negative_outputs(self):
         for rec in self:
             if rec.good_coconut_kg < 0:
                 raise ValidationError(_('Kelapa Layak Produksi (Kg) tidak boleh negatif.'))
-            if rec.reject_coconut_kg < 0:
-                raise ValidationError(_('Kelapa Reject (Kg) tidak boleh negatif.'))
-            if rec.loss_kg < 0:
-                raise ValidationError(_('Susut Sortir (Kg) tidak boleh negatif.'))
+            if any(val < 0 for val in [
+                rec.reject_pecah_kg, rec.reject_busuk_kg, rec.reject_kecil_kg,
+                rec.reject_tunas_kg, rec.reject_muda_kg
+            ]):
+                raise ValidationError(_('Detail Kelapa Reject (Kg) tidak boleh negatif.'))
+
+    @api.constrains('good_coconut_kg', 'receipt_id')
+    def _check_good_coconut_vs_receipt(self):
+        for rec in self:
+            if rec.receipt_id and rec.good_coconut_kg > rec.receipt_id.net_received_weight:
+                raise ValidationError(_('Kelapa Layak Produksi tidak boleh melebihi berat bersih penerimaan.'))
 
     @api.constrains('input_weight_kg')
     def _check_input_weight(self):
@@ -191,28 +203,26 @@ class CoconutSorting(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError(_('Hanya dokumen draft yang dapat dikonfirmasi.'))
-            if not record.receipt_id:
-                raise UserError(_('Penerimaan Kelapa harus dipilih sebelum konfirmasi.'))
-            if record.receipt_id.state != 'received':
-                raise UserError(_(
-                    'Penerimaan Kelapa yang dipilih belum berstatus "Diterima". '
-                    'Selesaikan proses penerimaan terlebih dahulu.'
-                ))
             if record.input_weight_kg <= 0:
                 raise UserError(_('Berat Input Sortir harus lebih besar dari nol.'))
+            # Jika penerimaan dipilih, pastikan statusnya sudah selesai
+            if record.receipt_id and record.receipt_id.state != 'done':
+                raise UserError(_(
+                    'Penerimaan Kelapa yang dipilih belum berstatus "Selesai". '
+                    'Selesaikan proses penerimaan terlebih dahulu.'
+                ))
             record.state = 'confirmed'
 
     def action_done(self):
         """
-        Complete the sorting process:
-        1. Validate mass balance.
-        2. Validate remaining unsorted stock.
-        3. Create stock moves:
-             • Consume Kelapa Bulat Belum Sortir  (WH → virtual production loc)
-             • Produce Kelapa Layak Produksi       (virtual production loc → WH)
-             • Produce Kelapa Reject               (virtual production loc → WH)
-        4. Create scrap for loss_kg.
-        5. Mark state = done.
+        Selesaikan proses sortir:
+        1. Validasi mass balance.
+        2. (Opsional) Validasi sisa stok dari penerimaan jika receipt_id dipilih.
+        3. Buat stock moves:
+             • Consume Kelapa Bulat  (WH → virtual production loc)
+             • Produce Kelapa Layak  (virtual production loc → WH)
+             • Produce Kelapa Reject (virtual production loc → WH)
+        5. Set state = done.
         """
         for record in self:
             if record.state != 'confirmed':
@@ -228,7 +238,7 @@ class CoconutSorting(models.Model):
             uom_kg = self.env.ref('uom.product_uom_kgm')
 
             # ── Mass balance ──
-            total_out = record.good_coconut_kg + record.reject_coconut_kg + record.loss_kg
+            total_out = record.good_coconut_kg + record.reject_coconut_kg
             diff = abs(round(total_out - record.input_weight_kg, 4))
             if diff > TOLERANCE:
                 raise UserError(_(
@@ -236,31 +246,32 @@ class CoconutSorting(models.Model):
                     'Input: %(input).2f kg\n'
                     'Total Output: %(output).2f kg\n'
                     'Selisih: %(diff).4f kg\n\n'
-                    'Pastikan: Kelapa Layak + Kelapa Reject + Susut Sortir = Berat Input.'
+                    'Pastikan: Kelapa Layak + Kelapa Reject = Berat Input.'
                 ) % {
                     'input': record.input_weight_kg,
                     'output': total_out,
                     'diff': total_out - record.input_weight_kg,
                 })
 
-            # ── Remaining stock check ──
-            done_sortings = self.search([
-                ('receipt_id', '=', record.receipt_id.id),
-                ('state', '=', 'done'),
-            ])
-            already_sorted = sum(done_sortings.mapped('input_weight_kg'))
-            remaining = record.receipt_id.net_weight - already_sorted
-            if float_compare(record.input_weight_kg, remaining + TOLERANCE,
-                             precision_rounding=uom_kg.rounding) > 0:
-                raise UserError(_(
-                    'Berat Input Sortir (%(input).2f kg) melebihi sisa berat belum tersortir '
-                    '(%(remaining).2f kg) dari penerimaan %(receipt)s.\n\n'
-                    'Kurangi berat input atau buat dokumen sortir baru sesuai sisa.'
-                ) % {
-                    'input': record.input_weight_kg,
-                    'remaining': remaining,
-                    'receipt': record.receipt_id.name,
-                })
+            # ── Cek sisa stok dari penerimaan (hanya jika receipt_id dipilih) ──
+            if record.receipt_id:
+                done_sortings = self.search([
+                    ('receipt_id', '=', record.receipt_id.id),
+                    ('state', '=', 'done'),
+                ])
+                already_sorted = sum(done_sortings.mapped('input_weight_kg'))
+                remaining = record.receipt_id.net_received_weight - already_sorted
+                if float_compare(record.input_weight_kg, remaining + TOLERANCE,
+                                 precision_rounding=uom_kg.rounding) > 0:
+                    raise UserError(_(
+                        'Berat Input Sortir (%(input).2f kg) melebihi sisa berat belum tersortir '
+                        '(%(remaining).2f kg) dari penerimaan %(receipt)s.\n\n'
+                        'Kurangi berat input atau buat dokumen sortir baru sesuai sisa.'
+                    ) % {
+                        'input': record.input_weight_kg,
+                        'remaining': remaining,
+                        'receipt': record.receipt_id.name,
+                    })
 
             # ── Resolve products ──
             def _get_variant(xml_id, label):
@@ -284,7 +295,7 @@ class CoconutSorting(models.Model):
                     ) % {'name': variant.name, 'uom': variant.uom_id.name})
                 return variant
 
-            raw_product = _get_variant('coconut_receiving.product_kelapa_bulat', 'Kelapa Bulat Belum Sortir')
+            raw_product = _get_variant('coconut_receiving.product_kelapa_bulat', 'Kelapa Bulat')
             good_product = _get_variant('coconut_receiving.product_kelapa_layak', 'Kelapa Layak Produksi')
             reject_product = _get_variant('coconut_receiving.product_kelapa_reject', 'Kelapa Reject')
 
@@ -321,7 +332,7 @@ class CoconutSorting(models.Model):
                 precision_rounding=uom_kg.rounding,
             ) < 0:
                 raise UserError(_(
-                    'Stok Kelapa Bulat Belum Sortir tidak mencukupi.\n\n'
+                    'Stok Kelapa Bulat tidak mencukupi.\n\n'
                     'Stok tersedia: %(avail).2f kg\n'
                     'Berat yang akan disortir: %(need).2f kg'
                 ) % {'avail': available_qty, 'need': record.input_weight_kg})
@@ -343,7 +354,7 @@ class CoconutSorting(models.Model):
 
             # Move 2: Produce good coconut (Production virtual loc → WH)
             good_move_vals = {
-                'name': f'{origin} – Hasil Kelapa Layak',
+                'name': f'{origin} – Hasil Kelapa Layak Produksi',
                 'origin': origin,
                 'product_id': good_product.id,
                 'product_uom_qty': record.good_coconut_kg,
@@ -378,23 +389,9 @@ class CoconutSorting(models.Model):
             record.good_move_id = moves[1].id
             record.reject_move_id = moves[2].id
 
-            # ── Scrap for loss ──
-            if not float_is_zero(record.loss_kg, precision_rounding=uom_kg.rounding):
-                scrap = self.env['stock.scrap'].create({
-                    'product_id': raw_product.id,
-                    'product_uom_id': uom_kg.id,
-                    'scrap_qty': record.loss_kg,
-                    'location_id': location_wh.id,
-                    'origin': origin,
-                    'company_id': record.company_id.id,
-                })
-                scrap.action_validate()
-                record.scrap_id = scrap.id
+
 
             record.state = 'done'
-
-            # Sync Stok Kelapa Harian record
-            self.env['coconut.daily.stock']._sync_from_receipt(record.receipt_id)
 
     def action_cancel(self):
         for record in self:
@@ -412,3 +409,24 @@ class CoconutSorting(models.Model):
             if record.state != 'cancelled':
                 raise UserError(_('Hanya dokumen yang dibatalkan yang dapat dikembalikan ke Draft.'))
             record.state = 'draft'
+
+    # ═══════════════════════════════ Helpers ══════════════════════════════════
+
+    def _get_stock_qty(self, xml_id):
+        """Get available quantity for a product identified by XML ID."""
+        try:
+            tmpl = self.env.ref(xml_id, raise_if_not_found=False)
+            if not tmpl:
+                return 0.0
+            variant = tmpl.product_variant_ids[:1]
+            if not variant:
+                return 0.0
+            warehouse = self.env['stock.warehouse'].search(
+                [('company_id', '=', self.env.company.id)], limit=1
+            )
+            if not warehouse:
+                return 0.0
+            location = warehouse.lot_stock_id
+            return self.env['stock.quant']._get_available_quantity(variant, location)
+        except Exception:
+            return 0.0

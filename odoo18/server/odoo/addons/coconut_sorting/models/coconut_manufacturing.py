@@ -12,12 +12,12 @@ _KG_ROUNDING = 0.01
 
 class CoconutManufacturing(models.Model):
     """
-    Manufaktur Kelapa – dokumen tunggal yang mencakup:
-      1. Sortir Kelapa (Kelapa Bulat → Kelapa Layak + Kelapa Reject)
-      2. Sheller   (Machine: Layak → Sheller | Manual: Reject → Sheller)
-      3. Parer     (Kelapa Sheller → Kelapa Parer)
+    Pemakaian Kelapa Produksi – dokumen yang mencakup:
+      1. Sheller Mesin  (Kelapa Layak → Kelapa Sheller)
+      2. Sheller Manual (Kelapa Reject → Kelapa Sheller)
+      3. Parer          (Kelapa Sheller → Kelapa Parer)
 
-    Setiap proses dieksekusi saat dokumen divalidasi (action_validate).
+    Proses Sortir Kelapa dilakukan di modul terpisah (coconut.sorting).
     Pergerakan stok direkam melalui stock.move standar Odoo.
     """
     _name = 'coconut.manufacturing'
@@ -30,7 +30,7 @@ class CoconutManufacturing(models.Model):
     # ═══════════════════════════════════════════════════════════
 
     name = fields.Char(
-        string='Kode Manufaktur',
+        string='Kode Pemakaian',
         required=True, copy=False, readonly=True,
         default=lambda self: _('Baru'),
         tracking=True,
@@ -43,7 +43,7 @@ class CoconutManufacturing(models.Model):
     )
     responsible_id = fields.Many2one(
         'hr.employee',
-        string='Karyawan Bertanggung Jawab',
+        string='Operator / Karyawan',
         default=lambda self: self.env.user.employee_id,
     )
     company_id = fields.Many2one(
@@ -55,19 +55,20 @@ class CoconutManufacturing(models.Model):
     notes = fields.Text(string='Catatan Produksi')
 
     # ═══════════════════════════════════════════════════════════
-    # SUMBER PENERIMAAN
+    # SUMBER PENERIMAAN (Opsional – hanya untuk tracing)
     # ═══════════════════════════════════════════════════════════
 
     receipt_id = fields.Many2one(
         'coconut.receipt',
-        string='Penerimaan Kelapa',
+        string='Penerimaan Kelapa (Opsional)',
         required=False,
         ondelete='restrict',
         domain=[('state', '=', 'done')],
         tracking=True,
+        help='Opsional. Pilih penerimaan untuk keperluan tracing.',
     )
 
-    # Initial Stock stored fields
+    # Initial Stock stored fields (snapshot saat validasi)
     initial_stock_layak = fields.Float(string='Stok Awal Layak (Kg)', readonly=True, copy=False)
     initial_stock_reject = fields.Float(string='Stok Awal Reject (Kg)', readonly=True, copy=False)
     initial_stock_sheller = fields.Float(string='Stok Awal Sheller (Kg)', readonly=True, copy=False)
@@ -118,73 +119,26 @@ class CoconutManufacturing(models.Model):
         store=False,
     )
 
-    # Remaining Kelapa Bulat from this receipt (computed from stock)
-    remaining_kelapa_bulat = fields.Float(
-        string='Sisa Kelapa Bulat dari Penerimaan (Kg)',
-        compute='_compute_remaining_kelapa_bulat',
-        store=False,
-        readonly=True,
-        help='Sisa Kelapa Bulat yang tersedia dari penerimaan ini berdasarkan pergerakan stok.',
-    )
-
-    # ═══════════════════════════════════════════════════════════
-    # SORTIR KELAPA
-    # ═══════════════════════════════════════════════════════════
-
-    raw_coconut_processed = fields.Float(
-        string='Kelapa Bulat Diproses (Kg)',
-        default=0.0,
-        help='Jumlah Kelapa Bulat yang masuk ke proses sortir.',
-    )
-    total_coconut_count = fields.Integer(
-        string='Jumlah Kelapa (Butir)',
-        default=0,
-        help='Total jumlah buah kelapa yang disortir.',
-    )
-    good_coconut_weight = fields.Float(
-        string='Kelapa Layak Produksi (Kg)',
-        default=0.0,
-    )
-    reject_coconut_weight = fields.Float(
-        string='Kelapa Reject (Kg)',
-        default=0.0,
-    )
-
-    # computed
-    kg_per_coconut = fields.Float(
-        string='KG per Butir',
-        compute='_compute_sorting_derived',
-        store=False,
-        readonly=True,
-    )
-    remaining_unsorted = fields.Float(
-        string='Sisa Kelapa Belum Disortir (Kg)',
-        compute='_compute_sorting_derived',
-        store=False,
-        readonly=True,
-        help='Sisa Kelapa Bulat dari penerimaan ini yang belum diproses sortir.',
-    )
-
     # ═══════════════════════════════════════════════════════════
     # SHELLER
     # ═══════════════════════════════════════════════════════════
 
     machine_sheller_input = fields.Float(
-        string='Input Machine Sheller (Kg)',
+        string='Kelapa Layak Produksi Digunakan (Kg)',
         default=0.0,
         help='Kelapa Layak Produksi yang dimasukkan ke Machine Sheller.',
     )
     manual_sheller_input = fields.Float(
-        string='Input Manual Sheller (Kg)',
+        string='Kelapa Reject Digunakan (Kg)',
         default=0.0,
         help='Kelapa Reject yang dimasukkan ke Manual Sheller.',
     )
     machine_sheller_output = fields.Float(
-        string='Output Machine Sheller (Kg)',
+        string='Output Machine Sheller / Kelapa Sheller (Kg)',
         default=0.0,
     )
     manual_sheller_output = fields.Float(
-        string='Output Manual Sheller (Kg)',
+        string='Output Manual Sheller / Kelapa Sheller (Kg)',
         default=0.0,
     )
 
@@ -196,20 +150,20 @@ class CoconutManufacturing(models.Model):
         readonly=True,
     )
     total_sheller_output = fields.Float(
-        string='Total Output Sheller (Kg)',
+        string='Total Output Kelapa Sheller (Kg)',
         compute='_compute_sheller_derived',
         store=False,
         readonly=True,
     )
     remaining_layak = fields.Float(
-        string='Sisa Kelapa Layak Produksi (Kg)',
+        string='Sisa Kelapa Layak Setelah Proses Ini (Kg)',
         compute='_compute_sheller_derived',
         store=False,
         readonly=True,
         help='Kelapa Layak Produksi yang tersedia dikurangi Machine Sheller Input (dokumen ini).',
     )
     remaining_reject = fields.Float(
-        string='Sisa Kelapa Reject (Kg)',
+        string='Sisa Kelapa Reject Setelah Proses Ini (Kg)',
         compute='_compute_sheller_derived',
         store=False,
         readonly=True,
@@ -228,7 +182,7 @@ class CoconutManufacturing(models.Model):
         help='Stok Kelapa Sheller yang tersedia di gudang saat ini.',
     )
     parer_input = fields.Float(
-        string='Input Parer (Kg)',
+        string='Kelapa Sheller Digunakan / Input Parer (Kg)',
         default=0.0,
         help='Kelapa Sheller yang dimasukkan ke proses Parer.',
     )
@@ -260,19 +214,6 @@ class CoconutManufacturing(models.Model):
     # REFERENSI PERGERAKAN STOK
     # ═══════════════════════════════════════════════════════════
 
-    # Sorting moves
-    sort_raw_move_id = fields.Many2one(
-        'stock.move', string='Move: Konsumsi Kelapa Bulat',
-        readonly=True, copy=False,
-    )
-    sort_good_move_id = fields.Many2one(
-        'stock.move', string='Move: Produksi Kelapa Layak',
-        readonly=True, copy=False,
-    )
-    sort_reject_move_id = fields.Many2one(
-        'stock.move', string='Move: Produksi Kelapa Reject',
-        readonly=True, copy=False,
-    )
     # Sheller moves
     shell_consume_layak_move_id = fields.Many2one(
         'stock.move', string='Move: Konsumsi Kelapa Layak (Machine)',
@@ -299,44 +240,6 @@ class CoconutManufacturing(models.Model):
     # ═══════════════════════════════════════════════════════════
     # COMPUTED METHODS
     # ═══════════════════════════════════════════════════════════
-
-    @api.depends('receipt_id', 'receipt_id.net_received_weight')
-    def _compute_remaining_kelapa_bulat(self):
-        """
-        Remaining Kelapa Bulat for this receipt = net_received_weight
-        minus sum of raw_coconut_processed from Done manufacturing records
-        for the same receipt.
-        """
-        uom_kg = self.env.ref('uom.product_uom_kgm')
-        for rec in self:
-            if not rec.receipt_id:
-                rec.remaining_kelapa_bulat = 0.0
-                continue
-            # Sum processed from done manufacturing docs (excluding current if not saved)
-            done_mfg = self.search([
-                ('receipt_id', '=', rec.receipt_id.id),
-                ('state', '=', 'done'),
-                ('id', '!=', rec.id if rec.id else 0),
-            ])
-            already_used = sum(done_mfg.mapped('raw_coconut_processed'))
-            rec.remaining_kelapa_bulat = (
-                rec.receipt_id.net_received_weight - already_used
-            )
-
-    @api.depends(
-        'good_coconut_weight', 'reject_coconut_weight',
-        'total_coconut_count', 'raw_coconut_processed',
-        'remaining_kelapa_bulat',
-    )
-    def _compute_sorting_derived(self):
-        for rec in self:
-            if rec.total_coconut_count > 0 and rec.good_coconut_weight > 0:
-                rec.kg_per_coconut = rec.good_coconut_weight / rec.total_coconut_count
-            else:
-                rec.kg_per_coconut = 0.0
-            rec.remaining_unsorted = (
-                rec.remaining_kelapa_bulat - rec.raw_coconut_processed
-            )
 
     @api.depends(
         'machine_sheller_input', 'manual_sheller_input',
@@ -389,9 +292,18 @@ class CoconutManufacturing(models.Model):
         for rec in self:
             if rec.state == 'done':
                 # Allow chatter, activities, and workflow state updates, but block other edits
-                user_fields = [k for k in vals.keys() if k != 'state' and not k.startswith('message_') and not k.startswith('activity_') and k not in ('message_ids', 'message_follower_ids', 'activity_ids')]
+                user_fields = [
+                    k for k in vals.keys()
+                    if k != 'state'
+                    and not k.startswith('message_')
+                    and not k.startswith('activity_')
+                    and k not in ('message_ids', 'message_follower_ids', 'activity_ids')
+                ]
                 if user_fields:
-                    raise UserError(_("Dokumen Pemakaian Kelapa Produksi yang sudah selesai tidak dapat diedit. Buat dokumen koreksi jika diperlukan."))
+                    raise UserError(_(
+                        "Dokumen Pemakaian Kelapa Produksi yang sudah selesai tidak dapat diedit. "
+                        "Buat dokumen koreksi jika diperlukan."
+                    ))
         return super().write(vals)
 
     # ═══════════════════════════════════════════════════════════
@@ -413,18 +325,15 @@ class CoconutManufacturing(models.Model):
 
     def action_validate(self):
         """
-        Validate the full manufacturing document.
-        Creates stock moves for all processes.
+        Validasi dokumen Pemakaian Kelapa Produksi.
+        Mencakup proses Sheller (Machine + Manual) dan Parer.
         """
-        if not self.env.user.has_group('base.group_system'):
-            raise UserError(_("Hanya Administrator yang dapat memvalidasi dokumen."))
-
         for rec in self:
             if rec.state != 'confirmed':
                 raise UserError(_(
                     "Hanya dokumen yang dikonfirmasi yang dapat divalidasi."
                 ))
-            # ── Idempotency guard (duplicate validation) ──
+            # ── Idempotency guard ──
             if rec.shell_output_move_id or rec.parer_output_move_id:
                 raise UserError(_(
                     "Dokumen '%s' sudah divalidasi dan pergerakan stok sudah tercatat. "
@@ -453,7 +362,7 @@ class CoconutManufacturing(models.Model):
 
             origin = f'{rec.name}' + (f' / {rec.receipt_id.name}' if rec.receipt_id else '')
 
-            # ── SECTION 2: SHELLER ──
+            # ── SHELLER ──
             rec._validate_sheller(uom_kg, loc_wh)
             shell_moves = rec._create_sheller_moves(
                 p_layak, p_reject, p_sheller, loc_wh, loc_prod, uom_kg, origin
@@ -466,7 +375,7 @@ class CoconutManufacturing(models.Model):
                 if shell_moves.get('produce_sheller'):
                     rec.shell_output_move_id = shell_moves['produce_sheller'].id
 
-            # ── SECTION 3: PARER ──
+            # ── PARER ──
             rec._validate_parer(uom_kg, loc_wh)
             parer_moves = rec._create_parer_moves(
                 p_sheller, p_parer, loc_wh, loc_prod, uom_kg, origin
@@ -480,8 +389,6 @@ class CoconutManufacturing(models.Model):
             rec.state = 'done'
 
     def action_cancel(self):
-        if not self.env.user.has_group('base.group_system'):
-            raise UserError(_("Hanya Administrator yang dapat membatalkan dokumen."))
         for rec in self:
             if rec.state == 'done':
                 raise UserError(_(
@@ -502,64 +409,6 @@ class CoconutManufacturing(models.Model):
     # ═══════════════════════════════════════════════════════════
     # VALIDATION HELPERS
     # ═══════════════════════════════════════════════════════════
-
-    def _validate_sorting(self, uom_kg, loc_wh, origin):
-        """Validate all sorting section business rules."""
-        rec = self
-        if rec.raw_coconut_processed <= 0:
-            raise UserError(_(
-                "Kelapa Bulat Diproses harus lebih besar dari nol."
-            ))
-        if rec.good_coconut_weight < 0:
-            raise UserError(_("Kelapa Layak Produksi tidak boleh negatif."))
-        if rec.reject_coconut_weight < 0:
-            raise UserError(_("Kelapa Reject tidak boleh negatif."))
-        if rec.total_coconut_count < 0:
-            raise UserError(_("Jumlah Kelapa tidak boleh negatif."))
-
-        # good + reject must equal raw_coconut_processed
-        total_out = rec.good_coconut_weight + rec.reject_coconut_weight
-        diff = abs(round(total_out - rec.raw_coconut_processed, 4))
-        if diff > _KG_ROUNDING:
-            raise UserError(_(
-                "Sortir: Kelapa Layak (%(good)s kg) + Kelapa Reject (%(reject)s kg) "
-                "= %(total)s kg harus sama dengan Kelapa Bulat Diproses (%(raw)s kg).\n"
-                "Selisih: %(diff)s kg."
-            ) % {
-                'good': rec.good_coconut_weight,
-                'reject': rec.reject_coconut_weight,
-                'total': total_out,
-                'raw': rec.raw_coconut_processed,
-                'diff': total_out - rec.raw_coconut_processed,
-            })
-
-        # Cannot exceed remaining Kelapa Bulat from this receipt
-        remaining = rec.remaining_kelapa_bulat
-        if float_compare(
-            rec.raw_coconut_processed,
-            remaining + _KG_ROUNDING,
-            precision_rounding=uom_kg.rounding,
-        ) > 0:
-            raise UserError(_(
-                "Sortir: Kelapa Bulat Diproses (%(proc)s kg) melebihi sisa "
-                "Kelapa Bulat dari penerimaan %(receipt)s (%(rem)s kg)."
-            ) % {
-                'proc': rec.raw_coconut_processed,
-                'receipt': rec.receipt_id.name,
-                'rem': remaining,
-            })
-
-        # Check actual stock availability
-        available = self._get_stock_qty('coconut_receiving.product_kelapa_bulat')
-        if float_compare(
-            available,
-            rec.raw_coconut_processed,
-            precision_rounding=uom_kg.rounding,
-        ) < 0:
-            raise UserError(_(
-                "Sortir: Stok Kelapa Bulat tidak mencukupi.\n"
-                "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
-            ) % {'avail': available, 'need': rec.raw_coconut_processed})
 
     def _validate_sheller(self, uom_kg, loc_wh):
         """Validate all sheller business rules."""
@@ -646,63 +495,12 @@ class CoconutManufacturing(models.Model):
             ) < 0:
                 raise UserError(_(
                     "Parer: Stok Kelapa Sheller tidak mencukupi.\n"
-                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg\n\n"
-                    "Input Parer sebesar %(inp)s kg tidak dapat diproses "
-                    "karena hanya tersedia %(avail)s kg Kelapa Sheller."
-                ) % {'avail': sheller_avail, 'need': rec.parer_input,
-                     'inp': rec.parer_input})
+                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
+                ) % {'avail': sheller_avail, 'need': rec.parer_input})
 
     # ═══════════════════════════════════════════════════════════
     # STOCK MOVE CREATORS
     # ═══════════════════════════════════════════════════════════
-
-    def _create_sorting_moves(self, p_bulat, p_layak, p_reject,
-                              loc_wh, loc_prod, uom_kg, origin):
-        """Create and complete 3 stock moves for the sorting section."""
-        rec = self
-        move_vals = [
-            # Consume Kelapa Bulat (WH → Production)
-            {
-                'name': f'{origin} – Sortir: Konsumsi Kelapa Bulat',
-                'origin': origin,
-                'product_id': p_bulat.id,
-                'product_uom_qty': rec.raw_coconut_processed,
-                'product_uom': uom_kg.id,
-                'location_id': loc_wh.id,
-                'location_dest_id': loc_prod.id,
-                'company_id': rec.company_id.id,
-            },
-            # Produce Kelapa Layak (Production → WH)
-            {
-                'name': f'{origin} – Sortir: Produksi Kelapa Layak',
-                'origin': origin,
-                'product_id': p_layak.id,
-                'product_uom_qty': rec.good_coconut_weight,
-                'product_uom': uom_kg.id,
-                'location_id': loc_prod.id,
-                'location_dest_id': loc_wh.id,
-                'company_id': rec.company_id.id,
-            },
-            # Produce Kelapa Reject (Production → WH)
-            {
-                'name': f'{origin} – Sortir: Produksi Kelapa Reject',
-                'origin': origin,
-                'product_id': p_reject.id,
-                'product_uom_qty': rec.reject_coconut_weight,
-                'product_uom': uom_kg.id,
-                'location_id': loc_prod.id,
-                'location_dest_id': loc_wh.id,
-                'company_id': rec.company_id.id,
-            },
-        ]
-        moves = self.env['stock.move'].create(move_vals)
-        moves._action_confirm()
-        moves._action_assign()
-        for move in moves:
-            move.quantity = move.product_uom_qty
-            move.picked = True
-        moves._action_done()
-        return moves
 
     def _create_sheller_moves(self, p_layak, p_reject, p_sheller,
                               loc_wh, loc_prod, uom_kg, origin):
@@ -714,7 +512,7 @@ class CoconutManufacturing(models.Model):
 
         if not float_is_zero(rec.machine_sheller_input, precision_rounding=uom_kg.rounding):
             moves_to_create.append({
-                'name': f'{origin} – Sheller: Konsumsi Kelapa Layak (Machine)',
+                'name': f'{origin} – Sheller Mesin: Konsumsi Kelapa Layak',
                 'origin': origin,
                 'product_id': p_layak.id,
                 'product_uom_qty': rec.machine_sheller_input,
@@ -727,7 +525,7 @@ class CoconutManufacturing(models.Model):
 
         if not float_is_zero(rec.manual_sheller_input, precision_rounding=uom_kg.rounding):
             moves_to_create.append({
-                'name': f'{origin} – Sheller: Konsumsi Kelapa Reject (Manual)',
+                'name': f'{origin} – Sheller Manual: Konsumsi Kelapa Reject',
                 'origin': origin,
                 'product_id': p_reject.id,
                 'product_uom_qty': rec.manual_sheller_input,
@@ -741,7 +539,7 @@ class CoconutManufacturing(models.Model):
         total_sheller_out = rec.machine_sheller_output + rec.manual_sheller_output
         if not float_is_zero(total_sheller_out, precision_rounding=uom_kg.rounding):
             moves_to_create.append({
-                'name': f'{origin} – Sheller: Produksi Kelapa Sheller',
+                'name': f'{origin} – Produksi Kelapa Sheller',
                 'origin': origin,
                 'product_id': p_sheller.id,
                 'product_uom_qty': total_sheller_out,
@@ -871,8 +669,7 @@ class CoconutManufacturing(models.Model):
         if variant.uom_id.category_id != uom_kg.category_id:
             raise UserError(_(
                 "Produk '%(name)s' menggunakan satuan '%(uom)s' yang bukan kategori Berat. "
-                "Silakan ubah satuan produk menjadi kg sebelum melanjutkan.\n\n"
-                "Contoh pesan: 'Product %(name)s must use kg from the Weight UoM category.'"
+                "Silakan ubah satuan produk menjadi kg sebelum melanjutkan."
             ) % {'name': variant.name, 'uom': variant.uom_id.name})
         return variant
 
@@ -910,7 +707,6 @@ class CoconutManufacturing(models.Model):
         used_layak = self.machine_sheller_input
         used_reject = self.manual_sheller_input
         used_sheller = self.parer_input
-        used_parer = 0.0
 
         produced_sheller = self.machine_sheller_output + self.manual_sheller_output
         produced_parer = self.parer_output
@@ -925,7 +721,7 @@ class CoconutManufacturing(models.Model):
             'layak': {'awal': awal_layak, 'used': used_layak, 'akhir': akhir_layak},
             'reject': {'awal': awal_reject, 'used': used_reject, 'akhir': akhir_reject},
             'sheller': {'awal': awal_sheller, 'used': used_sheller, 'akhir': akhir_sheller, 'produced': produced_sheller},
-            'parer': {'awal': awal_parer, 'used': used_parer, 'akhir': akhir_parer, 'produced': produced_parer},
+            'parer': {'awal': awal_parer, 'used': 0.0, 'akhir': akhir_parer, 'produced': produced_parer},
         }
 
     def format_kg(self, value):
@@ -935,4 +731,3 @@ class CoconutManufacturing(models.Model):
     def format_kg_raw(self, value):
         """Helper to format weight in Indonesian style without Kg suffix: 20000 -> 20.000"""
         return "{:,.0f}".format(value).replace(',', '.')
-

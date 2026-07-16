@@ -17,63 +17,94 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; color: #333;">
-                        <!-- Custom CSS/Style for beautiful appearance -->
                         <style>
+                            .company-name {
+                                font-size: 18px;
+                                font-weight: bold;
+                                color: #1e3a1e;
+                                text-align: center;
+                                margin-bottom: 4px;
+                            }
                             .report-title {
-                                font-size: 22px;
+                                font-size: 16px;
                                 font-weight: bold;
                                 text-transform: uppercase;
-                                color: #1e3a1e;
-                                border-bottom: 2px solid #A2CB8B;
-                                padding-bottom: 8px;
+                                color: #2e5a36;
+                                border-bottom: 2px solid #4a7c59;
+                                border-top: 2px solid #4a7c59;
+                                padding: 8px 0;
                                 margin-bottom: 20px;
                                 text-align: center;
+                                letter-spacing: 1px;
                             }
-                            .company-name {
-                                font-size: 14px;
-                                font-weight: bold;
-                                color: #555;
-                                text-align: center;
-                            }
-                            .section-title {
-                                font-size: 14px;
-                                font-weight: bold;
-                                color: #fff;
-                                background-color: #4a7c59;
-                                padding: 6px 10px;
-                                margin-top: 25px;
-                                margin-bottom: 10px;
-                                text-transform: uppercase;
-                                border-radius: 3px;
+                            .info-table {
+                                width: 100%;
+                                margin-bottom: 20px;
+                                border-collapse: collapse;
                             }
                             .info-table td {
-                                padding: 4px 8px;
-                                border: none;
+                                padding: 5px 8px;
+                                vertical-align: top;
                             }
                             .info-label {
                                 font-weight: bold;
                                 width: 180px;
+                                color: #555;
+                            }
+                            .info-colon {
+                                width: 10px;
+                            }
+                            .section-title {
+                                font-size: 13px;
+                                font-weight: bold;
+                                color: #fff;
+                                background-color: #4a7c59;
+                                padding: 6px 12px;
+                                margin-top: 20px;
+                                margin-bottom: 10px;
+                                text-transform: uppercase;
+                                border-radius: 3px;
                             }
                             .data-table {
                                 width: 100%;
                                 border-collapse: collapse;
-                                margin-top: 8px;
+                                margin-top: 6px;
                                 margin-bottom: 15px;
                             }
                             .data-table th {
-                                background-color: #f2f2f2;
-                                border: 1px solid #ddd;
-                                padding: 8px;
+                                background-color: #e8f5e9;
+                                border: 1px solid #a5d6a7;
+                                padding: 7px 10px;
                                 text-align: left;
                                 font-weight: bold;
+                                color: #1e3a1e;
                             }
                             .data-table td {
                                 border: 1px solid #ddd;
-                                padding: 8px;
+                                padding: 7px 10px;
+                            }
+                            .data-table tr:nth-child(even) td {
+                                background-color: #f9f9f9;
+                            }
+                            .text-right { text-align: right; }
+                            .text-bold { font-weight: bold; }
+                            .process-block {
+                                margin-left: 15px;
+                                margin-bottom: 12px;
+                                line-height: 1.8;
+                            }
+                            .process-subtitle {
+                                font-weight: bold;
+                                color: #2e5a36;
+                                margin-bottom: 4px;
+                            }
+                            .process-item {
+                                margin-left: 10px;
                             }
                             .signature-container {
                                 margin-top: 50px;
                                 width: 100%;
+                                overflow: hidden;
                             }
                             .signature-box {
                                 text-align: center;
@@ -82,150 +113,203 @@
                             }
                             .signature-line {
                                 margin-top: 60px;
+                                border-top: 1px solid #333;
+                                padding-top: 4px;
                                 font-weight: bold;
                             }
-                            .clear-fix {
-                                clear: both;
+                            .clear-fix { clear: both; }
+                            .status-badge {
+                                display: inline-block;
+                                padding: 2px 8px;
+                                border-radius: 3px;
+                                font-size: 11px;
+                                font-weight: bold;
                             }
+                            .badge-done { background-color: #4caf50; color: white; }
+                            .badge-confirmed { background-color: #ff9800; color: white; }
+                            .badge-draft { background-color: #2196f3; color: white; }
                         </style>
 
-                        <!-- Header -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="company-name">PT Coco Murni Prima Jaya</div>
-                                <div class="report-title">LAPORAN PEMAKAIAN KELAPA PRODUKSI</div>
-                            </div>
-                        </div>
+                        <!-- ══ HEADER ══ -->
+                        <div class="company-name">PT Coco Murni Prima Jaya</div>
+                        <div class="report-title">LAPORAN PEMAKAIAN KELAPA PRODUKSI</div>
 
-                        <!-- Document Information -->
-                        <table class="info-table" style="width: 100%; margin-bottom: 20px;">
+                        <!-- ══ INFORMASI DOKUMEN ══ -->
+                        <table class="info-table">
                             <tr>
-                                <td class="info-label">Kode Pemakaian:</td>
-                                <td><span t-field="doc.name"/></td>
-                                <td class="info-label">Operator:</td>
+                                <td class="info-label">Kode PKK</td>
+                                <td class="info-colon">:</td>
+                                <td><strong><span t-field="doc.name"/></strong></td>
+                                <td class="info-label">Operator</td>
+                                <td class="info-colon">:</td>
                                 <td><span t-field="doc.responsible_id.name"/></td>
                             </tr>
                             <tr>
-                                <td class="info-label">Tanggal Produksi:</td>
+                                <td class="info-label">Tanggal Produksi</td>
+                                <td class="info-colon">:</td>
                                 <td><span t-field="doc.production_date" t-options='{"widget": "date"}'/></td>
-                                <td class="info-label">Status:</td>
+                                <td class="info-label">Status</td>
+                                <td class="info-colon">:</td>
                                 <td>
-                                    <span t-if="doc.state == 'draft'">Draft</span>
-                                    <span t-elif="doc.state == 'confirmed'">Confirmed</span>
-                                    <span t-elif="doc.state == 'done'">Done</span>
-                                    <span t-elif="doc.state == 'cancelled'">Cancelled</span>
+                                    <span t-if="doc.state == 'draft'" class="status-badge badge-draft">Draft</span>
+                                    <span t-elif="doc.state == 'confirmed'" class="status-badge badge-confirmed">Dikonfirmasi</span>
+                                    <span t-elif="doc.state == 'done'" class="status-badge badge-done">Selesai</span>
+                                    <span t-else="">Dibatalkan</span>
                                 </td>
+                            </tr>
+                            <tr t-if="doc.receipt_id">
+                                <td class="info-label">Sumber Penerimaan</td>
+                                <td class="info-colon">:</td>
+                                <td><span t-field="doc.receipt_id.name"/></td>
+                                <td></td><td></td><td></td>
                             </tr>
                         </table>
 
                         <t t-set="stock_data" t-value="doc.get_report_stock_data()"/>
 
-                        <!-- Section 1: Persediaan Awal -->
-                        <div class="section-title">SECTION 1: PERSEDIAAN AWAL</div>
+                        <!-- ══ SECTION 1: PERSEDIAAN AWAL ══ -->
+                        <div class="section-title">1. Persediaan Awal</div>
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Produk</th>
-                                    <th>Stok Awal</th>
+                                    <th class="text-right">Stok Awal (Kg)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>Kelapa Layak Produksi</td>
-                                    <td><t t-esc="doc.format_kg(stock_data['layak']['awal'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['layak']['awal'])"/></td>
                                 </tr>
                                 <tr>
                                     <td>Kelapa Reject</td>
-                                    <td><t t-esc="doc.format_kg(stock_data['reject']['awal'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['reject']['awal'])"/></td>
                                 </tr>
                                 <tr>
                                     <td>Kelapa Sheller</td>
-                                    <td><t t-esc="doc.format_kg(stock_data['sheller']['awal'])"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <!-- Section 2: Pemakaian Sheller -->
-                        <div class="section-title">SECTION 2: PEMAKAIAN SHELLER</div>
-                        
-                        <div style="margin-left: 10px; margin-bottom: 15px;">
-                            <h6 style="font-weight: bold; color: #2e5a36; margin-top: 10px;">Cungkil Mesin:</h6>
-                            <div style="margin-left: 15px;">
-                                <div>Kelapa Layak Produksi Digunakan: <strong t-esc="doc.format_kg(doc.machine_sheller_input)"/></div>
-                                <div>Output Kelapa Sheller: <strong t-esc="doc.format_kg(doc.machine_sheller_output)"/></div>
-                            </div>
-
-                            <h6 style="font-weight: bold; color: #2e5a36; margin-top: 15px;">Cungkil Manual:</h6>
-                            <div style="margin-left: 15px;">
-                                <div>Kelapa Reject Digunakan: <strong t-esc="doc.format_kg(doc.manual_sheller_input)"/></div>
-                                <div>Output Kelapa Sheller: <strong t-esc="doc.format_kg(doc.manual_sheller_output)"/></div>
-                            </div>
-                        </div>
-
-                        <!-- Section 3: Proses Parer -->
-                        <div class="section-title">SECTION 3: PROSES PARER</div>
-                        <div style="margin-left: 10px; margin-bottom: 15px; line-height: 1.6;">
-                            <div>Kelapa Sheller Digunakan: <strong t-esc="doc.format_kg(doc.parer_input)"/></div>
-                            <div>Output Kelapa Parer: <strong t-esc="doc.format_kg(doc.parer_output)"/></div>
-                        </div>
-
-                        <!-- Section 4: Ringkasan Persediaan -->
-                        <div class="section-title">SECTION 4: RINGKASAN PERSEDIAAN</div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Awal</th>
-                                    <th>Pemakaian</th>
-                                    <th>Akhir</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Kelapa Layak Produksi</td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['awal'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['used'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['layak']['akhir'])"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Kelapa Reject</td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['awal'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['used'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['reject']['akhir'])"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Kelapa Sheller</td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['awal'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['used'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['sheller']['akhir'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['sheller']['awal'])"/></td>
                                 </tr>
                                 <tr>
                                     <td>Kelapa Parer</td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['awal'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['used'])"/></td>
-                                    <td><t t-esc="doc.format_kg_raw(stock_data['parer']['akhir'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['parer']['awal'])"/></td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <!-- Section 5: Stock Movement -->
-                        <div class="section-title">SECTION 5: STOCK MOVEMENT</div>
-                        <div style="margin-left: 10px; margin-bottom: 25px; line-height: 1.6;">
-                            <div><strong>Reference:</strong> <span t-field="doc.name"/></div>
-                            <div style="margin-top: 5px;"><strong>Generated Stock Moves:</strong></div>
-                            <ul style="margin-top: 5px; margin-left: 15px; padding-left: 10px;">
-                                <li>Kelapa Layak Produksi → Production</li>
-                                <li>Kelapa Reject → Production</li>
-                                <li>Kelapa Sheller → Warehouse</li>
-                                <li>Kelapa Parer → Warehouse</li>
-                            </ul>
+                        <!-- ══ SECTION 2: PEMAKAIAN SHELLER ══ -->
+                        <div class="section-title">2. Pemakaian Sheller</div>
+                        <div class="process-block">
+                            <div class="process-subtitle">Sheller Mesin:</div>
+                            <div class="process-item">
+                                <span>Kelapa Layak Produksi Digunakan: </span>
+                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_input)"/></strong>
+                            </div>
+                            <div class="process-item">
+                                <span>Output Kelapa Sheller (Mesin): </span>
+                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_output)"/></strong>
+                            </div>
+                        </div>
+                        <div class="process-block">
+                            <div class="process-subtitle">Sheller Manual:</div>
+                            <div class="process-item">
+                                <span>Kelapa Reject Digunakan: </span>
+                                <strong><t t-esc="doc.format_kg(doc.manual_sheller_input)"/></strong>
+                            </div>
+                            <div class="process-item">
+                                <span>Output Kelapa Sheller (Manual): </span>
+                                <strong><t t-esc="doc.format_kg(doc.manual_sheller_output)"/></strong>
+                            </div>
+                        </div>
+                        <div class="process-block">
+                            <div class="process-subtitle">Total Output Kelapa Sheller:</div>
+                            <div class="process-item">
+                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_output + doc.manual_sheller_output)"/></strong>
+                            </div>
                         </div>
 
-                        <!-- Signature Area -->
-                        <div class="signature-container">
+                        <!-- ══ SECTION 3: PROSES PARER ══ -->
+                        <div class="section-title">3. Proses Parer</div>
+                        <div class="process-block">
+                            <div class="process-item">
+                                <span>Kelapa Sheller Digunakan: </span>
+                                <strong><t t-esc="doc.format_kg(doc.parer_input)"/></strong>
+                            </div>
+                            <div class="process-item">
+                                <span>Output Kelapa Parer: </span>
+                                <strong><t t-esc="doc.format_kg(doc.parer_output)"/></strong>
+                            </div>
+                        </div>
+
+                        <!-- ══ SECTION 4: RINGKASAN PERGERAKAN STOK ══ -->
+                        <div class="section-title">4. Ringkasan Pergerakan Stok</div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Produk</th>
+                                    <th class="text-right">Awal</th>
+                                    <th class="text-right">Pemakaian (−)</th>
+                                    <th class="text-right">Produksi (+)</th>
+                                    <th class="text-right">Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Kelapa Layak Produksi</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['layak']['awal'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['layak']['used'])"/></td>
+                                    <td class="text-right">−</td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['layak']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Reject</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['reject']['awal'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['reject']['used'])"/></td>
+                                    <td class="text-right">−</td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['reject']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Sheller</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['awal'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['used'])"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['produced'])"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['sheller']['akhir'])"/></td>
+                                </tr>
+                                <tr>
+                                    <td>Kelapa Parer</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['parer']['awal'])"/></td>
+                                    <td class="text-right">−</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['parer']['produced'])"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['parer']['akhir'])"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- ══ SECTION 5: STATUS PERGERAKAN STOK ══ -->
+                        <div class="section-title">5. Referensi Pergerakan Stok</div>
+                        <div class="process-block" style="line-height: 1.8;">
+                            <t t-if="doc.shell_consume_layak_move_id or doc.shell_consume_reject_move_id">
+                                <div><strong>Sheller:</strong>
+                                    <span t-if="doc.shell_consume_layak_move_id"> Konsumsi Kelapa Layak (Mesin) ✓</span>
+                                    <span t-if="doc.shell_consume_reject_move_id"> | Konsumsi Kelapa Reject (Manual) ✓</span>
+                                    <span t-if="doc.shell_output_move_id"> | Produksi Kelapa Sheller ✓</span>
+                                </div>
+                            </t>
+                            <t t-if="doc.parer_consume_move_id or doc.parer_output_move_id">
+                                <div><strong>Parer:</strong>
+                                    <span t-if="doc.parer_consume_move_id"> Konsumsi Kelapa Sheller ✓</span>
+                                    <span t-if="doc.parer_output_move_id"> | Produksi Kelapa Parer ✓</span>
+                                </div>
+                            </t>
+                            <t t-if="not doc.shell_output_move_id and not doc.parer_output_move_id">
+                                <div style="color: #999; font-style: italic;">Pergerakan stok belum dibuat (dokumen belum selesai).</div>
+                            </t>
+                        </div>
+
+                        <!-- ══ TANDA TANGAN ══ -->
+                        <div class="signature-container" style="margin-top: 60px;">
                             <div class="signature-box">
                                 <div>Dibuat Oleh:</div>
-                                <div class="signature-line">(________________)</div>
+                                <div class="signature-line"><span t-field="doc.responsible_id.name"/></div>
                             </div>
                             <div class="signature-box">
                                 <div>Diperiksa Oleh:</div>
