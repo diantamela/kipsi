@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dummy security group to hide unused elements -->
+    <record id="group_unused_features" model="res.groups">
+        <field name="name">Hidden Features (PT Coco Murni Prima Jaya)</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+    </record>
+
+    <!-- 1. Inventory Overview: Hide "Order Pengiriman" card -->
+    <record id="stock_picking_type_kanban_inherit" model="ir.ui.view">
+        <field name="name">stock.picking.type.kanban.inherit</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.stock_picking_type_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='stock_picking']" position="attributes">
+                <attribute name="t-if">record.show_picking_type.raw_value &amp;&amp; record.code.raw_value != 'outgoing'</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 2. Inventory Menus: Hide Pengiriman, Pengadaan, Replenishment, Tatanama Barcode -->
+    <record id="stock.out_picking" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+    <record id="stock.menu_stock_procurement" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+    <record id="stock.menu_reordering_rules_replenish" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+    <record id="stock.menu_wms_barcode_nomenclature_all" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
+    <!-- 3. Purchase: PO form customizations -->
+    <record id="purchase_order_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Hide Create Bill buttons in header -->
+            <xpath expr="//header/button[@name='action_create_invoice'][hasclass('oe_highlight')]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//header/button[@name='action_create_invoice'][not(hasclass('oe_highlight'))]" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide smart buttons in button box -->
+            <xpath expr="//button[@name='action_bill_matching']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_view_invoice']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide qty_invoiced and taxes_id on order lines list view -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='qty_invoiced']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='taxes_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <!-- Hide qty_invoiced, taxes_id, and invoice_lines in order lines form view -->
+            <xpath expr="//field[@name='order_line']/form//field[@name='qty_invoiced']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='invoice_lines']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide invoicing fields in Other Info -->
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='fiscal_position_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Purchase: PO tree views customizations (Hide Create Bill buttons & columns) -->
+    <record id="purchase_order_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_kpis_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.kpis.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_create_invoice']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_tree_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.view.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/button[@name='action_create_invoice']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='invoice_status']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- 4. Product Customizations: Form and Tree views -->
+    <record id="product_template_form_view_inherit_coco" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.coco</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <!-- Hide Sales Price -->
+            <xpath expr="//label[@for='list_price']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='list_price_uom']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Cost -->
+            <xpath expr="//label[@id='standard_price_label']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='standard_price_uom']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Customer Taxes -->
+            <xpath expr="//label[@for='taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//div[@name='taxes_div']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Vendor Taxes -->
+            <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Invoicing/Accounting Page -->
+            <xpath expr="//page[@name='invoicing']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Routes (Operations group) -->
+            <xpath expr="//group[@name='operations']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Packaging -->
+            <xpath expr="//group[@name='packaging']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <!-- Hide Traceability -->
+            <xpath expr="//group[@name='traceability']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='tracking']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide Barcode on Template Form -->
+    <record id="product_template_only_form_view_inherit_coco" model="ir.ui.view">
+        <field name="name">product.template.only.form.inherit.coco</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide Barcode/Cost/Price on Variant Form -->
+    <record id="product_normal_form_view_inherit_coco" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.coco</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='barcode']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='lst_price']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide Columns in Product Tree Views -->
+    <record id="product_template_tree_view_inherit_coco" model="ir.ui.view">
+        <field name="name">product.template.tree.inherit.coco</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='barcode']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_product_tree_view_inherit_coco" model="ir.ui.view">
+        <field name="name">product.product.tree.inherit.coco</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lst_price']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='standard_price']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='barcode']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_view_tree_inherit_coco" model="ir.ui.view">
+        <field name="name">product.template.view.tree.inherit.coco</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="account.product_template_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='taxes_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='supplier_taxes_id']" position="attributes">
+                <attribute name="column_invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Hide Invoicing/Accounting Menu from main navbar -->
+    <record id="account.menu_finance" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+</odoo>

@@ -147,12 +147,14 @@ class TestCoconutReceiving(TransactionCase):
         uom_unit = self.env.ref('uom.product_uom_unit')
         original_uom = p_bulat_tmpl.uom_id
         try:
-            p_bulat_tmpl.write({'uom_id': uom_unit.id})
+            self.env.cr.execute("UPDATE product_template SET uom_id = %s WHERE id = %s", (uom_unit.id, p_bulat_tmpl.id))
+            p_bulat_tmpl.invalidate_recordset(['uom_id'])
             receipt = self._create_receipt()
             with self.assertRaises(UserError, msg="Must raise UserError for wrong UoM"):
                 receipt.action_validate()
         finally:
-            p_bulat_tmpl.write({'uom_id': original_uom.id})
+            self.env.cr.execute("UPDATE product_template SET uom_id = %s WHERE id = %s", (original_uom.id, p_bulat_tmpl.id))
+            p_bulat_tmpl.invalidate_recordset(['uom_id'])
 
     # ─────────────────────────────────────────────────────────────
     # TEST 8: Removed processes not in active workflow

@@ -319,15 +319,14 @@ class CoconutReceipt(models.Model):
                 raise ValidationError(_(
                     "Berat Wadah tidak boleh negatif."
                 ))
-            if rec.gross_vehicle_weight > 0:
-                if rec.gross_vehicle_weight <= (rec.tare_vehicle_weight + rec.pot_weight):
-                    raise ValidationError(_(
-                        "Berat Kotor Kendaraan (%(gross)s kg) harus lebih besar dari "
-                        "Tara + Wadah (%(sum)s kg)."
-                    ) % {
-                        'gross': rec.gross_vehicle_weight,
-                        'sum': rec.tare_vehicle_weight + rec.pot_weight,
-                    })
+            if rec.gross_vehicle_weight <= (rec.tare_vehicle_weight + rec.pot_weight):
+                raise ValidationError(_(
+                    "Berat Kotor Kendaraan (%(gross)s kg) harus lebih besar dari "
+                    "Tara + Wadah (%(sum)s kg)."
+                ) % {
+                    'gross': rec.gross_vehicle_weight,
+                    'sum': rec.tare_vehicle_weight + rec.pot_weight,
+                })
             if rec.exit_datetime and rec.entry_datetime:
                 if rec.exit_datetime < rec.entry_datetime:
                     raise ValidationError(_(
