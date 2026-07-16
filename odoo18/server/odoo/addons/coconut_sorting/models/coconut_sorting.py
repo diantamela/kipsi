@@ -404,9 +404,11 @@ class CoconutSorting(models.Model):
             record.good_move_id = moves[1].id
             record.reject_move_id = moves[2].id
 
-
-
             record.state = 'done'
+
+            # ── Sync to Daily Stock Report ──
+            if record.receipt_id:
+                self.env['coconut.daily.stock']._sync_from_receipt(record.receipt_id)
 
     def action_cancel(self):
         for record in self:

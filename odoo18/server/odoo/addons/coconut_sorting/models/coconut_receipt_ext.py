@@ -62,3 +62,10 @@ class CoconutReceiptSortingMixin(models.Model):
 
             receipt.total_sorting_input_weight = sort_total
             receipt.remaining_unsorted_weight = receipt.net_received_weight - sort_total
+
+    def action_validate(self):
+        res = super().action_validate()
+        for receipt in self:
+            if receipt.state == 'done':
+                self.env['coconut.daily.stock']._sync_from_receipt(receipt)
+        return res

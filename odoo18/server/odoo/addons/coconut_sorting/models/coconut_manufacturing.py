@@ -260,12 +260,14 @@ class CoconutManufacturing(models.Model):
             rec.remaining_layak = layak_stock - rec.machine_sheller_input
             rec.remaining_reject = reject_stock - rec.manual_sheller_input
 
-    @api.depends('parer_input')
+    @api.depends('machine_sheller_output', 'manual_sheller_output', 'state')
     def _compute_available_sheller(self):
         for rec in self:
-            rec.available_kelapa_sheller = rec._get_stock_qty(
-                'coconut_receiving.product_kelapa_sheller'
-            )
+            if rec.state == 'done':
+                rec.available_kelapa_sheller = rec.initial_stock_sheller + rec.machine_sheller_output + rec.manual_sheller_output
+            else:
+                existing = rec._get_stock_qty('coconut_receiving.product_kelapa_sheller')
+                rec.available_kelapa_sheller = existing + rec.machine_sheller_output + rec.manual_sheller_output
 
     @api.depends('parer_input', 'available_kelapa_sheller')
     def _compute_parer_derived(self):
