@@ -459,61 +459,6 @@ odoo.define('@analytic/views/pivot/pivot_view',['@web/core/registry','@web/views
 /* /stock/static/src/stock_forecasted/forecasted_graph.js */
 odoo.define('@stock/stock_forecasted/forecasted_graph',['@web/core/registry','@web/views/graph/graph_renderer','@web/views/graph/graph_view'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{GraphRenderer}=require("@web/views/graph/graph_renderer");const{graphView}=require("@web/views/graph/graph_view");const StockForecastedGraphRenderer=__exports.StockForecastedGraphRenderer=class StockForecastedGraphRenderer extends GraphRenderer{static template="stock.ForecastedGraphRenderer";};const StockForecastedGraphView=__exports.StockForecastedGraphView={...graphView,Renderer:StockForecastedGraphRenderer,};registry.category("views").add("stock_forecasted_graph",StockForecastedGraphView);return __exports;});;
 
-/* /project/static/src/views/project_task_graph/project_task_graph_model.js */
-odoo.define('@project/views/project_task_graph/project_task_graph_model',['@web/views/graph/graph_model','@web/core/l10n/translation'],function(require){'use strict';let __exports={};const{GraphModel}=require("@web/views/graph/graph_model");const{_t}=require("@web/core/l10n/translation");const ProjectTaskGraphModel=__exports.ProjectTaskGraphModel=class ProjectTaskGraphModel extends GraphModel{_getDefaultFilterLabel(field){if(field.fieldName==="project_id"){return _t("🔒 Private");}
-return super._getDefaultFilterLabel(field);}}
-return __exports;});;
-
-/* /project/static/src/views/project_task_graph/project_task_graph_view.js */
-odoo.define('@project/views/project_task_graph/project_task_graph_view',['@web/core/registry','@web/views/graph/graph_view','@project/views/project_task_graph/project_task_graph_model'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{graphView}=require("@web/views/graph/graph_view");const{ProjectTaskGraphModel}=require("@project/views/project_task_graph/project_task_graph_model");const viewRegistry=registry.category("views");const projectTaskGraphView=__exports.projectTaskGraphView={...graphView,Model:ProjectTaskGraphModel,};viewRegistry.add("project_task_graph",projectTaskGraphView);return __exports;});;
-
-/* /project/static/src/views/project_task_pivot/project_pivot_model.js */
-odoo.define('@project/views/project_task_pivot/project_pivot_model',['@web/core/l10n/translation','@web/views/pivot/pivot_model'],function(require){'use strict';let __exports={};const{_t}=require("@web/core/l10n/translation");const{PivotModel}=require("@web/views/pivot/pivot_model");const ProjectTaskPivotModel=__exports.ProjectTaskPivotModel=class ProjectTaskPivotModel extends PivotModel{_getEmptyGroupLabel(fieldName){if(fieldName==="project_id"){return _t("Private");}else if(fieldName==="user_ids"){return _t("Unassigned");}else{return super._getEmptyGroupLabel(fieldName);}}}
-return __exports;});;
-
-/* /project/static/src/views/project_task_pivot/project_pivot_view.js */
-odoo.define('@project/views/project_task_pivot/project_pivot_view',['@web/core/registry','@web/views/pivot/pivot_view','@project/views/project_task_pivot/project_pivot_model'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{pivotView}=require("@web/views/pivot/pivot_view");const{ProjectTaskPivotModel}=require("@project/views/project_task_pivot/project_pivot_model");const projectPivotView=__exports.projectPivotView={...pivotView,Model:ProjectTaskPivotModel,};registry.category("views").add("project_pivot",projectPivotView);return __exports;});;
-
-/* /project/static/src/views/burndown_chart/burndown_chart_model.js */
-odoo.define('@project/views/burndown_chart/burndown_chart_model',['@web/core/l10n/translation','@web/views/graph/graph_model','@web/core/utils/arrays'],function(require){'use strict';let __exports={};const{_t}=require("@web/core/l10n/translation");const{GraphModel}=require("@web/views/graph/graph_model");const{sortBy}=require("@web/core/utils/arrays");const BurndownChartModel=__exports.BurndownChartModel=class BurndownChartModel extends GraphModel{setup(params){super.setup(params);this.stageSeqAndNamePerId={};}
-async _fetchStageInfo(context){const searchDomain=!context.active_id||!context.default_project_id?[]:[["project_ids","in",context.active_id]];const data=await this.orm.webSearchRead("project.task.type",searchDomain,{specification:{name:{},sequence:{},},});const stageSeqAndNamePerId={};for(const{id,name,sequence}of data.records){stageSeqAndNamePerId[id]={name,sequence};}
-return stageSeqAndNamePerId;}
-async load(searchParams){const{context,groupBy}=searchParams;if(groupBy.includes("stage_id")){if(context.stage_name_and_sequence_per_id&&context.default_project_id){this.stageSeqAndNamePerId=context.stage_name_and_sequence_per_id;}else{this.stageSeqAndNamePerId=await this._fetchStageInfo(context);}}else{this.stageSeqAndNamePerId={};}
-await super.load(searchParams);}
-_prepareData(){super._prepareData();const{groupBy}=this.searchParams;const{mode}=this.metaData;if(mode==="line"&&groupBy.includes("stage_id")){this.data.datasets=sortBy(this.data.datasets,(dataSet)=>{const firstIdentifier=[...dataSet.identifiers][0];const group=Object.assign(...JSON.parse(firstIdentifier));const val=group.stage_id;if(Array.isArray(val)){return this.stageSeqAndNamePerId[val[0]]?.sequence||-1;}
-return-1;});}}
-async _loadDataPoints(metaData){metaData.measures.__count.string=_t("# of Tasks");return super._loadDataPoints(metaData);}}
-return __exports;});;
-
-/* /project/static/src/views/burndown_chart/burndown_chart_search_model.js */
-odoo.define('@project/views/burndown_chart/burndown_chart_search_model',['@web/core/l10n/translation','@web/core/utils/hooks','@web/search/search_model'],function(require){'use strict';let __exports={};const{_t}=require("@web/core/l10n/translation");const{useService}=require("@web/core/utils/hooks");const{SearchModel}=require("@web/search/search_model");const BurndownChartSearchModel=__exports.BurndownChartSearchModel=class BurndownChartSearchModel extends SearchModel{setup(services){this.notificationService=useService("notification");super.setup(...arguments);}
-async load(config){await super.load(...arguments);for(const searchItem of Object.values(this.searchItems)){if(['dateGroupBy','groupBy'].includes(searchItem.type)){if(this.stageIdSearchItemId&&this.dateSearchItemId&&this.isClosedSearchItemId){return;}
-switch(searchItem.fieldName){case'date':this.dateSearchItemId=searchItem.id;break;case'stage_id':this.stageIdSearchItemId=searchItem.id;break;case'is_closed':this.isClosedSearchItemId=searchItem.id;break;}}}}
-deactivateGroup(groupId){if(this.searchItems[this.dateSearchItemId].groupId==groupId){if(this.query.some(queryElem=>[this.stageIdSearchItemId,this.isClosedSearchItemId].includes(queryElem.searchItemId))){this._addGroupByNotification(_t("The report should be grouped either by \"Stage\" to represent a Burndown Chart or by \"Is Closed\" to represent a Burn-up chart. Without one of these groupings applied, the report will not provide relevant information."));}
-return;}
-super.deactivateGroup(groupId);}
-toggleDateGroupBy(searchItemId,intervalId){if(searchItemId===this.dateSearchItemId){let filtered_query=[];let triggerNotification=false;for(const queryElem of this.query){if(queryElem.searchItemId!==searchItemId){filtered_query.push(queryElem);}else if(queryElem.intervalId===intervalId){triggerNotification=true;}}
-if(filtered_query.length!==this.query.length){this.query=filtered_query;if(triggerNotification){this._addGroupByNotification(_t("The Burndown Chart must be grouped by Date"));}}}
-super.toggleDateGroupBy(...arguments);}
-toggleSearchItem(searchItemId){if(searchItemId===this.isClosedSearchItemId){super.toggleSearchItem(this.stageIdSearchItemId);}else if(searchItemId===this.stageIdSearchItemId){super.toggleSearchItem(this.isClosedSearchItemId);}
-super.toggleSearchItem(...arguments);}
-_addGroupByNotification(body){this.notificationService.add(body,{type:"danger"});}
-async _notify(){let stageIdIndex=-1;let dateIndex=-1;let isClosedIndex=-1;for(const[index,queryElem]of this.query.entries()){if(dateIndex!==-1&&(stageIdIndex!==-1||isClosedIndex!==-1)){break;}
-switch(queryElem.searchItemId){case this.dateSearchItemId:dateIndex=index;break;case this.stageIdSearchItemId:stageIdIndex=index;break;case this.isClosedSearchItemId:isClosedIndex=index;break;}}
-if(isClosedIndex>0){if(isClosedIndex>dateIndex){dateIndex+=1;}
-this.query.splice(0,0,this.query.splice(stageIdIndex,1)[0]);}else if(stageIdIndex>0){if(stageIdIndex>dateIndex){dateIndex+=1;}
-this.query.splice(0,0,this.query.splice(stageIdIndex,1)[0]);}
-if(dateIndex>0){this.query.splice(0,0,this.query.splice(dateIndex,1)[0]);}
-await super._notify(...arguments);}}
-return __exports;});;
-
-/* /project/static/src/views/burndown_chart/burndown_chart_view.js */
-odoo.define('@project/views/burndown_chart/burndown_chart_view',['@project/views/burndown_chart/burndown_chart_model','@web/views/graph/graph_view','@web/core/registry','@project/views/burndown_chart/burndown_chart_search_model'],function(require){'use strict';let __exports={};const{BurndownChartModel}=require("@project/views/burndown_chart/burndown_chart_model");const{graphView}=require("@web/views/graph/graph_view");const{registry}=require("@web/core/registry");const{BurndownChartSearchModel}=require("@project/views/burndown_chart/burndown_chart_search_model");const viewRegistry=registry.category("views");const burndownChartGraphView={...graphView,buttonTemplate:"project.BurndownChartView.Buttons",hideCustomGroupBy:true,Model:BurndownChartModel,searchMenuTypes:graphView.searchMenuTypes.filter(menuType=>menuType!=="comparison"),SearchModel:BurndownChartSearchModel,};viewRegistry.add("burndown_chart",burndownChartGraphView);return __exports;});;
-
-/* /mass_mailing/static/src/views/mass_mailing_subscription_graph_renderer.js */
-odoo.define('@mass_mailing/views/mass_mailing_subscription_graph_renderer',['@web/core/registry','@web/views/graph/graph_renderer','@web/views/graph/graph_view'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{GraphRenderer}=require("@web/views/graph/graph_renderer");const{graphView}=require("@web/views/graph/graph_view");const SubscriptionGraphRenderer=__exports.SubscriptionGraphRenderer=class SubscriptionGraphRenderer extends GraphRenderer{openView(domain,views,context){this.actionService.doAction({context,domain,name:this.model.metaData.title,res_model:this.model.metaData.resModel,target:"current",type:"ir.actions.act_window",views:[[false,"pivot"],[false,"form"]],},{viewType:"pivot",});}}
-const subscriptionGraphView=__exports.subscriptionGraphView={...graphView,Renderer:SubscriptionGraphRenderer,};registry.category("views").add("subscription_graph",subscriptionGraphView);return __exports;});;
-
 /* /hr/static/src/views/hr_graph_view.js */
 odoo.define('@hr/views/hr_graph_view',['@web/core/registry','@web/views/graph/graph_view','@web/views/graph/graph_controller','@hr/views/hr_action_helper'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{graphView}=require("@web/views/graph/graph_view");const{GraphController}=require("@web/views/graph/graph_controller");const{HrActionHelper}=require("@hr/views/hr_action_helper");const HrGraphController=__exports.HrGraphController=class HrGraphController extends GraphController{static template="hr.GraphView";static components={...GraphController.components,HrActionHelper};}
 const HrGraphView=__exports.HrGraphView={...graphView,Controller:HrGraphController,};registry.category("views").add("hr_graph_view",HrGraphView);return __exports;});;
@@ -1119,14 +1064,6 @@ registerTemplate("stock.ForecastedGraphRenderer", `/stock/static/src/stock_forec
             <attribute name="height">300</attribute>
         </xpath>
     </t>
-`);
-registerTemplate("project.BurndownChartView.Buttons", `/project/static/src/views/burndown_chart/burndown_chart_view.xml`, `<t t-name="project.BurndownChartView.Buttons" t-inherit="web.GraphView.Buttons" t-inherit-mode="primary" xml:space="preserve">
-        <xpath expr="//button[@data-mode='pie']" position="replace">
-        </xpath>
-        <xpath expr="//div[@role='toolbar'][@name='toggleOrderToolbar']" position="replace">
-        </xpath>
-    </t>
-
 `);
 registerTemplate("hr.GraphView", `/hr/static/src/views/hr_graph_controller.xml`, `<t t-name="hr.GraphView" t-inherit="web.GraphView" xml:space="preserve">
         <t t-call="web.ActionHelper" position="replace">

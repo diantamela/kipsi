@@ -18,6 +18,11 @@
         </field>
     </record>
 
+    <!-- Archive Outgoing picking type (Order Pengiriman) -->
+    <record id="stock.picking_type_out" model="stock.picking.type">
+        <field name="active">False</field>
+    </record>
+
     <!-- 2. Inventory Menus: Hide Pengiriman, Pengadaan, Replenishment, Tatanama Barcode -->
     <record id="stock.out_picking" model="ir.ui.menu">
         <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
@@ -29,6 +34,17 @@
         <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
     </record>
     <record id="stock.menu_wms_barcode_nomenclature_all" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+    <record id="stock.menu_procurement_compute" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+    <record id="stock.menu_delivery" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
+    <!-- Hide native Stock Overview menu -->
+    <record id="stock.stock_picking_type_menu" model="ir.ui.menu">
         <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
     </record>
 
@@ -261,4 +277,41 @@
     <record id="account.menu_finance" model="ir.ui.menu">
         <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
     </record>
+
+    <!-- Hide Purchase Menu from main navbar -->
+    <record id="purchase.menu_purchase_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
+    <!-- 5. Inventory Operations: Override default menus to point to custom models -->
+    <!-- Rename "Penerimaan" to "Penerimaan Kelapa" and direct to coconut_receiving.action_coconut_receipt -->
+    <record id="stock.in_picking" model="ir.ui.menu">
+        <field name="name">Penerimaan Kelapa</field>
+        <field name="action" ref="coconut_receiving.action_coconut_receipt"/>
+    </record>
+
+    <!-- Rename "Manufaktur" to "Pemakaian Kelapa Produksi" and direct to coconut_receiving.action_coconut_manufacturing -->
+    <record id="mrp.mrp_operation_picking" model="ir.ui.menu">
+        <field name="name">Pemakaian Kelapa Produksi</field>
+        <field name="action" ref="coconut_receiving.action_coconut_manufacturing"/>
+    </record>
+
+    <!-- 6. Kelapa Module Overview Card with Bar Chart -->
+    <record id="action_coconut_picking_type_kanban" model="ir.actions.act_window">
+        <field name="name">Overview</field>
+        <field name="res_model">stock.picking.type</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('code', '=', 'incoming')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Overview Penerimaan Kelapa
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_coconut_overview"
+              name="Overview"
+              parent="coconut_receiving.menu_coconut_receiving_root"
+              action="action_coconut_picking_type_kanban"
+              sequence="5"/>
 </odoo>

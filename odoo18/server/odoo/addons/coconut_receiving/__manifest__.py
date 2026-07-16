@@ -20,7 +20,7 @@
     """,
     'author': 'PT Coco Murni Prima Jaya / Custom',
     'category': 'Manufacturing',
-    'depends': ['base', 'stock', 'hr', 'mail', 'uom', 'purchase', 'product'],
+    'depends': ['base', 'stock', 'hr', 'mail', 'uom', 'purchase', 'product', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequence.xml',
