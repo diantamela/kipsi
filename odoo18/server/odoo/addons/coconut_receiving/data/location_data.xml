@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <!-- Keep noupdate="0" or "1"? Let's use noupdate="0" for new stock locations so they are guaranteed to be created/updated correctly. -->
+    <data noupdate="0">
         <!-- Virtual production location for sorting (legacy – keep for old records) -->
         <record id="stock_location_coconut_sorting" model="stock.location">
             <field name="name">Produksi Sortir Kelapa</field>
@@ -11,6 +12,49 @@
         <record id="stock_location_coconut_manufacturing" model="stock.location">
             <field name="name">Produksi Manufaktur Kelapa</field>
             <field name="usage">production</field>
+        </record>
+
+        <!-- Six required coconut stock locations -->
+        <record id="location_gudang_kelapa_bulat" model="stock.location">
+            <field name="name">Gudang Kelapa Bulat</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_stok_kelapa_layak" model="stock.location">
+            <field name="name">Stok Kelapa Layak</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_stok_kelapa_reject" model="stock.location">
+            <field name="name">Stok Kelapa Reject</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_area_sheller" model="stock.location">
+            <field name="name">Area Sheller</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_area_parer" model="stock.location">
+            <field name="name">Area Parer</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_gudang_kelapa_akhir_mp" model="stock.location">
+            <field name="name">Gudang Kelapa Akhir MP</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
         </record>
     </data>
 </odoo>

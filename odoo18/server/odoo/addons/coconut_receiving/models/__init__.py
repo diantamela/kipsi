@@ -5,3 +5,4 @@ from . import coconut_sorting
 from . import coconut_manufacturing
 from . import coconut_stock_report
 from . import stock_picking_type
+from . import finalisasi_kelapa_mp

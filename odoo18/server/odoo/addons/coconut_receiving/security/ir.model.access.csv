@@ -8,3 +8,5 @@ access_coconut_manufacturing_manager,coconut.manufacturing manager,model_coconut
 access_coconut_daily_stock_user,coconut.daily.stock user,model_coconut_daily_stock,base.group_user,1,0,0,0
 access_coconut_daily_stock_manager,coconut.daily.stock manager,model_coconut_daily_stock,base.group_system,1,1,1,1
 access_coconut_stock_report,coconut.stock.report user,model_coconut_stock_report,base.group_user,1,1,1,1
+access_finalisasi_kelapa_mp_user,finalisasi.kelapa.mp user,model_finalisasi_kelapa_mp,stock.group_stock_user,1,1,1,0
+access_finalisasi_kelapa_mp_manager,finalisasi.kelapa.mp manager,model_finalisasi_kelapa_mp,stock.group_stock_manager,1,1,1,1

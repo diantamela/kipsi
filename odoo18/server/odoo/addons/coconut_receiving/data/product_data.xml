@@ -2,17 +2,21 @@
 <odoo>
     <data noupdate="0">
 
-        <!-- ═══════════════════════════════════════════════════════════
-             BAHAN BAKU 1: Kelapa Bulat
-             Diterima dari pemasok, masuk ke Kelapa Bulat inventory.
-             XML ID stable: coconut_receiving.product_kelapa_bulat
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- Category: Produk Kelapa -->
+        <record id="product_category_kelapa" model="product.category">
+            <field name="name">Produk Kelapa</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <!-- Kelapa Bulat (COCO-BULAT) -->
         <record id="product_kelapa_bulat" model="product.template">
             <field name="name">Kelapa Bulat</field>
+            <field name="default_code">COCO-BULAT</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
             <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
@@ -20,17 +24,15 @@
             <field name="description">Kelapa bulat utuh yang diterima dari pemasok. Stok ditambah saat Penerimaan Kelapa divalidasi berdasarkan Berat Bersih Diterima.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             BAHAN BAKU 2: Kelapa Layak Produksi
-             Dihasilkan dari proses Sortir (Coconut Manufacturing).
-             XML ID stable: coconut_receiving.product_kelapa_layak
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- Kelapa Layak Produksi (COCO-LAYAK) -->
         <record id="product_kelapa_layak" model="product.template">
             <field name="name">Kelapa Layak Produksi</field>
+            <field name="default_code">COCO-LAYAK</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
             <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
@@ -38,17 +40,15 @@
             <field name="description">Kelapa bulat yang telah disortir dan dinyatakan layak untuk proses Machine Sheller.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             BAHAN BAKU 3: Kelapa Reject
-             Dihasilkan dari proses Sortir (Coconut Manufacturing).
-             XML ID stable: coconut_receiving.product_kelapa_reject
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- Kelapa Reject (COCO-REJECT) -->
         <record id="product_kelapa_reject" model="product.template">
             <field name="name">Kelapa Reject</field>
+            <field name="default_code">COCO-REJECT</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
             <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
@@ -56,19 +56,15 @@
             <field name="description">Kelapa yang tidak memenuhi standar kualitas saat sortir. Diproses oleh Manual Sheller.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             BARANG DALAM PROSES 4: Kelapa Sheller
-             Dihasilkan dari Machine Sheller (dari Kelapa Layak) dan
-             Manual Sheller (dari Kelapa Reject).
-             Input untuk proses Parer.
-             XML ID stable: coconut_receiving.product_kelapa_sheller
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- Kelapa Sheller (COCO-SHELLER) -->
         <record id="product_kelapa_sheller" model="product.template">
             <field name="name">Kelapa Sheller</field>
+            <field name="default_code">COCO-SHELLER</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
             <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
@@ -76,22 +72,36 @@
             <field name="description">Kelapa yang telah diproses Machine Sheller atau Manual Sheller. Merupakan input untuk proses Parer.</field>
         </record>
 
-        <!-- ═══════════════════════════════════════════════════════════
-             BARANG DALAM PROSES 5: Kelapa Parer
-             Dihasilkan dari proses Parer (dari Kelapa Sheller).
-             XML ID stable: coconut_receiving.product_kelapa_parer
-             ═══════════════════════════════════════════════════════════ -->
+        <!-- Kelapa Parer (COCO-PARER) -->
         <record id="product_kelapa_parer" model="product.template">
             <field name="name">Kelapa Parer</field>
+            <field name="default_code">COCO-PARER</field>
             <field name="type">consu</field>
             <field name="is_storable" eval="True"/>
             <field name="uom_id" ref="uom.product_uom_kgm"/>
             <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
             <field name="tracking">none</field>
             <field name="purchase_ok" eval="False"/>
             <field name="sale_ok" eval="False"/>
             <field name="active" eval="True"/>
-            <field name="description">Kelapa yang telah dikupas kulitnya melalui proses Parer dari Kelapa Sheller. Produk akhir proses manufaktur kelapa.</field>
+            <field name="description">Kelapa yang telah dikupas kulitnya melalui proses Parer dari Kelapa Sheller.</field>
+        </record>
+
+        <!-- Kelapa Akhir MP (COCO-AKHIR-MP) -->
+        <record id="product_kelapa_akhir_mp" model="product.template">
+            <field name="name">Kelapa Akhir MP</field>
+            <field name="default_code">COCO-AKHIR-MP</field>
+            <field name="type">consu</field>
+            <field name="is_storable" eval="True"/>
+            <field name="uom_id" ref="uom.product_uom_kgm"/>
+            <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+            <field name="categ_id" ref="product_category_kelapa"/>
+            <field name="tracking">none</field>
+            <field name="purchase_ok" eval="False"/>
+            <field name="sale_ok" eval="False"/>
+            <field name="active" eval="True"/>
+            <field name="description">Kelapa Akhir MP. Produk akhir divisi MP.</field>
         </record>
 
     </data>

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Window Action -->
+    <record id="action_finalisasi_kelapa_mp" model="ir.actions.act_window">
+        <field name="name">Finalisasi Kelapa MP</field>
+        <field name="res_model">finalisasi.kelapa.mp</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Buat pencatatan finalisasi Kelapa MP baru.
+            </p>
+        </field>
+    </record>
+
+    <!-- List View -->
+    <record id="view_finalisasi_kelapa_mp_list" model="ir.ui.view">
+        <field name="name">finalisasi.kelapa.mp.list</field>
+        <field name="model">finalisasi.kelapa.mp</field>
+        <field name="arch" type="xml">
+            <list string="Finalisasi Kelapa MP">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="batch_number"/>
+                <field name="product_parer_id"/>
+                <field name="parer_qty_used" sum="Total Parer"/>
+                <field name="akhir_mp_qty_produced" sum="Total Akhir MP"/>
+                <field name="process_loss" sum="Total Susut"/>
+                <field name="responsible_id"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'confirmed'" decoration-success="state == 'done'" decoration-muted="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_finalisasi_kelapa_mp_form" model="ir.ui.view">
+        <field name="name">finalisasi.kelapa.mp.form</field>
+        <field name="model">finalisasi.kelapa.mp</field>
+        <field name="arch" type="xml">
+            <form string="Finalisasi Kelapa MP">
+                <header>
+                    <button name="action_confirm" string="Konfirmasi" type="object" class="oe_highlight" invisible="state != 'draft'"/>
+                    <button name="action_done" string="Selesai" type="object" class="oe_highlight" invisible="state not in ['draft', 'confirmed']"/>
+                    <button name="action_cancel" string="Batalkan" type="object" confirm="Apakah Anda yakin ingin membatalkan transaksi ini? Pergerakan stok akan dibalik secara otomatis." invisible="state not in ['confirmed', 'done']"/>
+                    <button name="action_reset_draft" string="Kembalikan ke Draft" type="object" invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done,cancelled"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date" readonly="state in ['done', 'cancelled']"/>
+                            <field name="batch_number" readonly="state in ['done', 'cancelled']"/>
+                            <field name="responsible_id" readonly="state in ['done', 'cancelled']"/>
+                        </group>
+                        <group>
+                            <field name="product_parer_id" readonly="state in ['done', 'cancelled']"/>
+                            <field name="available_parer_qty"/>
+                            <field name="parer_qty_used" readonly="state in ['done', 'cancelled']"/>
+                            <field name="akhir_mp_qty_produced" readonly="state in ['done', 'cancelled']"/>
+                            <field name="process_loss"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="state in ['done', 'cancelled']"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Catatan">
+                            <field name="notes" placeholder="Catatan internal..." readonly="state in ['done', 'cancelled']"/>
+                        </page>
+                        <page string="Audit Pergerakan Stok" invisible="state == 'draft'">
+                            <field name="stock_move_ids" readonly="1">
+                                <list>
+                                    <field name="reference"/>
+                                    <field name="product_id"/>
+                                    <field name="location_id"/>
+                                    <field name="location_dest_id"/>
+                                    <field name="product_uom_qty" string="Permintaan"/>
+                                    <field name="quantity" string="Selesai"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_finalisasi_kelapa_mp_search" model="ir.ui.view">
+        <field name="name">finalisasi.kelapa.mp.search</field>
+        <field name="model">finalisasi.kelapa.mp</field>
+        <field name="arch" type="xml">
+            <search string="Cari Finalisasi">
+                <field name="name"/>
+                <field name="batch_number"/>
+                <field name="responsible_id"/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Dikonfirmasi" name="confirmed" domain="[('state','=','confirmed')]"/>
+                <filter string="Selesai" name="done" domain="[('state','=','done')]"/>
+                <filter string="Dibatalkan" name="cancelled" domain="[('state','=','cancelled')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Tanggal" name="group_date" context="{'group_by':'date'}"/>
+                    <filter string="Status" name="group_state" context="{'group_by':'state'}"/>
+                    <filter string="Penanggung Jawab" name="group_responsible" context="{'group_by':'responsible_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+</odoo>

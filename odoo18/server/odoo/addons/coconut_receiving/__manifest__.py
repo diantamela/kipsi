@@ -20,7 +20,7 @@
     """,
     'author': 'PT Coco Murni Prima Jaya / Custom',
     'category': 'Manufacturing',
-    'depends': ['base', 'stock', 'hr', 'mail', 'uom', 'purchase', 'product', 'mrp'],
+    'depends': ['base', 'web', 'stock', 'hr', 'mail', 'uom', 'purchase', 'product', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
         'data/sequence.xml',
@@ -31,13 +31,23 @@
         'views/coconut_stock_report_views.xml',
         'views/coconut_sorting_views.xml',
         'views/coconut_manufacturing_views.xml',
+        'views/finalisasi_kelapa_mp_views.xml',
+        'views/menu_views.xml',
         'views/custom_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'coconut_receiving/static/src/js/coconut_dashboard.js',
+            'coconut_receiving/static/src/xml/coconut_dashboard.xml',
+            'coconut_receiving/static/src/css/coconut_dashboard.css',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
     'tests': [
         'tests/test_coconut_receiving.py',
         'tests/test_coconut_manufacturing.py',
+        'tests/test_finalisasi_kelapa_mp.py',
     ],
 }

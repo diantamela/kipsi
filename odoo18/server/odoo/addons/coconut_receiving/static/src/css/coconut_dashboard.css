@@ -1,0 +1,93 @@
+.o_coco_dashboard {
+    padding: 24px;
+    background-color: #f8f9fa;
+    min-height: 100%;
+}
+
+.coco_title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.coco_subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+.coco_card {
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.coco_card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+    border-color: #3b82f6;
+}
+
+.product_title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0;
+}
+
+.coco_icon_wrapper {
+    width: 42px;
+    height: 42px;
+    background-color: rgba(59, 130, 246, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.coco_icon_wrapper i {
+    font-size: 18px;
+    color: #3b82f6;
+}
+
+.coco_metric_label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.coco_metric_val {
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.coco_metric_val small {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.coco_details_list {
+    margin-top: 16px;
+}
+
+.coco_details_list > div {
+    font-size: 13px;
+    padding: 8px 0;
+}
+
+.coco_card:hover .coco_icon_wrapper {
+    background-color: #3b82f6;
+    transition: background-color 0.3s ease;
+}
+
+.coco_card:hover .coco_icon_wrapper i {
+    color: #ffffff;
+    transition: color 0.3s ease;
+}

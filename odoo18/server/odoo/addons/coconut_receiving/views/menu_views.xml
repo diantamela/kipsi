@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Client Action for Dashboard -->
+    <record id="action_coconut_product_dashboard" model="ir.actions.client">
+        <field name="name">Dashboard Produk Kelapa</field>
+        <field name="tag">pt_coconut_dashboard_action</field>
+    </record>
+
+    <!-- Override Inventory -> Products -> Products to open Dashboard -->
+    <record id="stock.menu_product_variant_config_stock" model="ir.ui.menu">
+        <field name="action" ref="coconut_receiving.action_coconut_product_dashboard"/>
+    </record>
+
+    <!-- Menu for Finalisasi Kelapa MP under Inventory -> Products -->
+    <menuitem id="menu_finalisasi_kelapa_mp"
+              name="Finalisasi Kelapa MP"
+              parent="stock.menu_stock_inventory_control"
+              action="coconut_receiving.action_finalisasi_kelapa_mp"
+              sequence="15"/>
+
+    <!-- Menu for Riwayat Pergerakan under Inventory -> Products -->
+    <menuitem id="menu_coconut_stock_move_history"
+              name="Riwayat Pergerakan"
+              parent="stock.menu_stock_inventory_control"
+              action="stock.stock_move_action"
+              sequence="20"/>
+</odoo>

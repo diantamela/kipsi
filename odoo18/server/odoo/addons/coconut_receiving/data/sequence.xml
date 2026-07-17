@@ -27,5 +27,13 @@
             <field name="padding">5</field>
             <field name="company_id" eval="False"/>
         </record>
+        <!-- Sequence for Finalisasi Kelapa MP -->
+        <record id="seq_finalisasi_kelapa_mp" model="ir.sequence">
+            <field name="name">Finalisasi Kelapa MP</field>
+            <field name="code">finalisasi.kelapa.mp</field>
+            <field name="prefix">FMP/%(year)s/%(month)s/</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
     </data>
 </odoo>
