@@ -318,7 +318,7 @@ class CoconutDailyStockWizard(models.TransientModel):
             raise UserError(_("Tanggal Dari tidak boleh lebih besar dari Tanggal Sampai."))
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Stok Kelapa Harian'),
+            'name': _('Stok'),
             'res_model': 'coconut.daily.stock',
             'view_mode': 'list,form',
             'domain': [
@@ -336,7 +336,7 @@ class CoconutDailyStockWizard(models.TransientModel):
         """Open all daily stock records without date filter."""
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Stok Kelapa Harian'),
+            'name': _('Stok'),
             'res_model': 'coconut.daily.stock',
             'view_mode': 'list,form',
             'target': 'main',

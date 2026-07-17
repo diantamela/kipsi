@@ -27,7 +27,7 @@
 
     <!-- Override Inventory -> Reporting -> Stock to open Stok Kelapa Harian -->
     <record id="stock.menu_product_stock" model="ir.ui.menu">
-        <field name="name">Stok Kelapa Harian</field>
+        <field name="name">Stok</field>
         <field name="action" ref="coconut_receiving.action_coconut_daily_stock"/>
     </record>
 </odoo>
