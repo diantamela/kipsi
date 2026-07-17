@@ -24,4 +24,10 @@
               parent="stock.menu_stock_inventory_control"
               action="stock.stock_move_action"
               sequence="20"/>
+
+    <!-- Override Inventory -> Reporting -> Stock to open Stok Kelapa Harian -->
+    <record id="stock.menu_product_stock" model="ir.ui.menu">
+        <field name="name">Stok Kelapa Harian</field>
+        <field name="action" ref="coconut_receiving.action_coconut_daily_stock"/>
+    </record>
 </odoo>

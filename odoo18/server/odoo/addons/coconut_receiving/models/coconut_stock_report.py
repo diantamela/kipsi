@@ -109,6 +109,24 @@ class CoconutDailyStock(models.Model):
         store=False,
         help='Stok Kelapa Reject saat ini di gudang.',
     )
+    stok_kelapa_sheller = fields.Float(
+        string='Stok Kelapa Sheller (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+    )
+    stok_kelapa_parer = fields.Float(
+        string='Stok Kelapa Parer (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+    )
+    stok_kelapa_akhir_mp = fields.Float(
+        string='Stok Kelapa Akhir MP (Kg)',
+        digits=(16, 3),
+        compute='_compute_stok_real_time',
+        store=False,
+    )
     total_stok_kelapa = fields.Float(
         string='Total Stok Kelapa (Kg)',
         digits=(16, 3),
@@ -150,20 +168,26 @@ class CoconutDailyStock(models.Model):
     # COMPUTED: STOK REAL-TIME
     # ===================================================================
 
-    def _get_stock_qty(self, xml_id):
-        """Helper: get current on-hand qty for a product template XML ID."""
+    def _get_stock_qty(self, xml_id, loc_xml_id=None):
+        """Helper: get current on-hand qty for a product template XML ID and optional location XML ID."""
         tmpl = self.env.ref(xml_id, raise_if_not_found=False)
         if not tmpl:
             return 0.0
         product = tmpl.product_variant_ids[:1]
         if not product:
             return 0.0
-        wh = self.env['stock.warehouse'].search(
-            [('company_id', '=', self.env.company.id)], limit=1
-        )
-        if not wh:
+        
+        if loc_xml_id:
+            location = self.env.ref(loc_xml_id, raise_if_not_found=False)
+        else:
+            wh = self.env['stock.warehouse'].search(
+                [('company_id', '=', self.env.company.id)], limit=1
+            )
+            location = wh.lot_stock_id if wh else False
+
+        if not location:
             return 0.0
-        location = wh.lot_stock_id
+
         quant = self.env['stock.quant'].search([
             ('product_id', '=', product.id),
             ('location_id', '=', location.id),
@@ -173,14 +197,20 @@ class CoconutDailyStock(models.Model):
     @api.depends()
     def _compute_stok_real_time(self):
         # Fetch once per compute call (same value for all records)
-        bulat = self._get_stock_qty('coconut_receiving.product_kelapa_bulat')
-        layak = self._get_stock_qty('coconut_receiving.product_kelapa_layak')
-        reject = self._get_stock_qty('coconut_receiving.product_kelapa_reject')
+        bulat = self._get_stock_qty('coconut_receiving.product_kelapa_bulat', 'coconut_receiving.location_gudang_kelapa_bulat')
+        layak = self._get_stock_qty('coconut_receiving.product_kelapa_layak', 'coconut_receiving.location_stok_kelapa_layak')
+        reject = self._get_stock_qty('coconut_receiving.product_kelapa_reject', 'coconut_receiving.location_stok_kelapa_reject')
+        sheller = self._get_stock_qty('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_area_sheller')
+        parer = self._get_stock_qty('coconut_receiving.product_kelapa_parer', 'coconut_receiving.location_area_parer')
+        akhir_mp = self._get_stock_qty('coconut_receiving.product_kelapa_akhir_mp', 'coconut_receiving.location_gudang_kelapa_akhir_mp')
         total = bulat + layak + reject
         for rec in self:
             rec.stok_kelapa_bulat = bulat
             rec.stok_kelapa_layak = layak
             rec.stok_kelapa_reject = reject
+            rec.stok_kelapa_sheller = sheller
+            rec.stok_kelapa_parer = parer
+            rec.stok_kelapa_akhir_mp = akhir_mp
             rec.total_stok_kelapa = total
 
     # ===================================================================
@@ -200,6 +230,20 @@ class CoconutDailyStock(models.Model):
             total_input = sum(mfg_docs.mapped('machine_sheller_input')) + \
                           sum(mfg_docs.mapped('manual_sheller_input'))
             rec.pakai_kelapa_hari_ini = total_input
+
+    @api.model
+    def _search(self, domain, offset=0, limit=None, order=None):
+        selected_product_code = self.env.context.get('selected_product_code')
+        if selected_product_code:
+            if selected_product_code == 'COCO-BULAT':
+                domain = domain + [('total_coconut_count', '>', 0)]
+            elif selected_product_code == 'COCO-LAYAK':
+                domain = domain + [('tonase_layak', '>', 0)]
+            elif selected_product_code == 'COCO-REJECT':
+                domain = domain + [('reject_kg', '>', 0)]
+            elif selected_product_code in ('COCO-SHELLER', 'COCO-PARER', 'COCO-AKHIR-MP'):
+                domain = domain + [('pakai_kelapa_hari_ini', '>', 0)]
+        return super(CoconutDailyStock, self)._search(domain, offset=offset, limit=limit, order=order)
 
     # ===================================================================
     # ORM: CREATE FROM RECEIPT

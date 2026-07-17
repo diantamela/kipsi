@@ -12,11 +12,7 @@
                     <button class="btn btn-outline-primary" t-on-click="loadData">
                         <i class="fa fa-refresh mr-1"/> Segarkan
                     </button>
-                    <t t-if="state.isManager">
-                        <button class="btn btn-primary" t-on-click="openAllProducts">
-                            <i class="fa fa-cubes mr-1"/> Kelola Semua Produk
-                        </button>
-                    </t>
+
                 </div>
             </div>
 
@@ -34,7 +30,7 @@
                 <div class="row g-4 coco_grid">
                     <t t-foreach="state.products" t-as="prod" t-key="prod.code">
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card coco_card shadow-sm h-100" t-on-click="() => this.openProductForm(prod.id)">
+                            <div class="card coco_card shadow-sm h-100" t-on-click="() => this.openProductStock(prod.code)">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-start mb-3">
                                         <div>

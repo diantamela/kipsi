@@ -311,11 +311,8 @@
               action="action_coconut_manufacturing"
               sequence="30"/>
 
-    <!-- Stok Kelapa Harian -->
-    <menuitem id="menu_coconut_daily_report"
-              name="Stok Kelapa Harian"
-              parent="coconut_receiving.menu_coconut_receiving_root"
-              action="coconut_sorting.action_coconut_daily_stock"
-              sequence="40"/>
+
+    <!-- Stok Kelapa Harian menu removed (moved to Inventory module) -->
+
 
 </odoo>

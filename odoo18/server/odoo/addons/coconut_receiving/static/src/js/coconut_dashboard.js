@@ -35,19 +35,13 @@ class CoconutDashboard extends Component {
         }
     }
 
-    openProductForm(productId) {
-        if (!productId) return;
-        this.actionService.doAction({
-            type: "ir.actions.act_window",
-            res_model: "product.template",
-            res_id: productId,
-            views: [[false, "form"]],
-            target: "current",
+    openProductStock(productCode) {
+        if (!productCode) return;
+        this.actionService.doAction("coconut_receiving.action_coconut_daily_stock", {
+            additionalContext: {
+                selected_product_code: productCode,
+            },
         });
-    }
-
-    openAllProducts() {
-        this.actionService.doAction("stock.product_template_action_product");
     }
 }
 
