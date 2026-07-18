@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_coconut_payroll_tariff_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.tariff.form</field>
+        <field name="model">coconut.payroll.tariff</field>
+        <field name="arch" type="xml">
+            <form string="Tarif Pekerjaan">
+                <sheet>
+                    <group>
+                        <group string="Informasi Tarif">
+                            <field name="name"/>
+                            <field name="worker_type"/>
+                            <field name="work_type"/>
+                            <field name="rate"/>
+                        </group>
+                        <group string="Masa Berlaku">
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                            <field name="active"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_tariff_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.tariff.list</field>
+        <field name="model">coconut.payroll.tariff</field>
+        <field name="arch" type="xml">
+            <list string="Tarif Pekerjaan">
+                <field name="name"/>
+                <field name="worker_type"/>
+                <field name="work_type"/>
+                <field name="rate"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="active"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_coconut_payroll_tariff" model="ir.actions.act_window">
+        <field name="name">Tarif Pekerjaan</field>
+        <field name="res_model">coconut.payroll.tariff</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

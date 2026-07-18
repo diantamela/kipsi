@@ -21134,6 +21134,12 @@ onWillSaveRecord(record,changes){this.mustReload="lang"in changes;}
 async onRecordSaved(record){await super.onRecordSaved(...arguments);if(this.mustReload){this.mustReload=false;return this.action.doAction("reload_context");}}}
 registry.category("views").add("hr_employee_profile_form",{...formView,Controller:EmployeeProfileController,});return __exports;});;
 
+/* /coconut_receiving/static/src/js/coconut_dashboard.js */
+odoo.define('@coconut_receiving/js/coconut_dashboard',['@web/core/registry','@odoo/owl','@web/core/utils/hooks'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{Component,onWillStart,useState}=require("@odoo/owl");const{useService}=require("@web/core/utils/hooks");class CoconutDashboard extends Component{setup(){this.orm=useService("orm");this.actionService=useService("action");this.state=useState({products:[],isManager:false,loading:true,});onWillStart(async()=>{await this.loadData();});}
+async loadData(){this.state.loading=true;try{const data=await this.orm.call("finalisasi.kelapa.mp","get_dashboard_data",[]);this.state.products=data.products||[];this.state.isManager=data.is_manager||false;}catch(error){console.error("Error loading dashboard data:",error);}finally{this.state.loading=false;}}
+openProductStock(productCode){if(!productCode)return;this.actionService.doAction("coconut_receiving.action_coconut_daily_stock",{additionalContext:{selected_product_code:productCode,},});}}
+CoconutDashboard.template="coconut_receiving.CoconutDashboard";registry.category("actions").add("pt_coconut_dashboard_action",CoconutDashboard);return __exports;});;
+
 /* /survey/static/src/question_page/description_page_field.js */
 odoo.define('@survey/question_page/description_page_field',['@web/views/fields/char/char_field','@web/core/registry','@odoo/owl'],function(require){'use strict';let __exports={};const{CharField,charField}=require("@web/views/fields/char/char_field");const{registry}=require("@web/core/registry");const{useEffect,useRef}=require("@odoo/owl");class DescriptionPageField extends CharField{static template="survey.DescriptionPageField";setup(){super.setup();const inputRef=useRef("input");useEffect((input)=>{if(input){input.classList.add("col");}},()=>[inputRef.el]);}
 onExternalBtnClick(){this.env.openRecord(this.props.record);}}
@@ -36770,6 +36776,90 @@ registerTemplate("hr.EmployeeActionHelper", `/hr/static/src/views/hr_action_help
                     <t t-esc="props.noContentParagraph"/>
                 </p>
             </div>
+        </div>
+    </t>
+`);
+registerTemplate("coconut_receiving.CoconutDashboard", `/coconut_receiving/static/src/xml/coconut_dashboard.xml`, `<t t-name="coconut_receiving.CoconutDashboard" owl="1" xml:space="preserve">
+        <div class="o_coco_dashboard">
+
+            <div class="coco_dashboard_header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="coco_title">Dashboard Produk Kelapa</h1>
+                    <p class="coco_subtitle text-muted">Ringkasan stok real-time PT Coco Murni Prima Jaya</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" t-on-click="loadData">
+                        <i class="fa fa-refresh mr-1"/> Segarkan
+                    </button>
+
+                </div>
+            </div>
+
+
+            <t t-if="state.loading">
+                <div class="coco_loader d-flex justify-content-center align-items-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </t>
+
+
+            <t t-else="">
+                <div class="row g-4 coco_grid">
+                    <t t-foreach="state.products" t-as="prod" t-key="prod.code">
+                        <div class="col-12 col-md-6 col-lg-4">
+                            <div class="card coco_card shadow-sm h-100" t-on-click="() =&gt; this.openProductStock(prod.code)">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div>
+                                            <span class="badge bg-secondary mb-1"><t t-esc="prod.code"/></span>
+                                            <h4 class="card-title product_title"><t t-esc="prod.name"/></h4>
+                                        </div>
+                                        <div class="coco_icon_wrapper">
+                                            <i class="fa fa-archive text-primary"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row text-center my-4">
+                                        <div class="col-6 border-end">
+                                            <div class="coco_metric_label">Stok Fisik</div>
+                                            <div class="coco_metric_val text-success"><t t-esc="prod.qty"/> <small>Kg</small></div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="coco_metric_label">Stok Tersedia</div>
+                                            <div class="coco_metric_val text-info"><t t-esc="prod.qty_available"/> <small>Kg</small></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="coco_details_list">
+                                        <div class="d-flex justify-content-between py-1 border-bottom">
+                                            <span class="text-muted"><i class="fa fa-arrow-down text-success mr-1"/> Masuk Hari Ini</span>
+                                            <span class="fw-bold"><t t-esc="prod.incoming_today"/> Kg</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between py-1 border-bottom">
+                                            <span class="text-muted"><i class="fa fa-arrow-up text-danger mr-1"/> Keluar Hari Ini</span>
+                                            <span class="fw-bold"><t t-esc="prod.outgoing_today"/> Kg</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between py-1 border-bottom">
+                                            <span class="text-muted"><i class="fa fa-map-marker text-warning mr-1"/> Lokasi Stok</span>
+                                            <span class="fw-bold text-truncate text-end" style="max-width: 150px;" t-att-title="prod.location_name">
+                                                <t t-esc="prod.location_name"/>
+                                            </span>
+                                        </div>
+                                        <div class="py-2">
+                                            <div class="text-muted small mb-1"><i class="fa fa-history mr-1"/> Pergerakan Terakhir</div>
+                                            <div class="small fw-bold text-truncate" t-att-title="prod.last_move">
+                                                <t t-esc="prod.last_move"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </t>
         </div>
     </t>
 `);

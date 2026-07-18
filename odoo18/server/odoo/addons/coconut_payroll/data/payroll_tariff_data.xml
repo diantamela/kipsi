@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="tariff_parer_production" model="coconut.payroll.tariff">
+            <field name="name">Parer Production Rp300</field>
+            <field name="worker_type">parer</field>
+            <field name="work_type">parer_prod</field>
+            <field name="rate">300.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="tariff_white_meat" model="coconut.payroll.tariff">
+            <field name="name">White Meat Kopra Rp300</field>
+            <field name="worker_type">parer</field>
+            <field name="work_type">white_meat</field>
+            <field name="rate">300.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="tariff_bad_meat" model="coconut.payroll.tariff">
+            <field name="name">Bad Meat Rp300</field>
+            <field name="worker_type">parer</field>
+            <field name="work_type">bad_meat</field>
+            <field name="rate">300.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="tariff_bad_meat_sunday" model="coconut.payroll.tariff">
+            <field name="name">Bad Meat Sunday Rp350</field>
+            <field name="worker_type">parer</field>
+            <field name="work_type">bad_meat_sunday</field>
+            <field name="rate">350.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="tariff_sheller_180" model="coconut.payroll.tariff">
+            <field name="name">Sheller Rp180</field>
+            <field name="worker_type">sheller</field>
+            <field name="work_type">sheller_prod</field>
+            <field name="rate">180.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="tariff_sheller_200" model="coconut.payroll.tariff">
+            <field name="name">Sheller Rp200</field>
+            <field name="worker_type">sheller</field>
+            <field name="work_type">sheller_prod</field>
+            <field name="rate">200.0</field>
+            <field name="date_start">2026-01-01</field>
+            <field name="date_end">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>

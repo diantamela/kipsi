@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_coconut_payroll" model="ir.module.category">
+        <field name="name">Penggajian</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <record id="group_coconut_payroll_operator" model="res.groups">
+        <field name="name">Payroll Operator</field>
+        <field name="category_id" ref="module_category_coconut_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_coconut_payroll_supervisor" model="res.groups">
+        <field name="name">Payroll Supervisor</field>
+        <field name="category_id" ref="module_category_coconut_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('group_coconut_payroll_operator'))]"/>
+    </record>
+
+    <record id="group_coconut_payroll_manager" model="res.groups">
+        <field name="name">Payroll Manager</field>
+        <field name="category_id" ref="module_category_coconut_payroll"/>
+        <field name="implied_ids" eval="[(4, ref('group_coconut_payroll_supervisor'))]"/>
+        <field name="users" eval="[(4, ref('base.user_admin')), (4, ref('base.user_root'))]"/>
+    </record>
+
+    <!-- Multi-Company Rules -->
+    <record id="rule_coconut_payroll_period_company" model="ir.rule">
+        <field name="name">Periode Penggajian Multi-Company</field>
+        <field name="model_id" ref="model_coconut_payroll_period"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_payroll_line_company" model="ir.rule">
+        <field name="name">Slip Gaji Multi-Company</field>
+        <field name="model_id" ref="model_coconut_payroll_line"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_work_result_company" model="ir.rule">
+        <field name="name">Hasil Kerja Multi-Company</field>
+        <field name="model_id" ref="model_coconut_work_result"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_payroll_tariff_company" model="ir.rule">
+        <field name="name">Tarif Pekerjaan Multi-Company</field>
+        <field name="model_id" ref="model_coconut_payroll_tariff"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_payroll_premium_rule_company" model="ir.rule">
+        <field name="name">Aturan Premi Multi-Company</field>
+        <field name="model_id" ref="model_coconut_payroll_premium_rule"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

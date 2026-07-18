@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_coconut_payroll_root"
+              name="Penggajian"
+              sequence="50"/>
+
+    <menuitem id="menu_coconut_payroll_period"
+              name="Periode Penggajian"
+              parent="menu_coconut_payroll_root"
+              action="action_coconut_payroll_period"
+              sequence="10"/>
+
+    <menuitem id="menu_coconut_work_result"
+              name="Hasil Kerja"
+              parent="menu_coconut_payroll_root"
+              action="action_coconut_work_result"
+              sequence="20"/>
+
+    <menuitem id="menu_coconut_payroll_line"
+              name="Slip Gaji"
+              parent="menu_coconut_payroll_root"
+              action="action_coconut_payroll_line"
+              sequence="30"/>
+
+    <menuitem id="menu_coconut_payroll_config_parent"
+              name="Konfigurasi"
+              parent="menu_coconut_payroll_root"
+              sequence="100"/>
+
+    <menuitem id="menu_coconut_payroll_tariff"
+              name="Tarif Pekerjaan"
+              parent="menu_coconut_payroll_config_parent"
+              action="action_coconut_payroll_tariff"
+              sequence="10"/>
+
+    <menuitem id="menu_coconut_payroll_premium_rule"
+              name="Aturan Premi"
+              parent="menu_coconut_payroll_config_parent"
+              action="action_coconut_payroll_premium_rule"
+              sequence="20"/>
+
+    <menuitem id="menu_coconut_payroll_settings"
+              name="Pengaturan"
+              parent="menu_coconut_payroll_config_parent"
+              action="action_coconut_payroll_config"
+              sequence="30"
+              groups="coconut_payroll.group_coconut_payroll_manager"/>
+</odoo>

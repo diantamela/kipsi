@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_coconut_payroll_period_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.period.form</field>
+        <field name="model">coconut.payroll.period</field>
+        <field name="arch" type="xml">
+            <form string="Periode Penggajian">
+                <header>
+                    <button name="action_calculate" string="Calculate Payroll" type="object" class="oe_highlight" invisible="state not in ['draft', 'calculated']"/>
+                    <button name="action_confirm" string="Confirm" type="object" class="oe_highlight" invisible="state != 'calculated'"/>
+                    <button name="action_paid" string="Mark as Paid" type="object" class="oe_highlight" invisible="state != 'confirmed'"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state != 'confirmed'"/>
+                    <button name="action_draft" string="Reset to Draft" type="object" invisible="state not in ['calculated', 'confirmed']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,calculated,confirmed,paid"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Informasi Periode">
+                            <field name="name" readonly="state in ['confirmed', 'paid', 'cancelled']"/>
+                            <field name="date_start" readonly="state in ['confirmed', 'paid', 'cancelled']"/>
+                            <field name="date_end" readonly="state in ['confirmed', 'paid', 'cancelled']"/>
+                        </group>
+                        <group string="Perusahaan &amp; Ringkasan">
+                            <field name="company_id" readonly="state in ['confirmed', 'paid', 'cancelled']" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_gross"/>
+                            <field name="total_deduction"/>
+                            <field name="total_net" class="oe_subtotal_footer_separator"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Daftar Slip Gaji" name="payroll_lines">
+                            <field name="payroll_line_ids" readonly="state in ['confirmed', 'paid', 'cancelled']">
+                                <list editable="bottom">
+                                    <field name="employee_id" readonly="parent.state != 'draft'"/>
+                                    <field name="worker_type" readonly="parent.state != 'draft'"/>
+                                    <field name="total_quantity" readonly="1"/>
+                                    <field name="basic_wage" readonly="1"/>
+                                    <field name="premium_method"/>
+                                    <field name="target_premium"/>
+                                    <field name="additional_hours"/>
+                                    <field name="daily_addition" readonly="1"/>
+                                    <field name="overtime_hours"/>
+                                    <field name="overtime_amount" readonly="1"/>
+                                    <field name="arrears"/>
+                                    <field name="other_income"/>
+                                    <field name="gross_income" readonly="1"/>
+                                    <field name="salary_overpayment_deduction"/>
+                                    <field name="tool_deduction"/>
+                                    <field name="axe_blade_deduction"/>
+                                    <field name="sack_deduction"/>
+                                    <field name="other_deduction"/>
+                                    <field name="total_deduction" readonly="1"/>
+                                    <field name="rounding_difference" readonly="1"/>
+                                    <field name="net_income" readonly="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="notes"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Catatan Internal" name="notes">
+                            <field name="notes" placeholder="Catatan internal periode..." readonly="state in ['confirmed', 'paid', 'cancelled']"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_period_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.period.list</field>
+        <field name="model">coconut.payroll.period</field>
+        <field name="arch" type="xml">
+            <list string="Periode Penggajian" decoration-info="state == 'draft'" decoration-warning="state == 'calculated'" decoration-success="state == 'confirmed'" decoration-muted="state == 'paid'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="total_gross"/>
+                <field name="total_deduction"/>
+                <field name="total_net"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_period_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.period.search</field>
+        <field name="model">coconut.payroll.period</field>
+        <field name="arch" type="xml">
+            <search string="Cari Periode">
+                <field name="name"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Calculated" name="calculated" domain="[('state', '=', 'calculated')]"/>
+                <filter string="Confirmed" name="confirmed" domain="[('state', '=', 'confirmed')]"/>
+                <filter string="Paid" name="paid" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                    <filter string="Perusahaan" name="group_by_company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_coconut_payroll_period" model="ir.actions.act_window">
+        <field name="name">Periode Penggajian</field>
+        <field name="res_model">coconut.payroll.period</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_period_search"/>
+    </record>
+
+    <!-- Slip Gaji (Payroll Lines) Views -->
+    <record id="view_coconut_payroll_line_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.list</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <list string="Slip Gaji" create="false" edit="false">
+                <field name="period_id"/>
+                <field name="employee_id"/>
+                <field name="worker_type"/>
+                <field name="total_quantity"/>
+                <field name="basic_wage"/>
+                <field name="target_premium"/>
+                <field name="gross_income"/>
+                <field name="total_deduction"/>
+                <field name="net_income"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.form</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <form string="Slip Gaji Karyawan" create="false" edit="false">
+                <sheet>
+                    <group>
+                        <group string="Karyawan &amp; Periode">
+                            <field name="employee_id" readonly="1"/>
+                            <field name="worker_type" readonly="1"/>
+                            <field name="period_id" readonly="1"/>
+                            <field name="company_id" readonly="1" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Hasil Kerja">
+                            <field name="total_quantity" readonly="1"/>
+                            <field name="basic_wage" readonly="1"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Pendapatan">
+                            <field name="premium_method" readonly="1"/>
+                            <field name="target_premium" readonly="1"/>
+                            <field name="additional_hours" readonly="1"/>
+                            <field name="daily_addition" readonly="1"/>
+                            <field name="overtime_hours" readonly="1"/>
+                            <field name="overtime_amount" readonly="1"/>
+                            <field name="arrears" readonly="1"/>
+                            <field name="other_income" readonly="1"/>
+                            <field name="gross_income" readonly="1"/>
+                        </group>
+                        <group string="Potongan &amp; Net">
+                            <field name="salary_overpayment_deduction" readonly="1"/>
+                            <field name="tool_deduction" readonly="1"/>
+                            <field name="axe_blade_deduction" readonly="1"/>
+                            <field name="sack_deduction" readonly="1"/>
+                            <field name="other_deduction" readonly="1"/>
+                            <field name="total_deduction" readonly="1"/>
+                            <field name="rounding_difference" readonly="1"/>
+                            <field name="net_income" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Catatan">
+                        <field name="notes" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.search</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <search string="Cari Slip Gaji">
+                <field name="employee_id"/>
+                <field name="period_id"/>
+                <field name="worker_type"/>
+                <group expand="0" string="Group By">
+                    <filter string="Periode" name="group_by_period" context="{'group_by': 'period_id'}"/>
+                    <filter string="Karyawan" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Jenis Pekerja" name="group_by_worker_type" context="{'group_by': 'worker_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_coconut_payroll_line" model="ir.actions.act_window">
+        <field name="name">Slip Gaji</field>
+        <field name="res_model">coconut.payroll.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_line_search"/>
+    </record>
+</odoo>

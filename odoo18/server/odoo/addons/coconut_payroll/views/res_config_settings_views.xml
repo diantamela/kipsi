@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.coconut.payroll</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="99"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Penggajian" string="Penggajian" name="coconut_payroll">
+                    <block title="Konfigurasi Penggajian PT Coco Murni" name="payroll_setting_block">
+                        <setting id="payroll_overtime_rate_setting" string="Tarif Lembur" help="Tarif lembur per jam karyawan">
+                            <field name="payroll_overtime_rate"/>
+                        </setting>
+                        <setting id="payroll_daily_base_wage_setting" string="Upah Dasar Harian" help="Nilai upah dasar harian untuk jam tambahan">
+                            <field name="payroll_daily_base_wage"/>
+                        </setting>
+                        <setting id="payroll_standard_hours_setting" string="Jam Kerja Standar" help="Jam kerja standar harian">
+                            <field name="payroll_standard_hours"/>
+                        </setting>
+                        <setting id="payroll_rounding_unit_setting" string="Satuan Pembulatan Gaji" help="Nominal pembulatan gaji (contoh: 1000 untuk Rp1.000)">
+                            <field name="payroll_rounding_unit"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_coconut_payroll_config" model="ir.actions.act_window">
+        <field name="name">Konfigurasi Penggajian</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'coconut_payroll'}</field>
+    </record>
+</odoo>
