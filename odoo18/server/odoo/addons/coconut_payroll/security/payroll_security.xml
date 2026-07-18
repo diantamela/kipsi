@@ -24,7 +24,7 @@
         <field name="users" eval="[(4, ref('base.user_admin')), (4, ref('base.user_root'))]"/>
     </record>
 
-    <!-- Multi-Company Rules -->
+    <!-- Multi-Company Rules (Deprecated / Kept) -->
     <record id="rule_coconut_payroll_period_company" model="ir.rule">
         <field name="name">Periode Penggajian Multi-Company</field>
         <field name="model_id" ref="model_coconut_payroll_period"/>
@@ -54,8 +54,51 @@
     </record>
 
     <record id="rule_coconut_payroll_premium_rule_company" model="ir.rule">
-        <field name="name">Aturan Premi Multi-Company</field>
+        <field name="name">Aturan Premi Deprecated Multi-Company</field>
         <field name="model_id" ref="model_coconut_payroll_premium_rule"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Multi-Company Rules (New Models) -->
+    <record id="rule_coconut_work_sheet_company" model="ir.rule">
+        <field name="name">Lembar Kerja Harian Multi-Company</field>
+        <field name="model_id" ref="model_coconut_work_sheet"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_salary_rule_company" model="ir.rule">
+        <field name="name">Aturan Gaji Multi-Company</field>
+        <field name="model_id" ref="model_coconut_salary_rule"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_premium_rule_company" model="ir.rule">
+        <field name="name">Aturan Premi Baru Multi-Company</field>
+        <field name="model_id" ref="model_coconut_premium_rule"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_employee_loan_company" model="ir.rule">
+        <field name="name">Pinjaman Karyawan Multi-Company</field>
+        <field name="model_id" ref="model_coconut_employee_loan"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_loan_installment_company" model="ir.rule">
+        <field name="name">Cicilan Pinjaman Multi-Company</field>
+        <field name="model_id" ref="model_coconut_loan_installment"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+
+    <record id="rule_coconut_payroll_recap_company" model="ir.rule">
+        <field name="name">Rekapitulasi Penggajian Multi-Company</field>
+        <field name="model_id" ref="model_coconut_payroll_recap"/>
         <field name="global" eval="True"/>
         <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
     </record>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Sheller Normal (Biasa) -->
+        <record id="salary_rule_sheller_biasa_low" model="coconut.salary.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">0.0</field>
+            <field name="max_quantity">424.99</field>
+            <field name="wage_rate">180.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="salary_rule_sheller_biasa_high" model="coconut.salary.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">425.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="wage_rate">225.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Sheller Holiday (Merah) -->
+        <record id="salary_rule_sheller_merah_low" model="coconut.salary.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">0.0</field>
+            <field name="max_quantity">424.99</field>
+            <field name="wage_rate">230.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="salary_rule_sheller_merah_high" model="coconut.salary.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">425.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="wage_rate">275.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Parer Normal (Biasa) -->
+        <record id="salary_rule_parer_biasa" model="coconut.salary.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">0.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="wage_rate">340.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- Parer Holiday (Merah) -->
+        <record id="salary_rule_parer_merah" model="coconut.salary.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">0.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="wage_rate">390.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>

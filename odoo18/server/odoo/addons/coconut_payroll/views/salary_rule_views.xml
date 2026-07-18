@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Premium Rule Form View -->
-    <record id="view_coconut_premium_rule_form" model="ir.ui.view">
-        <field name="name">coconut.premium.rule.form</field>
-        <field name="model">coconut.premium.rule</field>
+    <!-- Salary Rule Form View -->
+    <record id="view_coconut_salary_rule_form" model="ir.ui.view">
+        <field name="name">coconut.salary.rule.form</field>
+        <field name="model">coconut.salary.rule</field>
         <field name="arch" type="xml">
-            <form string="Aturan Premi">
+            <form string="Aturan Upah Gaji">
                 <sheet>
                     <group>
                         <group string="Kategori Pekerjaan">
@@ -20,10 +20,9 @@
                             <field name="start_date"/>
                             <field name="end_date"/>
                         </group>
-                        <group string="Premi">
-                            <field name="premium_amount"/>
+                        <group string="Tarif">
+                            <field name="wage_rate"/>
                             <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
                 </sheet>
@@ -31,17 +30,17 @@
         </field>
     </record>
 
-    <!-- Premium Rule Tree View -->
-    <record id="view_coconut_premium_rule_list" model="ir.ui.view">
-        <field name="name">coconut.premium.rule.list</field>
-        <field name="model">coconut.premium.rule</field>
+    <!-- Salary Rule Tree View -->
+    <record id="view_coconut_salary_rule_list" model="ir.ui.view">
+        <field name="name">coconut.salary.rule.list</field>
+        <field name="model">coconut.salary.rule</field>
         <field name="arch" type="xml">
-            <list string="Aturan Premi">
+            <list string="Aturan Upah Gaji">
                 <field name="worker_type"/>
                 <field name="day_type"/>
                 <field name="min_quantity"/>
                 <field name="max_quantity"/>
-                <field name="premium_amount"/>
+                <field name="wage_rate"/>
                 <field name="start_date"/>
                 <field name="end_date"/>
                 <field name="company_id" groups="base.group_multi_company"/>
@@ -49,12 +48,12 @@
         </field>
     </record>
 
-    <!-- Premium Rule Search View -->
-    <record id="view_coconut_premium_rule_search" model="ir.ui.view">
-        <field name="name">coconut.premium.rule.search</field>
-        <field name="model">coconut.premium.rule</field>
+    <!-- Salary Rule Search View -->
+    <record id="view_coconut_salary_rule_search" model="ir.ui.view">
+        <field name="name">coconut.salary.rule.search</field>
+        <field name="model">coconut.salary.rule</field>
         <field name="arch" type="xml">
-            <search string="Cari Aturan Premi">
+            <search string="Cari Aturan Upah">
                 <field name="worker_type"/>
                 <field name="day_type"/>
                 <group expand="0" string="Group By">
@@ -65,11 +64,11 @@
         </field>
     </record>
 
-    <!-- Premium Rule Action -->
-    <record id="action_coconut_premium_rule" model="ir.actions.act_window">
-        <field name="name">Aturan Premi</field>
-        <field name="res_model">coconut.premium.rule</field>
+    <!-- Salary Rule Action -->
+    <record id="action_coconut_salary_rule" model="ir.actions.act_window">
+        <field name="name">Aturan Upah</field>
+        <field name="res_model">coconut.salary.rule</field>
         <field name="view_mode">list,form</field>
-        <field name="search_view_id" ref="view_coconut_premium_rule_search"/>
+        <field name="search_view_id" ref="view_coconut_salary_rule_search"/>
     </record>
 </odoo>

@@ -1,50 +1,10 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
-from odoo.exceptions import ValidationError, UserError
+from odoo.exceptions import ValidationError
 
-class CoconutPayrollPremiumRule(models.Model):
-    _name = 'coconut.payroll.premium.rule'
-    _description = 'Aturan Premi (Lama/Deprecated)'
-
-    name = fields.Char(
-        string='Nama Aturan Premi',
-        required=True,
-    )
-    worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
-        ('parer', 'Parer'),
-    ], string='Jenis Pekerja', required=True)
-    minimum_quantity = fields.Float(
-        string='Jumlah Minimal (Kg)',
-        required=True,
-    )
-    maximum_quantity = fields.Float(
-        string='Jumlah Maksimal (Kg)',
-        required=True,
-    )
-    company_id = fields.Many2one(
-        'res.company',
-        string='Perusahaan',
-        required=True,
-        default=lambda self: self.env.company,
-    )
-    currency_id = fields.Many2one(
-        'res.currency',
-        related='company_id.currency_id',
-    )
-    premium_amount = fields.Monetary(
-        string='Jumlah Premi (Rp)',
-        currency_field='currency_id',
-        required=True,
-    )
-    date_start = fields.Date(string='Tanggal Mulai')
-    date_end = fields.Date(string='Tanggal Selesai')
-    active = fields.Boolean(string='Aktif', default=True)
-
-
-class CoconutPremiumRule(models.Model):
-    _name = 'coconut.premium.rule'
-    _description = 'Aturan Premi Baru'
+class CoconutSalaryRule(models.Model):
+    _name = 'coconut.salary.rule'
+    _description = 'Aturan Upah Gaji'
     _order = 'start_date desc, id desc'
 
     worker_type = fields.Selection([
@@ -69,24 +29,8 @@ class CoconutPremiumRule(models.Model):
         default=999999.0,
     )
 
-    company_id = fields.Many2one(
-        'res.company',
-        string='Perusahaan',
-        required=True,
-        default=lambda self: self.env.company,
-        index=True,
-    )
-
-    currency_id = fields.Many2one(
-        'res.currency',
-        related='company_id.currency_id',
-        store=True,
-        readonly=True,
-    )
-
-    premium_amount = fields.Monetary(
-        string='Jumlah Premi',
-        currency_field='currency_id',
+    wage_rate = fields.Float(
+        string='Tarif Upah',
         required=True,
         default=0.0,
     )
@@ -99,6 +43,14 @@ class CoconutPremiumRule(models.Model):
     end_date = fields.Date(
         string='Tanggal Selesai',
         required=True,
+    )
+
+    company_id = fields.Many2one(
+        'res.company',
+        string='Perusahaan',
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
     )
 
     @api.constrains('worker_type', 'day_type', 'min_quantity', 'max_quantity', 'start_date', 'end_date', 'company_id')
@@ -127,7 +79,7 @@ class CoconutPremiumRule(models.Model):
 
             if overlap:
                 raise ValidationError(_(
-                    "Aturan premi tumpang tindih dengan aturan lain (ID: %s, Tanggal: %s s.d %s, Qty: %s s.d %s)."
+                    "Aturan upah tumpang tindih dengan aturan lain (ID: %s, Tanggal: %s s.d %s, Qty: %s s.d %s)."
                 ) % (
                     overlap.id,
                     overlap.start_date,

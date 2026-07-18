@@ -8,12 +8,6 @@ class TestCoconutPayroll(TransactionCase):
     def setUp(self):
         super(TestCoconutPayroll, self).setUp()
         self.company = self.env.ref('base.main_company')
-        self.company.write({
-            'payroll_overtime_rate': 12000.0,
-            'payroll_daily_base_wage': 65000.0,
-            'payroll_standard_hours': 7.0,
-            'payroll_rounding_unit': 1000.0,
-        })
 
         # Create groups
         self.group_operator = self.env.ref('coconut_payroll.group_coconut_payroll_operator')
@@ -54,391 +48,216 @@ class TestCoconutPayroll(TransactionCase):
             'payroll_active': True,
         })
 
-        # Create active tariffs
-        self.tariff_parer_prod = self.env['coconut.payroll.tariff'].create({
-            'name': 'Parer Prod Rp300',
+        # Clear existing rules for testing to avoid conflicts
+        self.env['coconut.salary.rule'].search([]).unlink()
+        self.env['coconut.premium.rule'].search([]).unlink()
+
+        # Create Salary Rules for Sheller
+        self.rule_sheller_biasa_low = self.env['coconut.salary.rule'].create({
+            'worker_type': 'sheller',
+            'day_type': 'biasa',
+            'min_quantity': 0.0,
+            'max_quantity': 424.99,
+            'wage_rate': 180.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+        self.rule_sheller_biasa_high = self.env['coconut.salary.rule'].create({
+            'worker_type': 'sheller',
+            'day_type': 'biasa',
+            'min_quantity': 425.0,
+            'max_quantity': 999999.0,
+            'wage_rate': 225.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+        self.rule_sheller_merah_low = self.env['coconut.salary.rule'].create({
+            'worker_type': 'sheller',
+            'day_type': 'merah',
+            'min_quantity': 0.0,
+            'max_quantity': 424.99,
+            'wage_rate': 230.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+        self.rule_sheller_merah_high = self.env['coconut.salary.rule'].create({
+            'worker_type': 'sheller',
+            'day_type': 'merah',
+            'min_quantity': 425.0,
+            'max_quantity': 999999.0,
+            'wage_rate': 275.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+
+        # Create Salary Rules for Parer
+        self.rule_parer_biasa = self.env['coconut.salary.rule'].create({
             'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'rate': 300.0,
-            'date_start': '2026-01-01',
-            'date_end': '2026-12-31',
+            'day_type': 'biasa',
+            'min_quantity': 0.0,
+            'max_quantity': 999999.0,
+            'wage_rate': 340.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
             'company_id': self.company.id,
         })
-        self.tariff_bad_meat_sunday = self.env['coconut.payroll.tariff'].create({
-            'name': 'Bad Meat Sunday Rp350',
+        self.rule_parer_merah = self.env['coconut.salary.rule'].create({
             'worker_type': 'parer',
-            'work_type': 'bad_meat_sunday',
-            'rate': 350.0,
-            'date_start': '2026-01-01',
-            'date_end': '2026-12-31',
-            'company_id': self.company.id,
-        })
-        self.tariff_sheller_180 = self.env['coconut.payroll.tariff'].create({
-            'name': 'Sheller Rp180',
-            'worker_type': 'sheller',
-            'work_type': 'sheller_prod',
-            'rate': 180.0,
-            'date_start': '2026-01-01',
-            'date_end': '2026-12-31',
-            'company_id': self.company.id,
-        })
-        self.tariff_sheller_200 = self.env['coconut.payroll.tariff'].create({
-            'name': 'Sheller Rp200',
-            'worker_type': 'sheller',
-            'work_type': 'sheller_prod',
-            'rate': 200.0,
-            'date_start': '2026-01-01',
-            'date_end': '2026-12-31',
+            'day_type': 'merah',
+            'min_quantity': 0.0,
+            'max_quantity': 999999.0,
+            'wage_rate': 390.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
             'company_id': self.company.id,
         })
 
-    def test_01_parer_wage_300(self):
-        # 1. Parer wage at Rp300 per kg.
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
+        # Create Premium Rules
+        self.premium_sheller_biasa_500 = self.env['coconut.premium.rule'].create({
+            'worker_type': 'sheller',
+            'day_type': 'biasa',
+            'min_quantity': 500.0,
+            'max_quantity': 599.99,
+            'premium_amount': 25000.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+        self.premium_parer_biasa_250 = self.env['coconut.premium.rule'].create({
             'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'quantity': 100.0,
-            'rate': 300.0,
+            'day_type': 'biasa',
+            'min_quantity': 250.0,
+            'max_quantity': 299.99,
+            'premium_amount': 20000.0,
+            'start_date': '2026-01-01',
+            'end_date': '2026-12-31',
+            'company_id': self.company.id,
+        })
+
+    def test_01_sheller_biasa_wage_calculation(self):
+        # 1. Sheller normal day calculation (< 425 kg vs >= 425 kg)
+        sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
+            'worker_type': 'sheller',
+            'production_type': 'sheller_prod',
+            'day_type': 'biasa',
+            'total_production_qty': 900.0,
             'company_id': self.company.id,
         })
-        self.assertEqual(wr.basic_wage, 30000.0)
 
-    def test_02_sheller_wage_selected_tariff(self):
-        # 2. Sheller wage using the selected tariff.
-        # User manually selects rate = 180
-        wr1 = self.env['coconut.work.result'].create({
+        # Low qty worker (Budi = 400kg, rate = 180, basic = 72000)
+        # High qty worker (Siti, wait, Siti is parer, we need another employee)
+        emp_sheller2 = self.env['hr.employee'].create({
+            'name': 'Andi Sheller',
+            'payroll_worker_type': 'sheller',
+            'employee_code': 'EMP003',
+        })
+
+        res1 = self.env['coconut.work.result'].create({
+            'work_sheet_id': sheet.id,
             'employee_id': self.emp_sheller.id,
-            'worker_type': 'sheller',
-            'work_type': 'sheller_prod',
-            'quantity': 150.0,
-            'rate': 180.0,
+            'quantity_kg': 400.0,
+        })
+        res2 = self.env['coconut.work.result'].create({
+            'work_sheet_id': sheet.id,
+            'employee_id': emp_sheller2.id,
+            'quantity_kg': 500.0,
+        })
+
+        sheet.action_validate()
+
+        self.assertEqual(res1.wage_rate, 180.0)
+        self.assertEqual(res1.basic_wage, 72000.0)
+        self.assertEqual(res1.premium, 0.0)
+
+        # High qty: 500kg >= 425kg -> rate = 225, basic = 112500, premium = 25000
+        self.assertEqual(res2.wage_rate, 225.0)
+        self.assertEqual(res2.basic_wage, 112500.0)
+        self.assertEqual(res2.premium, 25000.0)
+        self.assertEqual(res2.total_wage, 137500.0)
+
+    def test_02_production_validation_mismatch(self):
+        # 2. Production quantity mismatch validation
+        sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
-            'company_id': self.company.id,
-        })
-        self.assertEqual(wr1.basic_wage, 27000.0)
-
-        # User manually selects rate = 200
-        wr2 = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_sheller.id,
             'worker_type': 'sheller',
-            'work_type': 'sheller_prod',
-            'quantity': 150.0,
-            'rate': 200.0,
-            'date': '2026-07-01',
+            'production_type': 'sheller_prod',
+            'day_type': 'biasa',
+            'total_production_qty': 1000.0,
             'company_id': self.company.id,
         })
-        self.assertEqual(wr2.basic_wage, 30000.0)
 
-    def test_03_bad_meat_sunday_350(self):
-        # 3. Bad Meat Sunday at Rp350 per kg.
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_type': 'bad_meat_sunday',
-            'quantity': 50.0,
-            'rate': 350.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-        })
-        self.assertEqual(wr.basic_wage, 17500.0)
-
-    def test_04_overtime_calculation(self):
-        # 4. Overtime calculation.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode Juli 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        line = self.env['coconut.payroll.line'].create({
-            'period_id': period.id,
+        self.env['coconut.work.result'].create({
+            'work_sheet_id': sheet.id,
             'employee_id': self.emp_sheller.id,
-            'worker_type': 'sheller',
-            'overtime_hours': 3.5,
-            'company_id': self.company.id,
+            'quantity_kg': 500.0,
         })
-        # 3.5 hours * 12,000 = 42,000
-        self.assertEqual(line.overtime_amount, 42000.0)
 
-    def test_05_additional_hours_calculation(self):
-        # 5. Additional-hours calculation.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode Juli 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        line = self.env['coconut.payroll.line'].create({
-            'period_id': period.id,
-            'employee_id': self.emp_sheller.id,
-            'worker_type': 'sheller',
-            'additional_hours': 1.5,
-            'company_id': self.company.id,
-        })
-        # 1.5 hours * (65,000 / 7) = 13,928.571428... -> rounded to 13928.57
-        self.assertAlmostEqual(line.daily_addition, round(1.5 * (65000.0 / 7.0), 2))
-
-    def test_06_sheller_rounding_order(self):
-        # 6. Sheller rounding order.
-        # Net before rounding = Gross - Total Deduction
-        # Net income = Round down Net before rounding
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode Juli 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_sheller.id,
-            'worker_type': 'sheller',
-            'work_type': 'sheller_prod',
-            'quantity': 1.0,
-            'rate': 10050.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-            'state': 'validated',
-        })
-        
-        line = self.env['coconut.payroll.line'].create({
-            'period_id': period.id,
-            'employee_id': self.emp_sheller.id,
-            'worker_type': 'sheller',
-            'work_result_ids': [(6, 0, [wr.id])],
-            'additional_hours': 0.5,
-            'tool_deduction': 100.0,
-            'company_id': self.company.id,
-        })
-        
-        expected_gross = round(10050.0 + (0.5 * (65000.0 / 7.0)), 2) # 10050 + 4642.86 = 14692.86
-        expected_net_before = expected_gross - 100.0 # 14592.86
-        expected_net_rounded = 14000.0 # rounded down to nearest 1,000
-        
-        self.assertEqual(line.gross_income, expected_gross)
-        self.assertEqual(line.net_income, expected_net_rounded)
-        self.assertAlmostEqual(line.rounding_difference, expected_net_before - expected_net_rounded)
-
-    def test_07_parer_rounding_order(self):
-        # 7. Parer rounding order.
-        # Gross = Round down Gross before rounding
-        # Net = Round down (Gross - Total Deduction)
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode Juli 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'quantity': 1.0,
-            'rate': 20050.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-            'state': 'validated',
-        })
-        
-        line = self.env['coconut.payroll.line'].create({
-            'period_id': period.id,
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_result_ids': [(6, 0, [wr.id])],
-            'additional_hours': 0.5,
-            'tool_deduction': 150.0,
-            'company_id': self.company.id,
-        })
-        
-        expected_gross_before = 20050.0 + (0.5 * (65000.0 / 7.0)) # 20050 + 4642.857 = 24692.857
-        expected_gross_rounded = 24000.0 # rounded down
-        expected_net = 23000.0 # rounded down of (24000 - 150) = 23850 -> 23000
-        
-        self.assertEqual(line.gross_income, expected_gross_rounded)
-        self.assertEqual(line.net_income, expected_net)
-
-    def test_08_payroll_period_overlap(self):
-        # 8. Payroll-period overlap.
-        self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
         with self.assertRaises(ValidationError):
-            self.env['coconut.payroll.period'].create({
-                'name': 'Periode Overlap',
-                'date_start': '2026-07-05',
-                'date_end': '2026-07-12',
-                'company_id': self.company.id,
-            })
+            sheet.action_validate()
 
-    def test_09_duplicate_employee_one_period(self):
-        # 9. Duplicate employee in one period.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
+    def test_03_loan_deductions_in_recap(self):
+        # 3. Employee loan creation and automated deduction calculation in recap
+        loan = self.env['coconut.employee.loan'].create({
+            'employee_id': self.emp_sheller.id,
+            'loan_amount': 100000.0,
+            'installment_amount': 30000.0,
             'company_id': self.company.id,
         })
-        self.env['coconut.payroll.line'].create({
-            'period_id': period.id,
+        loan.action_active()
+
+        sheet = self.env['coconut.work.sheet'].create({
+            'date': '2026-07-01',
+            'worker_type': 'sheller',
+            'production_type': 'sheller_prod',
+            'day_type': 'biasa',
+            'total_production_qty': 500.0,
+            'company_id': self.company.id,
+        })
+        res = self.env['coconut.work.result'].create({
+            'work_sheet_id': sheet.id,
             'employee_id': self.emp_sheller.id,
+            'quantity_kg': 500.0,
+        })
+        sheet.action_validate()
+
+        recap = self.env['coconut.payroll.recap'].create({
+            'date_start': '2026-07-01',
+            'date_end': '2026-07-07',
             'worker_type': 'sheller',
             'company_id': self.company.id,
         })
-        with self.assertRaises(Exception): # SQL Unique Constraint
-            self.env['coconut.payroll.line'].create({
-                'period_id': period.id,
-                'employee_id': self.emp_sheller.id,
+        recap.action_generate()
+
+        line = recap.line_ids.filtered(lambda l: l.employee_id == self.emp_sheller)
+        self.assertTrue(line)
+        self.assertEqual(line.loan_deduction, 30000.0)
+        self.assertEqual(line.net_salary, line.gross_salary - 30000.0)
+
+        # Approve and pay recap
+        recap.action_approve()
+        recap.action_paid()
+
+        # Sisa loan should be updated: 100k - 30k = 70k
+        self.assertEqual(loan.remaining_amount, 70000.0)
+        self.assertEqual(len(loan.installment_line_ids), 1)
+        self.assertEqual(loan.installment_line_ids[0].amount, 30000.0)
+        self.assertEqual(loan.installment_line_ids[0].state, 'posted')
+
+    def test_04_rule_overlap_validation(self):
+        # 4. Try to create overlapping salary rule (should fail)
+        with self.assertRaises(ValidationError):
+            self.env['coconut.salary.rule'].create({
                 'worker_type': 'sheller',
+                'day_type': 'biasa',
+                'min_quantity': 100.0,
+                'max_quantity': 200.0,
+                'wage_rate': 200.0,
+                'start_date': '2026-06-01',
+                'end_date': '2026-07-15',
                 'company_id': self.company.id,
             })
-
-    def test_10_work_result_one_payroll_period(self):
-        # 10. A work result cannot enter two payroll periods.
-        period1 = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        period2 = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 2',
-            'date_start': '2026-07-08',
-            'date_end': '2026-07-14',
-            'company_id': self.company.id,
-        })
-        
-        line1 = self.env['coconut.payroll.line'].create({
-            'period_id': period1.id,
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'company_id': self.company.id,
-        })
-        line2 = self.env['coconut.payroll.line'].create({
-            'period_id': period2.id,
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'company_id': self.company.id,
-        })
-
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'quantity': 100.0,
-            'rate': 300.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-        })
-
-        # Link to line1
-        wr.write({'payroll_line_id': line1.id})
-        
-        # Trying to assign same wr to line2 must be blocked by database/relation or code constraints
-        # Since payroll_line_id is a Many2one, writing it to line2.id will move it out of line1.
-        # But we ensure it cannot enter another period if it's already assigned.
-        self.assertEqual(wr.payroll_line_id, line1)
-
-    def test_11_paid_work_result_protection(self):
-        # 11. Paid work results cannot be edited or deleted.
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'quantity': 100.0,
-            'rate': 300.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-            'state': 'paid',
-        })
-        with self.assertRaises(ValidationError):
-            wr.write({'quantity': 200.0})
-        with self.assertRaises(ValidationError):
-            wr.unlink()
-
-    def test_12_operator_cannot_confirm_or_pay(self):
-        # 12. Operators cannot confirm or pay payroll.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-            'state': 'calculated',
-        })
-        with self.assertRaises(UserError):
-            period.with_user(self.user_operator).action_confirm()
-        with self.assertRaises(UserError):
-            period.with_user(self.user_operator).action_paid()
-
-    def test_13_supervisor_cannot_pay(self):
-        # 13. Supervisors cannot mark payroll as paid.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-            'state': 'confirmed',
-        })
-        with self.assertRaises(UserError):
-            period.with_user(self.user_supervisor).action_paid()
-
-    def test_14_manager_can_pay(self):
-        # 14. Managers can mark payroll as paid.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-            'state': 'confirmed',
-        })
-        period.with_user(self.user_manager).action_paid()
-        self.assertEqual(period.state, 'paid')
-
-    def test_15_cancellation_releases_validated_work_results(self):
-        # 15. Cancellation releases validated work results.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-        })
-        wr = self.env['coconut.work.result'].create({
-            'employee_id': self.emp_parer.id,
-            'worker_type': 'parer',
-            'work_type': 'parer_prod',
-            'quantity': 100.0,
-            'rate': 300.0,
-            'date': '2026-07-01',
-            'company_id': self.company.id,
-            'state': 'validated',
-        })
-        
-        # Calculate
-        period.action_calculate()
-        self.assertEqual(wr.payroll_line_id.period_id, period)
-
-        # Confirm
-        period.action_confirm()
-
-        # Cancel
-        period.with_user(self.user_manager).action_cancel()
-        
-        # Released checks
-        self.assertFalse(wr.payroll_line_id)
-        self.assertEqual(wr.state, 'validated')
-
-    def test_16_paid_payroll_cannot_be_cancelled(self):
-        # 16. Paid payroll cannot be cancelled.
-        period = self.env['coconut.payroll.period'].create({
-            'name': 'Periode 1',
-            'date_start': '2026-07-01',
-            'date_end': '2026-07-07',
-            'company_id': self.company.id,
-            'state': 'paid',
-        })
-        with self.assertRaises(UserError):
-            period.with_user(self.user_manager).action_cancel()

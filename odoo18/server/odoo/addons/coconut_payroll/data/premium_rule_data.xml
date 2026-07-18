@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- SHELLER PREMIUM RULES (Biasa) -->
+        <record id="premium_sheller_biasa_500" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">500.0</field>
+            <field name="max_quantity">599.99</field>
+            <field name="premium_amount">25000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_biasa_600" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">600.0</field>
+            <field name="max_quantity">699.99</field>
+            <field name="premium_amount">35000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_biasa_700" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">700.0</field>
+            <field name="max_quantity">749.99</field>
+            <field name="premium_amount">40000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_biasa_750" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">750.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="premium_amount">50000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- SHELLER PREMIUM RULES (Merah) -->
+        <record id="premium_sheller_merah_500" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">500.0</field>
+            <field name="max_quantity">599.99</field>
+            <field name="premium_amount">25000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_merah_600" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">600.0</field>
+            <field name="max_quantity">699.99</field>
+            <field name="premium_amount">35000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_merah_700" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">700.0</field>
+            <field name="max_quantity">749.99</field>
+            <field name="premium_amount">40000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_sheller_merah_750" model="coconut.premium.rule">
+            <field name="worker_type">sheller</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">750.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="premium_amount">50000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- PARER PREMIUM RULES (Biasa) -->
+        <record id="premium_parer_biasa_250" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">250.0</field>
+            <field name="max_quantity">299.99</field>
+            <field name="premium_amount">20000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_biasa_300" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">300.0</field>
+            <field name="max_quantity">399.99</field>
+            <field name="premium_amount">30000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_biasa_400" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">400.0</field>
+            <field name="max_quantity">499.99</field>
+            <field name="premium_amount">40000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_biasa_500" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">biasa</field>
+            <field name="min_quantity">500.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="premium_amount">50000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <!-- PARER PREMIUM RULES (Merah) -->
+        <record id="premium_parer_merah_250" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">250.0</field>
+            <field name="max_quantity">299.99</field>
+            <field name="premium_amount">20000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_merah_300" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">300.0</field>
+            <field name="max_quantity">399.99</field>
+            <field name="premium_amount">30000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_merah_400" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">400.0</field>
+            <field name="max_quantity">499.99</field>
+            <field name="premium_amount">40000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+        <record id="premium_parer_merah_500" model="coconut.premium.rule">
+            <field name="worker_type">parer</field>
+            <field name="day_type">merah</field>
+            <field name="min_quantity">500.0</field>
+            <field name="max_quantity">999999.0</field>
+            <field name="premium_amount">50000.0</field>
+            <field name="start_date">2026-01-01</field>
+            <field name="end_date">2036-12-31</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Recapitulation Form View -->
+    <record id="view_coconut_payroll_recap_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.recap.form</field>
+        <field name="model">coconut.payroll.recap</field>
+        <field name="arch" type="xml">
+            <form string="Rekapitulasi Penggajian">
+                <header>
+                    <button name="action_generate" string="Hitung Rekap" type="object" class="oe_highlight" invisible="state not in ['draft', 'generated']"/>
+                    <button name="action_approve" string="Setujui" type="object" class="oe_highlight" invisible="state != 'generated'"/>
+                    <button name="action_paid" string="Lunas" type="object" class="oe_highlight" invisible="state != 'approved'"/>
+                    <button name="action_draft" string="Kembali ke Draft" type="object" invisible="state not in ['generated', 'approved']"/>
+                    <button name="action_cancel" string="Batal" type="object" invisible="state in ['paid', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end" readonly="state != 'draft'"/>
+                            <field name="worker_type" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" readonly="state != 'draft'" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rincian Gaji Karyawan" name="lines">
+                            <field name="line_ids" readonly="1">
+                                <list>
+                                    <field name="employee_id"/>
+                                    <field name="worker_type"/>
+                                    <field name="total_quantity_kg"/>
+                                    <field name="basic_wage"/>
+                                    <field name="premium"/>
+                                    <field name="gross_salary"/>
+                                    <field name="loan_deduction"/>
+                                    <field name="net_salary"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Recapitulation Tree View -->
+    <record id="view_coconut_payroll_recap_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.recap.list</field>
+        <field name="model">coconut.payroll.recap</field>
+        <field name="arch" type="xml">
+            <list string="Rekapitulasi Penggajian" decoration-info="state == 'draft'" decoration-success="state == 'approved'" decoration-muted="state == 'paid'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="worker_type"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Recapitulation Search View -->
+    <record id="view_coconut_payroll_recap_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.recap.search</field>
+        <field name="model">coconut.payroll.recap</field>
+        <field name="arch" type="xml">
+            <search string="Cari Rekapitulasi">
+                <field name="name"/>
+                <field name="worker_type"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Disetujui" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Lunas" name="paid" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Jenis Pekerja" name="group_by_worker_type" context="{'group_by': 'worker_type'}"/>
+                    <filter string="Status" name="group_by_state" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Recapitulation Action -->
+    <record id="action_coconut_payroll_recap" model="ir.actions.act_window">
+        <field name="name">Rekapitulasi Penggajian</field>
+        <field name="res_model">coconut.payroll.recap</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_recap_search"/>
+    </record>
+
+    <!-- Salary Slip Form View -->
+    <record id="view_coconut_payroll_line_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.form</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <form string="Slip Gaji Karyawan" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group string="Informasi Karyawan">
+                            <field name="recap_id" readonly="1"/>
+                            <field name="employee_id" readonly="1"/>
+                            <field name="worker_type" readonly="1"/>
+                        </group>
+                        <group string="Rincian Pembayaran">
+                            <field name="total_quantity_kg" readonly="1"/>
+                            <field name="basic_wage" readonly="1"/>
+                            <field name="premium" readonly="1"/>
+                            <field name="gross_salary" readonly="1"/>
+                            <field name="loan_deduction" readonly="1"/>
+                            <field name="net_salary" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Hasil Kerja Harian Terkait" name="work_results">
+                            <field name="work_result_ids" readonly="1">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="quantity_kg"/>
+                                    <field name="wage_rate"/>
+                                    <field name="basic_wage"/>
+                                    <field name="premium"/>
+                                    <field name="total_wage"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Salary Slip Tree View -->
+    <record id="view_coconut_payroll_line_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.list</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <list string="Slip Gaji Karyawan" create="false" edit="false" delete="false">
+                <field name="employee_id"/>
+                <field name="recap_id"/>
+                <field name="worker_type"/>
+                <field name="total_quantity_kg"/>
+                <field name="basic_wage"/>
+                <field name="premium"/>
+                <field name="gross_salary"/>
+                <field name="loan_deduction"/>
+                <field name="net_salary"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Salary Slip Search View -->
+    <record id="view_coconut_payroll_line_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.search</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="arch" type="xml">
+            <search string="Cari Slip Gaji">
+                <field name="employee_id"/>
+                <field name="recap_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Rekapitulasi" name="group_by_recap" context="{'group_by': 'recap_id'}"/>
+                    <filter string="Karyawan" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Salary Slip Action -->
+    <record id="action_coconut_payroll_line" model="ir.actions.act_window">
+        <field name="name">Slip Gaji</field>
+        <field name="res_model">coconut.payroll.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_line_search"/>
+    </record>
+</odoo>

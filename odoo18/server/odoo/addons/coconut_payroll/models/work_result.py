@@ -7,10 +7,19 @@ class CoconutWorkResult(models.Model):
     _description = 'Hasil Kerja Pekerja'
     _order = 'date desc, id desc'
 
+    work_sheet_id = fields.Many2one(
+        'coconut.work.sheet',
+        string='Lembar Kerja',
+        required=True,
+        ondelete='restrict',
+        index=True,
+    )
+
     date = fields.Date(
         string='Tanggal',
-        required=True,
-        default=fields.Date.context_today,
+        related='work_sheet_id.date',
+        store=True,
+        readonly=True,
     )
 
     employee_id = fields.Many2one(
@@ -20,38 +29,35 @@ class CoconutWorkResult(models.Model):
         index=True,
     )
 
-    worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
-        ('parer', 'Parer'),
-    ], string='Jenis Pekerja', required=True)
+    worker_type = fields.Selection(
+        related='work_sheet_id.worker_type',
+        store=True,
+        readonly=True,
+    )
 
-    work_type = fields.Selection([
-        ('sheller_prod', 'Sheller Production'),
-        ('parer_prod', 'Parer Production'),
-        ('white_meat', 'White Meat Kopra'),
-        ('bad_meat', 'Bad Meat'),
-        ('bad_meat_sunday', 'Bad Meat Sunday'),
-        ('other', 'Other'),
-    ], string='Jenis Pekerjaan', required=True)
+    production_type = fields.Selection(
+        related='work_sheet_id.production_type',
+        store=True,
+        readonly=True,
+    )
 
-    quantity = fields.Float(
+    day_type = fields.Selection(
+        related='work_sheet_id.day_type',
+        store=True,
+        readonly=True,
+    )
+
+    quantity_kg = fields.Float(
         string='Kuantitas (Kg)',
         required=True,
         default=0.0,
     )
 
-    uom_name = fields.Char(
-        string='Satuan',
-        default='Kg',
-        readonly=True,
-    )
-
     company_id = fields.Many2one(
         'res.company',
-        string='Perusahaan',
-        required=True,
-        default=lambda self: self.env.company,
-        index=True,
+        related='work_sheet_id.company_id',
+        store=True,
+        readonly=True,
     )
 
     currency_id = fields.Many2one(
@@ -61,31 +67,34 @@ class CoconutWorkResult(models.Model):
         readonly=True,
     )
 
-    rate = fields.Monetary(
-        string='Tarif',
-        currency_field='currency_id',
-        required=True,
+    wage_rate = fields.Float(
+        string='Tarif Upah',
+        readonly=True,
         default=0.0,
     )
 
     basic_wage = fields.Monetary(
         string='Upah Dasar',
         currency_field='currency_id',
-        compute='_compute_basic_wage',
-        store=True,
+        readonly=True,
+        default=0.0,
     )
 
     premium = fields.Monetary(
         string='Premi',
         currency_field='currency_id',
+        readonly=True,
         default=0.0,
     )
 
-    source_reference = fields.Char(
-        string='Referensi Sumber',
+    total_wage = fields.Monetary(
+        string='Total Upah',
+        currency_field='currency_id',
+        readonly=True,
+        default=0.0,
     )
 
-    payroll_line_id = fields.Many2one(
+    recap_line_id = fields.Many2one(
         'coconut.payroll.line',
         string='Slip Gaji Terkait',
         copy=False,
@@ -94,108 +103,84 @@ class CoconutWorkResult(models.Model):
         ondelete='restrict',
     )
 
-    payroll_period_id = fields.Many2one(
-        comodel_name='coconut.payroll.period',
-        string='Periode Penggajian',
-        related='payroll_line_id.period_id',
-        store=True,
-        readonly=True,
-    )
-
     state = fields.Selection([
         ('draft', 'Draft'),
         ('validated', 'Validated'),
+        ('processed', 'Processed'),
         ('paid', 'Paid'),
         ('cancelled', 'Cancelled'),
     ], string='Status', default='draft', required=True, index=True)
 
-    notes = fields.Text(
-        string='Catatan',
-    )
-
-    @api.depends('quantity', 'rate')
-    def _compute_basic_wage(self):
-        for record in self:
-            record.basic_wage = record.quantity * record.rate
-
-    @api.constrains('quantity')
+    @api.constrains('quantity_kg')
     def _check_quantity(self):
         for record in self:
-            if record.quantity < 0:
+            if record.quantity_kg < 0:
                 raise ValidationError(_("Kuantitas tidak boleh negatif."))
-
-    @api.constrains('rate')
-    def _check_rate(self):
-        for record in self:
-            if record.rate < 0:
-                raise ValidationError(_("Tarif tidak boleh negatif."))
 
     @api.constrains('employee_id', 'worker_type')
     def _check_employee_worker_type(self):
         for record in self:
-            if record.employee_id:
+            if record.employee_id and record.worker_type:
                 emp_type = record.employee_id.payroll_worker_type
                 if emp_type != record.worker_type:
-                    raise ValidationError(_("Karyawan %s memiliki Jenis Penggajian '%s', tidak cocok dengan Jenis Pekerja '%s'.") % (
+                    raise ValidationError(_("Karyawan %s memiliki Jenis Penggajian '%s', tidak cocok dengan Jenis Pekerja lembar kerja '%s'.") % (
                         record.employee_id.name,
                         dict(record.employee_id._fields['payroll_worker_type'].selection).get(emp_type) or emp_type,
                         dict(record._fields['worker_type'].selection).get(record.worker_type) or record.worker_type
                     ))
 
-    @api.onchange('worker_type', 'work_type', 'date', 'company_id')
-    def _onchange_work_details(self):
-        if self.worker_type and self.work_type and self.date:
-            try:
-                tariff = self.env['coconut.payroll.tariff'].get_applicable_tariff(
-                    self.company_id, self.worker_type, self.work_type, self.date
-                )
-                if tariff:
-                    self.rate = tariff.rate
-                else:
-                    self.rate = 0.0
-            except UserError as e:
-                raise e
+    def _calculate_and_snapshot_wages(self):
+        for record in self:
+            sheet = record.work_sheet_id
+            if not sheet:
+                continue
+
+            # Match salary rule
+            rule = self.env['coconut.salary.rule'].search([
+                ('worker_type', '=', sheet.worker_type),
+                ('day_type', '=', sheet.day_type),
+                ('start_date', '<=', sheet.date),
+                ('end_date', '>=', sheet.date),
+                ('min_quantity', '<=', record.quantity_kg),
+                ('max_quantity', '>=', record.quantity_kg),
+                ('company_id', '=', record.company_id.id),
+            ], limit=1)
+
+            if not rule:
+                raise ValidationError(_("Tidak ditemukan aturan upah gaji untuk Pekerja: %s, Hari: %s, Kuantitas: %s Kg pada %s.") % (
+                    dict(self._fields['worker_type'].selection).get(sheet.worker_type) or sheet.worker_type,
+                    dict(self._fields['day_type'].selection).get(sheet.day_type) or sheet.day_type,
+                    record.quantity_kg,
+                    sheet.date
+                ))
+
+            # Match premium rule (optional)
+            p_rule = self.env['coconut.premium.rule'].search([
+                ('worker_type', '=', sheet.worker_type),
+                ('day_type', '=', sheet.day_type),
+                ('start_date', '<=', sheet.date),
+                ('end_date', '>=', sheet.date),
+                ('min_quantity', '<=', record.quantity_kg),
+                ('max_quantity', '>=', record.quantity_kg),
+                ('company_id', '=', record.company_id.id),
+            ], limit=1)
+
+            record.wage_rate = rule.wage_rate
+            record.basic_wage = record.quantity_kg * rule.wage_rate
+            record.premium = p_rule.premium_amount if p_rule else 0.0
+            record.total_wage = record.basic_wage + record.premium
 
     def write(self, vals):
         if self.env.context.get('bypass_work_result_lock'):
             return super().write(vals)
-            
+
         for record in self:
-            if record.state == 'paid':
-                raise ValidationError(_("Hasil kerja yang sudah dibayar (Paid) tidak dapat diubah."))
-            if record.payroll_line_id and record.payroll_line_id.period_id.state in ['confirmed', 'paid']:
-                raise ValidationError(_("Hasil kerja tidak dapat diubah karena periode penggajian terkait sudah berstatus Confirmed atau Paid."))
+            if record.state in ['validated', 'processed', 'paid']:
+                raise ValidationError(_("Hasil kerja yang sudah divalidasi, diproses, atau dibayar tidak dapat diubah."))
         return super().write(vals)
 
     def unlink(self):
         for record in self:
-            if record.state == 'paid':
-                raise ValidationError(_("Hasil kerja yang sudah dibayar (Paid) tidak dapat dihapus."))
-            if record.payroll_line_id and record.payroll_line_id.period_id.state in ['confirmed', 'paid']:
-                raise ValidationError(_("Hasil kerja tidak dapat dihapus karena periode penggajian terkait sudah berstatus Confirmed atau Paid."))
+            if record.state in ['validated', 'processed', 'paid']:
+                raise ValidationError(_("Hasil kerja yang sudah divalidasi, diproses, atau dibayar tidak dapat dihapus."))
         return super().unlink()
-
-    def action_validate(self):
-        if not self.env.su and not (self.env.user.has_group('coconut_payroll.group_coconut_payroll_supervisor') or 
-                                    self.env.user.has_group('coconut_payroll.group_coconut_payroll_manager')):
-            raise UserError(_("Hanya Supervisor atau Manager Penggajian yang dapat memvalidasi hasil kerja."))
-        for record in self:
-            if record.state != 'draft':
-                raise UserError(_("Hanya hasil kerja berstatus Draft yang dapat divalidasi."))
-            if record.quantity <= 0:
-                raise ValidationError(_("Kuantitas harus lebih besar dari 0."))
-        self.with_context(bypass_work_result_lock=True).write({'state': 'validated'})
-
-    def action_draft(self):
-        for record in self:
-            if record.state == 'paid':
-                raise UserError(_("Hasil kerja yang sudah dibayar (Paid) tidak dapat diubah ke Draft."))
-            if record.payroll_line_id and record.payroll_line_id.period_id.state in ['confirmed', 'paid']:
-                raise UserError(_("Hasil kerja tidak dapat diubah ke Draft karena periode penggajian terkait sudah berstatus Confirmed atau Paid."))
-        self.with_context(bypass_work_result_lock=True).write({'state': 'draft'})
-
-    def action_cancel(self):
-        for record in self:
-            if record.state == 'paid':
-                raise UserError(_("Hasil kerja yang sudah dibayar tidak dapat dibatalkan."))
-        self.with_context(bypass_work_result_lock=True).write({'state': 'cancelled'})
