@@ -8,8 +8,9 @@ class CoconutSalaryRule(models.Model):
     _order = 'start_date desc, id desc'
 
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
     ], string='Jenis Pekerja', required=True)
 
     day_type = fields.Selection([

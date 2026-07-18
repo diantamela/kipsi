@@ -6,10 +6,24 @@ class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
     payroll_worker_type = fields.Selection([
-        ('daily', 'Karyawan Harian'),
-        ('sheller', 'Sheller Borongan'),
-        ('parer', 'Parer Borongan'),
-    ], string='Jenis Penggajian')
+        ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
+    ], string='Jenis Penggajian', compute='_compute_payroll_worker_type', store=True, readonly=False)
+
+    @api.depends('department_id')
+    def _compute_payroll_worker_type(self):
+        for employee in self:
+            dep_name = employee.department_id.name or ''
+            dep_display = employee.department_id.display_name or ''
+            if 'Parer' in dep_name or 'Parer' in dep_display:
+                employee.payroll_worker_type = 'parer'
+            elif 'Sheller Manual' in dep_name or 'Sheller Manual' in dep_display:
+                employee.payroll_worker_type = 'sheller_manual'
+            elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
+                employee.payroll_worker_type = 'sheller_mesin'
+            else:
+                employee.payroll_worker_type = False
 
     employee_code = fields.Char(
         string='Kode Karyawan',

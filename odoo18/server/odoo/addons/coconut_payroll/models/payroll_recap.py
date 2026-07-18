@@ -26,8 +26,9 @@ class CoconutPayrollRecap(models.Model):
     )
 
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
     ], string='Jenis Pekerja', required=True)
 
     company_id = fields.Many2one(

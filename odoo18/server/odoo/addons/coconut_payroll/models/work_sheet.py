@@ -1,7 +1,9 @@
-# -*- coding: utf-8 -*-
+import logging
 import math
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError, UserError
+
+_logger = logging.getLogger(__name__)
 
 class CoconutWorkSheet(models.Model):
     _name = 'coconut.work.sheet'
@@ -24,18 +26,10 @@ class CoconutWorkSheet(models.Model):
     )
 
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
-    ], string='Jenis Pekerja', required=True)
-
-    production_type = fields.Selection([
-        ('sheller_prod', 'Sheller Production'),
-        ('parer_prod', 'Parer Production'),
-        ('white_meat', 'White Meat Kopra'),
-        ('bad_meat', 'Bad Meat'),
-        ('bad_meat_sunday', 'Bad Meat Sunday'),
-        ('other', 'Other'),
-    ], string='Jenis Produksi', required=True)
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
+    ], string='Jenis Pekerjaan', required=True)
 
     day_type = fields.Selection([
         ('biasa', 'Hari Biasa'),
@@ -82,6 +76,39 @@ class CoconutWorkSheet(models.Model):
                 seq = self.env['ir.sequence'].next_by_code('coconut.work.sheet') or '/'
                 vals['name'] = f"WS/{date_str}/{w_type}/{seq}"
         return super().create(vals_list)
+
+    @api.onchange('worker_type')
+    def _onchange_worker_type(self):
+        _logger.info(
+            "Payroll worker type selected: %s",
+            self.worker_type
+        )
+        if self.worker_type:
+            dep_keyword = {
+                'parer': 'Parer',
+                'sheller_manual': 'Sheller Manual',
+                'sheller_mesin': 'Sheller Mesin',
+            }.get(self.worker_type, '')
+
+            departments = self.env['hr.department'].search([])
+            matching_deps = departments.filtered(lambda d: dep_keyword in (d.name or '') or dep_keyword in (d.display_name or ''))
+
+            employees = self.env['hr.employee'].search([
+                ('department_id', 'in', matching_deps.ids),
+            ])
+            _logger.info(
+                "Employees found: %s",
+                employees.mapped('name')
+            )
+            self.work_result_ids = [(5, 0, 0)] + [
+                (0, 0, {
+                    'employee_id': employee.id,
+                    'quantity_kg': 0.0
+                })
+                for employee in employees
+            ]
+        else:
+            self.work_result_ids = [(5, 0, 0)]
 
     def action_validate(self):
         if not self.env.su and not (self.env.user.has_group('coconut_payroll.group_coconut_payroll_supervisor') or 

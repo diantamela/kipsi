@@ -12,8 +12,9 @@ class CoconutPayrollTariff(models.Model):
     )
     
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
     ], string='Jenis Pekerja', required=True)
 
     work_type = fields.Selection([

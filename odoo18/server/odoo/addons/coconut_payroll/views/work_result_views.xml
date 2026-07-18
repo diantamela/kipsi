@@ -14,8 +14,7 @@
                             <field name="work_sheet_id" readonly="1"/>
                             <field name="date"/>
                             <field name="employee_id" readonly="state in ['processed', 'paid']"/>
-                            <field name="worker_type"/>
-                            <field name="production_type"/>
+                            <field name="worker_type" string="Jenis Pekerjaan"/>
                             <field name="day_type"/>
                         </group>
                         <group string="Perhitungan Hasil Kerja">
@@ -42,8 +41,7 @@
                 <field name="date"/>
                 <field name="work_sheet_id"/>
                 <field name="employee_id"/>
-                <field name="worker_type"/>
-                <field name="production_type"/>
+                <field name="worker_type" string="Jenis Pekerjaan"/>
                 <field name="day_type"/>
                 <field name="quantity_kg" sum="Total Qty"/>
                 <field name="wage_rate"/>
@@ -61,9 +59,7 @@
         <field name="model">coconut.work.result</field>
         <field name="arch" type="xml">
             <search string="Cari Hasil Kerja">
-                <field name="employee_id"/>
                 <field name="worker_type"/>
-                <field name="production_type"/>
                 <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Validated" name="validated" domain="[('state', '=', 'validated')]"/>
                 <filter string="Processed" name="processed" domain="[('state', '=', 'processed')]"/>

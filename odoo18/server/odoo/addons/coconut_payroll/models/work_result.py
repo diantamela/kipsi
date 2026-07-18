@@ -35,12 +35,6 @@ class CoconutWorkResult(models.Model):
         readonly=True,
     )
 
-    production_type = fields.Selection(
-        related='work_sheet_id.production_type',
-        store=True,
-        readonly=True,
-    )
-
     day_type = fields.Selection(
         related='work_sheet_id.day_type',
         store=True,
@@ -121,12 +115,25 @@ class CoconutWorkResult(models.Model):
     def _check_employee_worker_type(self):
         for record in self:
             if record.employee_id and record.worker_type:
-                emp_type = record.employee_id.payroll_worker_type
-                if emp_type != record.worker_type:
-                    raise ValidationError(_("Karyawan %s memiliki Jenis Penggajian '%s', tidak cocok dengan Jenis Pekerja lembar kerja '%s'.") % (
+                dep_name = record.employee_id.department_id.name or ''
+                dep_display = record.employee_id.department_id.display_name or ''
+                dep_keyword = {
+                    'parer': 'Parer',
+                    'sheller_manual': 'Sheller Manual',
+                    'sheller_mesin': 'Sheller Mesin',
+                }.get(record.worker_type, '')
+
+                if dep_keyword not in dep_name and dep_keyword not in dep_display:
+                    labels = {
+                        'parer': 'Parer',
+                        'sheller_manual': 'Sheller Manual',
+                        'sheller_mesin': 'Sheller Mesin',
+                    }
+                    raise ValidationError(_("Karyawan %s memiliki departemen '%s', tidak cocok dengan Jenis Pekerja lembar kerja '%s' (harus mengandung '%s').") % (
                         record.employee_id.name,
-                        dict(record.employee_id._fields['payroll_worker_type'].selection).get(emp_type) or emp_type,
-                        dict(record._fields['worker_type'].selection).get(record.worker_type) or record.worker_type
+                        dep_display or dep_name or _('Tanpa Departemen'),
+                        labels.get(record.worker_type, record.worker_type),
+                        dep_keyword
                     ))
 
     def _calculate_and_snapshot_wages(self):
@@ -147,12 +154,7 @@ class CoconutWorkResult(models.Model):
             ], limit=1)
 
             if not rule:
-                raise ValidationError(_("Tidak ditemukan aturan upah gaji untuk Pekerja: %s, Hari: %s, Kuantitas: %s Kg pada %s.") % (
-                    dict(self._fields['worker_type'].selection).get(sheet.worker_type) or sheet.worker_type,
-                    dict(self._fields['day_type'].selection).get(sheet.day_type) or sheet.day_type,
-                    record.quantity_kg,
-                    sheet.date
-                ))
+                raise ValidationError(_("Aturan upah tidak ditemukan untuk jenis pekerja dan jumlah produksi ini."))
 
             # Match premium rule (optional)
             p_rule = self.env['coconut.premium.rule'].search([

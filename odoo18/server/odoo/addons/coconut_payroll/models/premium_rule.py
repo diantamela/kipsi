@@ -11,8 +11,9 @@ class CoconutPayrollPremiumRule(models.Model):
         required=True,
     )
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
     ], string='Jenis Pekerja', required=True)
     minimum_quantity = fields.Float(
         string='Jumlah Minimal (Kg)',
@@ -48,8 +49,9 @@ class CoconutPremiumRule(models.Model):
     _order = 'start_date desc, id desc'
 
     worker_type = fields.Selection([
-        ('sheller', 'Sheller'),
         ('parer', 'Parer'),
+        ('sheller_manual', 'Sheller Manual'),
+        ('sheller_mesin', 'Sheller Mesin'),
     ], string='Jenis Pekerja', required=True)
 
     day_type = fields.Selection([

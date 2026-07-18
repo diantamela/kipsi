@@ -34,16 +34,20 @@ class TestCoconutPayroll(TransactionCase):
             'groups_id': [(6, 0, [self.group_manager.id])],
         })
 
+        # Create departments
+        self.dep_sheller = self.env['hr.department'].create({'name': 'MP / Sheller Manual'})
+        self.dep_parer = self.env['hr.department'].create({'name': 'MP / Parer'})
+
         # Create employees
         self.emp_sheller = self.env['hr.employee'].create({
             'name': 'Budi Sheller',
-            'payroll_worker_type': 'sheller',
+            'department_id': self.dep_sheller.id,
             'employee_code': 'EMP001',
             'payroll_active': True,
         })
         self.emp_parer = self.env['hr.employee'].create({
             'name': 'Siti Parer',
-            'payroll_worker_type': 'parer',
+            'department_id': self.dep_parer.id,
             'employee_code': 'EMP002',
             'payroll_active': True,
         })
@@ -54,7 +58,7 @@ class TestCoconutPayroll(TransactionCase):
 
         # Create Salary Rules for Sheller
         self.rule_sheller_biasa_low = self.env['coconut.salary.rule'].create({
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'min_quantity': 0.0,
             'max_quantity': 424.99,
@@ -64,7 +68,7 @@ class TestCoconutPayroll(TransactionCase):
             'company_id': self.company.id,
         })
         self.rule_sheller_biasa_high = self.env['coconut.salary.rule'].create({
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'min_quantity': 425.0,
             'max_quantity': 999999.0,
@@ -74,7 +78,7 @@ class TestCoconutPayroll(TransactionCase):
             'company_id': self.company.id,
         })
         self.rule_sheller_merah_low = self.env['coconut.salary.rule'].create({
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'day_type': 'merah',
             'min_quantity': 0.0,
             'max_quantity': 424.99,
@@ -84,7 +88,7 @@ class TestCoconutPayroll(TransactionCase):
             'company_id': self.company.id,
         })
         self.rule_sheller_merah_high = self.env['coconut.salary.rule'].create({
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'day_type': 'merah',
             'min_quantity': 425.0,
             'max_quantity': 999999.0,
@@ -118,7 +122,7 @@ class TestCoconutPayroll(TransactionCase):
 
         # Create Premium Rules
         self.premium_sheller_biasa_500 = self.env['coconut.premium.rule'].create({
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'min_quantity': 500.0,
             'max_quantity': 599.99,
@@ -142,8 +146,7 @@ class TestCoconutPayroll(TransactionCase):
         # 1. Sheller normal day calculation (< 425 kg vs >= 425 kg)
         sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
-            'worker_type': 'sheller',
-            'production_type': 'sheller_prod',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'total_production_qty': 900.0,
             'company_id': self.company.id,
@@ -153,7 +156,7 @@ class TestCoconutPayroll(TransactionCase):
         # High qty worker (Siti, wait, Siti is parer, we need another employee)
         emp_sheller2 = self.env['hr.employee'].create({
             'name': 'Andi Sheller',
-            'payroll_worker_type': 'sheller',
+            'department_id': self.dep_sheller.id,
             'employee_code': 'EMP003',
         })
 
@@ -184,8 +187,7 @@ class TestCoconutPayroll(TransactionCase):
         # 2. Production quantity mismatch validation
         sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
-            'worker_type': 'sheller',
-            'production_type': 'sheller_prod',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'total_production_qty': 1000.0,
             'company_id': self.company.id,
@@ -212,8 +214,7 @@ class TestCoconutPayroll(TransactionCase):
 
         sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
-            'worker_type': 'sheller',
-            'production_type': 'sheller_prod',
+            'worker_type': 'sheller_manual',
             'day_type': 'biasa',
             'total_production_qty': 500.0,
             'company_id': self.company.id,
@@ -228,7 +229,7 @@ class TestCoconutPayroll(TransactionCase):
         recap = self.env['coconut.payroll.recap'].create({
             'date_start': '2026-07-01',
             'date_end': '2026-07-07',
-            'worker_type': 'sheller',
+            'worker_type': 'sheller_manual',
             'company_id': self.company.id,
         })
         recap.action_generate()
@@ -252,7 +253,7 @@ class TestCoconutPayroll(TransactionCase):
         # 4. Try to create overlapping salary rule (should fail)
         with self.assertRaises(ValidationError):
             self.env['coconut.salary.rule'].create({
-                'worker_type': 'sheller',
+                'worker_type': 'sheller_manual',
                 'day_type': 'biasa',
                 'min_quantity': 100.0,
                 'max_quantity': 200.0,
@@ -261,3 +262,18 @@ class TestCoconutPayroll(TransactionCase):
                 'end_date': '2026-07-15',
                 'company_id': self.company.id,
             })
+
+    def test_05_onchange_worker_type(self):
+        # 5. Test auto-population of work results when worker_type is selected
+        sheet = self.env['coconut.work.sheet'].new({
+            'date': '2026-07-01',
+            'worker_type': 'sheller_manual',
+            'company_id': self.company.id,
+        })
+        sheet._onchange_worker_type()
+        
+        # Budi Sheller has sheller_manual worker type, Siti Parer has parer.
+        # Only Budi Sheller should be populated.
+        employees_populated = [res.employee_id for res in sheet.work_result_ids]
+        self.assertIn(self.emp_sheller, employees_populated)
+        self.assertNotIn(self.emp_parer, employees_populated)
