@@ -150,19 +150,9 @@ class CoconutPayrollPeriod(models.Model):
                         'work_result_ids': [(6, 0, wr_ids)]
                     })
                     processed_lines |= line
-                    # Get worker type from work results if available, otherwise fallback to department-based mapping
                     w_type = wr_list[0].worker_type if wr_list else False
                     if not w_type:
-                        dep_name = employee.department_id.name or ''
-                        dep_display = employee.department_id.display_name or ''
-                        if 'Parer' in dep_name or 'Parer' in dep_display:
-                            w_type = 'parer'
-                        elif 'Sheller Manual' in dep_name or 'Sheller Manual' in dep_display:
-                            w_type = 'sheller_manual'
-                        elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
-                            w_type = 'sheller_mesin'
-                        else:
-                            w_type = employee.payroll_worker_type or 'parer'
+                        w_type = employee.payroll_job_type or 'parer'
 
                     new_line = self.env['coconut.payroll.line'].create({
                         'period_id': period.id,

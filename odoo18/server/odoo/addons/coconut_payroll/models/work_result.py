@@ -11,7 +11,7 @@ class CoconutWorkResult(models.Model):
         'coconut.work.sheet',
         string='Lembar Kerja',
         required=True,
-        ondelete='restrict',
+        ondelete='cascade',
         index=True,
     )
 
@@ -63,6 +63,8 @@ class CoconutWorkResult(models.Model):
 
     wage_rate = fields.Float(
         string='Tarif Upah',
+        compute='_compute_wages',
+        store=True,
         readonly=True,
         default=0.0,
     )
@@ -70,6 +72,8 @@ class CoconutWorkResult(models.Model):
     basic_wage = fields.Monetary(
         string='Upah Dasar',
         currency_field='currency_id',
+        compute='_compute_wages',
+        store=True,
         readonly=True,
         default=0.0,
     )
@@ -77,6 +81,8 @@ class CoconutWorkResult(models.Model):
     premium = fields.Monetary(
         string='Premi',
         currency_field='currency_id',
+        compute='_compute_wages',
+        store=True,
         readonly=True,
         default=0.0,
     )
@@ -84,6 +90,8 @@ class CoconutWorkResult(models.Model):
     total_wage = fields.Monetary(
         string='Total Upah',
         currency_field='currency_id',
+        compute='_compute_wages',
+        store=True,
         readonly=True,
         default=0.0,
     )
@@ -115,26 +123,66 @@ class CoconutWorkResult(models.Model):
     def _check_employee_worker_type(self):
         for record in self:
             if record.employee_id and record.worker_type:
-                dep_name = record.employee_id.department_id.name or ''
-                dep_display = record.employee_id.department_id.display_name or ''
-                dep_keyword = {
-                    'parer': 'Parer',
-                    'sheller_manual': 'Sheller Manual',
-                    'sheller_mesin': 'Sheller Mesin',
-                }.get(record.worker_type, '')
+                job_type = record.employee_id.payroll_job_type
+                if record.worker_type == 'parer':
+                    if job_type != 'parer':
+                        raise ValidationError(_("Karyawan %s memiliki Jenis Pekerjaan Payroll '%s', tidak cocok dengan Jenis Pekerja lembar kerja 'Parer'.") % (
+                            record.employee_id.name,
+                            dict(self.env['hr.employee']._fields['payroll_job_type'].selection).get(job_type, job_type or _('Belum diisi'))
+                        ))
+                elif record.worker_type in ['sheller_manual', 'sheller_mesin']:
+                    if job_type not in ['sheller_manual', 'sheller_mesin']:
+                        raise ValidationError(_("Karyawan %s memiliki Jenis Pekerjaan Payroll '%s', tidak cocok dengan Jenis Pekerja lembar kerja Sheller.") % (
+                            record.employee_id.name,
+                            dict(self.env['hr.employee']._fields['payroll_job_type'].selection).get(job_type, job_type or _('Belum diisi'))
+                        ))
 
-                if dep_keyword not in dep_name and dep_keyword not in dep_display:
-                    labels = {
-                        'parer': 'Parer',
-                        'sheller_manual': 'Sheller Manual',
-                        'sheller_mesin': 'Sheller Mesin',
-                    }
-                    raise ValidationError(_("Karyawan %s memiliki departemen '%s', tidak cocok dengan Jenis Pekerja lembar kerja '%s' (harus mengandung '%s').") % (
-                        record.employee_id.name,
-                        dep_display or dep_name or _('Tanpa Departemen'),
-                        labels.get(record.worker_type, record.worker_type),
-                        dep_keyword
-                    ))
+    @api.depends('quantity_kg', 'work_sheet_id.date', 'work_sheet_id.worker_type', 'work_sheet_id.day_type', 'work_sheet_id.company_id', 'work_sheet_id.state')
+    def _compute_wages(self):
+        for record in self:
+            sheet = record.work_sheet_id
+            if sheet and sheet.state and sheet.state != 'draft' and record.wage_rate > 0.0:
+                record.wage_rate = record.wage_rate
+                record.basic_wage = record.basic_wage
+                record.premium = record.premium
+                record.total_wage = record.total_wage
+                continue
+
+            if not sheet or not sheet.worker_type or not sheet.day_type or not sheet.date:
+                record.wage_rate = 0.0
+                record.basic_wage = 0.0
+                record.premium = 0.0
+                record.total_wage = 0.0
+                continue
+
+            rule = self.env['coconut.salary.rule'].search([
+                ('worker_type', '=', sheet.worker_type),
+                ('day_type', '=', sheet.day_type),
+                ('start_date', '<=', sheet.date),
+                ('end_date', '>=', sheet.date),
+                ('min_quantity', '<=', record.quantity_kg),
+                ('max_quantity', '>=', record.quantity_kg),
+                ('company_id', '=', sheet.company_id.id),
+            ], limit=1)
+
+            p_rule = self.env['coconut.premium.rule'].search([
+                ('worker_type', '=', sheet.worker_type),
+                ('day_type', '=', sheet.day_type),
+                ('start_date', '<=', sheet.date),
+                ('end_date', '>=', sheet.date),
+                ('min_quantity', '<=', record.quantity_kg),
+                ('max_quantity', '>=', record.quantity_kg),
+                ('company_id', '=', sheet.company_id.id),
+            ], limit=1)
+
+            record.wage_rate = rule.wage_rate if rule else 0.0
+            record.basic_wage = record.quantity_kg * record.wage_rate
+            record.premium = p_rule.premium_amount if p_rule else 0.0
+            record.total_wage = record.basic_wage + record.premium
+
+    @api.onchange('quantity_kg')
+    def _onchange_quantity_kg(self):
+        self._compute_wages()
 
     def _calculate_and_snapshot_wages(self):
         for record in self:
@@ -142,7 +190,6 @@ class CoconutWorkResult(models.Model):
             if not sheet:
                 continue
 
-            # Match salary rule
             rule = self.env['coconut.salary.rule'].search([
                 ('worker_type', '=', sheet.worker_type),
                 ('day_type', '=', sheet.day_type),
@@ -155,22 +202,6 @@ class CoconutWorkResult(models.Model):
 
             if not rule:
                 raise ValidationError(_("Aturan upah tidak ditemukan untuk jenis pekerja dan jumlah produksi ini."))
-
-            # Match premium rule (optional)
-            p_rule = self.env['coconut.premium.rule'].search([
-                ('worker_type', '=', sheet.worker_type),
-                ('day_type', '=', sheet.day_type),
-                ('start_date', '<=', sheet.date),
-                ('end_date', '>=', sheet.date),
-                ('min_quantity', '<=', record.quantity_kg),
-                ('max_quantity', '>=', record.quantity_kg),
-                ('company_id', '=', record.company_id.id),
-            ], limit=1)
-
-            record.wage_rate = rule.wage_rate
-            record.basic_wage = record.quantity_kg * rule.wage_rate
-            record.premium = p_rule.premium_amount if p_rule else 0.0
-            record.total_wage = record.basic_wage + record.premium
 
     def write(self, vals):
         if self.env.context.get('bypass_work_result_lock'):

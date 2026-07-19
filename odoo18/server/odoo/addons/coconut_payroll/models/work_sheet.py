@@ -42,9 +42,15 @@ class CoconutWorkSheet(models.Model):
 
     total_production_qty = fields.Float(
         string='Total Produksi (Kg)',
-        required=True,
-        default=0.0,
+        compute='_compute_total_production_qty',
+        store=True,
+        readonly=True,
     )
+
+    @api.depends('work_result_ids.quantity_kg')
+    def _compute_total_production_qty(self):
+        for record in self:
+            record.total_production_qty = sum(record.work_result_ids.mapped('quantity_kg'))
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -79,31 +85,21 @@ class CoconutWorkSheet(models.Model):
 
     @api.onchange('worker_type')
     def _onchange_worker_type(self):
-        _logger.info(
-            "Payroll worker type selected: %s",
-            self.worker_type
-        )
         if self.worker_type:
-            dep_keyword = {
-                'parer': 'Parer',
-                'sheller_manual': 'Sheller Manual',
-                'sheller_mesin': 'Sheller Mesin',
-            }.get(self.worker_type, '')
-
-            departments = self.env['hr.department'].search([])
-            matching_deps = departments.filtered(lambda d: dep_keyword in (d.name or '') or dep_keyword in (d.display_name or ''))
-
             employees = self.env['hr.employee'].search([
-                ('department_id', 'in', matching_deps.ids),
+                ('active', '=', True),
+                ('payroll_job_type', '=', self.worker_type),
             ])
+
             _logger.info(
-                "Employees found: %s",
-                employees.mapped('name')
+                "WORK SHEET %s FOUND EMPLOYEE %s",
+                self.worker_type,
+                len(employees)
             )
             self.work_result_ids = [(5, 0, 0)] + [
                 (0, 0, {
                     'employee_id': employee.id,
-                    'quantity_kg': 0.0
+                    'quantity_kg': 0
                 })
                 for employee in employees
             ]

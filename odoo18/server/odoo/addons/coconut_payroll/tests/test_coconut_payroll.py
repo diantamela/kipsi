@@ -184,21 +184,13 @@ class TestCoconutPayroll(TransactionCase):
         self.assertEqual(res2.total_wage, 137500.0)
 
     def test_02_production_validation_mismatch(self):
-        # 2. Production quantity mismatch validation
+        # 2. Production quantity validation (ValidationError when empty or total is <= 0)
         sheet = self.env['coconut.work.sheet'].create({
             'date': '2026-07-01',
             'worker_type': 'sheller_manual',
             'day_type': 'biasa',
-            'total_production_qty': 1000.0,
             'company_id': self.company.id,
         })
-
-        self.env['coconut.work.result'].create({
-            'work_sheet_id': sheet.id,
-            'employee_id': self.emp_sheller.id,
-            'quantity_kg': 500.0,
-        })
-
         with self.assertRaises(ValidationError):
             sheet.action_validate()
 
