@@ -61,8 +61,9 @@ class CoconutWorkResult(models.Model):
         readonly=True,
     )
 
-    wage_rate = fields.Float(
+    wage_rate = fields.Monetary(
         string='Tarif Upah',
+        currency_field='currency_id',
         compute='_compute_wages',
         store=True,
         readonly=True,

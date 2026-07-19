@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format A5 Landscape -->
+    <record id="paperformat_a5_payslip" model="report.paperformat">
+        <field name="name">Format Kertas A5 Slip Gaji</field>
+        <field name="default" eval="False" />
+        <field name="format">A5</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">8</field>
+        <field name="margin_right">8</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Individual Payslip Report Action -->
+    <record id="action_report_payslip" model="ir.actions.report">
+        <field name="name">Cetak Slip Gaji</field>
+        <field name="model">coconut.payroll.line</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_payroll.report_payslip_template</field>
+        <field name="report_file">coconut_payroll.report_payslip_template</field>
+        <field name="print_report_name">'Slip_Gaji_' + (object.employee_id.name or '')</field>
+        <field name="binding_model_id" ref="model_coconut_payroll_line"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_a5_payslip"/>
+    </record>
+
+    <!-- Recap All Payslips Report Action -->
+    <record id="action_report_recap_payslips" model="ir.actions.report">
+        <field name="name">Cetak Semua Slip Gaji</field>
+        <field name="model">coconut.payroll.recap</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_payroll.report_recap_payslips_template</field>
+        <field name="report_file">coconut_payroll.report_recap_payslips_template</field>
+        <field name="print_report_name">'Semua_Slip_Gaji_' + (object.name or '')</field>
+        <field name="binding_model_id" ref="model_coconut_payroll_recap"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_a5_payslip"/>
+    </record>
+
+    <!-- Shared Payslip Card Component Template -->
+    <template id="payslip_card_component">
+        <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; padding: 10px; margin: 0; page-break-after: always; page-break-inside: avoid;">
+            <!-- Header -->
+            <div class="row mb-1">
+                <div class="col-6">
+                    <strong><span t-field="o.company_id.name" style="font-size: 14px; color: #2C3E50;"/></strong><br/>
+                    <span t-field="o.company_id.street" style="font-size: 10px;"/><br/>
+                    <span t-field="o.company_id.city" style="font-size: 10px;"/>
+                </div>
+                <div class="col-6 text-end">
+                    <h3 style="margin: 0; color: #2C3E50; font-weight: bold; font-size: 18px;">SLIP GAJI</h3>
+                    <strong>No:</strong> <span t-field="o.recap_id.name"/><br/>
+                    <strong>Periode:</strong> <span t-field="o.recap_id.date_start" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/> - <span t-field="o.recap_id.date_end" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
+                </div>
+            </div>
+
+            <hr style="border-top: 1.5px solid #2C3E50; margin-top: 3px; margin-bottom: 8px;"/>
+
+            <!-- Employee Details -->
+            <div class="row mb-2">
+                <div class="col-6">
+                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                        <tr>
+                            <td style="width: 35%; padding: 1px 0;"><strong>Nama Karyawan</strong></td>
+                            <td style="width: 5%; padding: 1px 0;">:</td>
+                            <td style="padding: 1px 0;"><span t-field="o.employee_id.name"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1px 0;"><strong>NIK</strong></td>
+                            <td style="padding: 1px 0;">:</td>
+                            <td style="padding: 1px 0;"><span t-field="o.employee_id.employee_code"/></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-6">
+                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                        <tr>
+                            <td style="width: 35%; padding: 1px 0;"><strong>Bagian/Jabatan</strong></td>
+                            <td style="width: 5%; padding: 1px 0;">:</td>
+                            <td style="padding: 1px 0;"><span t-field="o.worker_type"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1px 0;"><strong>Total Kerja</strong></td>
+                            <td style="padding: 1px 0;">:</td>
+                            <td style="padding: 1px 0;"><span t-field="o.total_quantity_kg"/> Kg</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Earnings and Deductions -->
+            <div class="row mb-2">
+                <!-- Earnings -->
+                <div class="col-6">
+                    <h6 style="border-bottom: 1.5px solid #2C3E50; padding-bottom: 3px; color: #2C3E50; font-weight: bold; font-size: 11px; margin-bottom: 4px;">PENERIMAAN</h6>
+                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                        <tr>
+                            <td style="padding: 2px 0;">Upah Dasar</td>
+                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.basic_wage" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 2px 0;">Premi / Bonus</td>
+                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.premium" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <tr style="border-top: 1px solid #ddd;">
+                            <td style="padding: 4px 0;"><strong>Total Gaji Kotor</strong></td>
+                            <td style="padding: 4px 0;" class="text-end"><strong><span t-field="o.gross_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Deductions -->
+                <div class="col-6" style="border-left: 1px solid #ddd;">
+                    <h6 style="border-bottom: 1.5px solid #2C3E50; padding-bottom: 3px; color: #2C3E50; font-weight: bold; font-size: 11px; margin-bottom: 4px;">POTONGAN</h6>
+                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                        <tr>
+                            <td style="padding: 2px 0;">Potongan Pinjaman</td>
+                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                        <!-- Empty alignment line -->
+                        <tr>
+                            <td style="padding: 2px 0;">&amp;nbsp;</td>
+                            <td style="padding: 2px 0;" class="text-end">&amp;nbsp;</td>
+                        </tr>
+                        <tr style="border-top: 1px solid #ddd;">
+                            <td style="padding: 4px 0;"><strong>Total Potongan</strong></td>
+                            <td style="padding: 4px 0;" class="text-end"><strong><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Net Salary -->
+            <div class="card p-2 mb-2" style="background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
+                <div class="row align-items-center">
+                    <div class="col-6">
+                        <h5 style="margin: 0; color: #2C3E50; font-weight: bold; font-size: 12px;">GAJI BERSIH (Take Home Pay)</h5>
+                    </div>
+                    <div class="col-6 text-end">
+                        <h4 style="margin: 0; color: #27AE60; font-weight: bold; font-size: 15px;"><span t-field="o.net_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signatures -->
+            <div class="row text-center mt-3" style="page-break-inside: avoid; margin-top: 15px; font-size: 10px;">
+                <div class="col-4">
+                    <p style="margin-bottom: 30px;">Dibuat Oleh,</p>
+                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;">Staf Payroll</p>
+                </div>
+                <div class="col-4">
+                    <p style="margin-bottom: 30px;">Disetujui Oleh,</p>
+                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;">Manager Operasional / HRD</p>
+                </div>
+                <div class="col-4">
+                    <p style="margin-bottom: 30px;">Diterima Oleh,</p>
+                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;"><span t-field="o.employee_id.name"/></p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Individual Payslip Template -->
+    <template id="report_payslip_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-call="coconut_payroll.payslip_card_component"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Recap All Payslips Template -->
+    <template id="report_recap_payslips_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="recap">
+                <t t-foreach="recap.line_ids" t-as="o">
+                    <t t-call="web.basic_layout">
+                        <t t-call="coconut_payroll.payslip_card_component"/>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -114,6 +114,13 @@ class CoconutWorkSheet(models.Model):
         for record in self:
             if record.state != 'draft':
                 raise UserError(_("Hanya dokumen berstatus Draft yang dapat divalidasi."))
+
+            # Unlink work results where quantity is 0 or less (they didn't work)
+            zero_lines = record.work_result_ids.filtered(lambda r: r.quantity_kg <= 0)
+            if zero_lines:
+                zero_lines.unlink()
+                record.invalidate_recordset(fnames=['work_result_ids', 'total_production_qty'])
+
             if not record.work_result_ids:
                 raise ValidationError(_("Hasil kerja karyawan harus diisi."))
             if record.total_production_qty <= 0:
@@ -125,8 +132,6 @@ class CoconutWorkSheet(models.Model):
 
             # Ensure detail lines have correct rate, basic wage, and premium populated and stored as snapshot
             for res in record.work_result_ids:
-                if res.quantity_kg <= 0:
-                    raise ValidationError(_("Kuantitas karyawan %s harus lebih besar dari 0.") % res.employee_id.name)
                 # Compute rules dynamically
                 res._calculate_and_snapshot_wages()
                 res.state = 'validated'

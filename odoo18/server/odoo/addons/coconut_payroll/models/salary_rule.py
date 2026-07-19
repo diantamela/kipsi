@@ -30,8 +30,16 @@ class CoconutSalaryRule(models.Model):
         default=999999.0,
     )
 
-    wage_rate = fields.Float(
+    currency_id = fields.Many2one(
+        'res.currency',
+        related='company_id.currency_id',
+        store=True,
+        readonly=True,
+    )
+
+    wage_rate = fields.Monetary(
         string='Tarif Upah',
+        currency_field='currency_id',
         required=True,
         default=0.0,
     )

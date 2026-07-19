@@ -27,6 +27,7 @@
         'views/payroll_recap_views.xml',
         'views/employee_loan_views.xml',
         'views/salary_rule_views.xml',
+        'views/payroll_line_report.xml',
         'views/payroll_menu.xml',
     ],
     'installable': True,
