@@ -296,6 +296,17 @@
         <field name="action" ref="coconut_receiving.action_coconut_manufacturing"/>
     </record>
 
+    <!-- Rename Inventory root menu to "Persediaan" and set homepage to Products (Dashboard) -->
+    <record id="stock.menu_stock_root" model="ir.ui.menu">
+        <field name="name">Persediaan</field>
+        <field name="action" ref="coconut_receiving.action_coconut_product_dashboard"/>
+    </record>
+
+    <!-- Direct native Manufacturing Orders in production module to custom manufacturing view -->
+    <record id="mrp.menu_mrp_production_action" model="ir.ui.menu">
+        <field name="action" ref="coconut_receiving.action_coconut_manufacturing"/>
+    </record>
+
     <!-- 6. Kelapa Module Overview Card with Bar Chart -->
     <record id="action_coconut_picking_type_kanban" model="ir.actions.act_window">
         <field name="name">Overview</field>
@@ -314,4 +325,9 @@
               parent="coconut_receiving.menu_coconut_receiving_root"
               action="action_coconut_picking_type_kanban"
               sequence="5"/>
+
+    <!-- Hide signup link on login page -->
+    <template id="auth_signup_login_hide_signup" inherit_id="auth_signup.login">
+        <xpath expr="//a[@t-if='signup_enabled']" position="replace"/>
+    </template>
 </odoo>

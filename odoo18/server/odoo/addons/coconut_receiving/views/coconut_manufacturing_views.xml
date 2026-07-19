@@ -286,9 +286,9 @@
            └── Stok Kelapa Harian   (seq 40)
          ═══════════════════════════════════════════════════ -->
 
-    <!-- Override / Rename Root Menu from coconut_receiving to "Kelapa" -->
+    <!-- Override / Rename Root Menu from coconut_receiving to "Penerimaan Kelapa" -->
     <menuitem id="coconut_receiving.menu_coconut_receiving_root"
-              name="Kelapa"
+              name="Penerimaan"
               sequence="40"/>
 
     <!-- Re-parent Penerimaan Kelapa under Kelapa -->

@@ -326,14 +326,15 @@
                         border-color: #205c32 !important;
                     }
                     
-                    a.text-success-custom {
+                    .form-label a, a.text-success-custom, .oe_login_form + div a, .oe_login_form ~ div a {
                         color: #2e7a46 !important;
                         font-weight: 600 !important;
                         text-decoration: none !important;
+                        font-size: 0.75rem !important;
                         transition: color 0.2s ease !important;
                     }
                     
-                    a.text-success-custom:hover {
+                    .form-label a:hover, a.text-success-custom:hover, .oe_login_form + div a:hover, .oe_login_form ~ div a:hover {
                         color: #1e5930 !important;
                         text-decoration: underline !important;
                     }
@@ -379,15 +380,8 @@
 
                 <!-- Center Pane -->
                 <div class="login-center-pane d-flex align-items-center justify-content-center">
-                    <div t-attf-class="card border-0 mx-auto {{login_card_classes}} o_database_list" style="max-width: 400px;">
-                        <div class="card-body p-4 p-md-5">
-                            <!-- Centered rounded logo box -->
-                            <div class="text-center mb-4 d-flex justify-content-center">
-                                <div style="background: #ffffff; border: 1px solid rgba(46, 89, 56, 0.06); border-radius: 1.25rem; padding: 0.8rem; width: 95px; height: 95px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(46, 89, 56, 0.04);">
-                                    <img t-attf-src="/web/binary/company_logo{{ '?dbname='+db if db else '' }}" alt="Logo" style="max-height: 65px; max-width: 65px; width: auto; height: auto; object-fit: contain;"/>
-                                </div>
-                            </div>
-                            
+                    <div t-attf-class="card border-0 mx-auto {{login_card_classes}} o_database_list" style="max-width: 340px;">
+                        <div class="card-body p-4">
                             <t t-out="0"/>
                             
                             <div class="text-center small mt-4 pt-3" style="border-top: 1px solid rgba(46, 89, 56, 0.08);" t-if="not disable_footer">
@@ -475,7 +469,7 @@
                 <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
 
                 <div class="mb-3" t-if="databases and len(databases) &gt; 1">
-                    <label for="db" class="form-label d-flex justify-content-between">Database <a href="/web/database/selector" class="small text-muted" style="font-size: 0.75rem; font-weight: normal;">Pilih user</a></label>
+                    <label for="db" class="form-label d-flex justify-content-between">Database</label>
                     <div class="input-icon-wrapper">
                         <span class="field-icon-left"><i class="fa fa-database"></i></span>
                         <input type="text" name="db" t-att-value="request.db" id="db" class="form-control" required="required" readonly="readonly"/>
@@ -484,7 +478,7 @@
                 </div>
 
                 <div class="mb-3 field-login">
-                    <label for="login" class="form-label">Email</label>
+                    <label for="login" class="form-label d-flex justify-content-between">Email</label>
                     <div class="input-icon-wrapper">
                         <span class="field-icon-left"><i class="fa fa-envelope-o"></i></span>
                         <input type="text" placeholder="Masukkan email" name="login" t-att-value="login" id="login" class="form-control" required="required" autocapitalize="off" autocomplete="username"/>
@@ -492,7 +486,7 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="password" class="form-label d-flex justify-content-between">Kata Sandi <a href="/web/database/lost_password" class="small text-success-custom">Atur Ulang Kata Sandi</a></label>
+                    <label for="password" class="form-label d-flex justify-content-between">Kata Sandi</label>
                     <div class="input-icon-wrapper">
                         <span class="field-icon-left"><i class="fa fa-lock"></i></span>
                         <input type="password" placeholder="Masukkan kata sandi" name="password" id="password" class="form-control" required="required" autocomplete="current-password" t-att-autofocus="'autofocus' if login else None" maxlength="4096"/>
@@ -530,10 +524,6 @@
                 <input type="hidden" name="type" value="password"/>
                 <input type="hidden" name="redirect" t-att-value="redirect"/>
             </form>
-            
-            <div class="text-center mt-3">
-                <a href="#" class="small text-success-custom">Tidak punya akun?</a>
-            </div>
             
             <script type="text/javascript">
                 document.addEventListener("DOMContentLoaded", function() {
