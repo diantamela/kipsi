@@ -45,13 +45,16 @@
     <template id="payslip_card_component">
         <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; padding: 10px; margin: 0; page-break-after: always; page-break-inside: avoid;">
             <!-- Header -->
-            <div class="row mb-1">
-                <div class="col-6">
+            <div class="row align-items-center mb-1">
+                <div class="col-2">
+                    <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 50px; max-width: 100%; display: block;" alt="Logo"/>
+                </div>
+                <div class="col-5">
                     <strong><span t-field="o.company_id.name" style="font-size: 14px; color: #2C3E50;"/></strong><br/>
                     <span t-field="o.company_id.street" style="font-size: 10px;"/><br/>
                     <span t-field="o.company_id.city" style="font-size: 10px;"/>
                 </div>
-                <div class="col-6 text-end">
+                <div class="col-5 text-end">
                     <h3 style="margin: 0; color: #2C3E50; font-weight: bold; font-size: 18px;">SLIP GAJI</h3>
                     <strong>No:</strong> <span t-field="o.recap_id.name"/><br/>
                     <strong>Periode:</strong> <span t-field="o.recap_id.date_start" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/> - <span t-field="o.recap_id.date_end" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>

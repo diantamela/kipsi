@@ -14,6 +14,7 @@
         'security/payroll_security.xml',
         'security/ir.model.access.csv',
         'data/payroll_sequence.xml',
+        'data/res_company_data.xml',
         'data/payroll_tariff_data.xml',
         'data/salary_rule_data.xml',
         'data/premium_rule_data.xml',
