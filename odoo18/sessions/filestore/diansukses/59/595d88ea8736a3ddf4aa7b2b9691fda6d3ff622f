@@ -21135,8 +21135,11 @@ async onRecordSaved(record){await super.onRecordSaved(...arguments);if(this.must
 registry.category("views").add("hr_employee_profile_form",{...formView,Controller:EmployeeProfileController,});return __exports;});;
 
 /* /coconut_receiving/static/src/js/coconut_dashboard.js */
-odoo.define('@coconut_receiving/js/coconut_dashboard',['@web/core/registry','@odoo/owl','@web/core/utils/hooks'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{Component,onWillStart,useState}=require("@odoo/owl");const{useService}=require("@web/core/utils/hooks");class CoconutDashboard extends Component{setup(){this.orm=useService("orm");this.actionService=useService("action");this.state=useState({products:[],isManager:false,loading:true,});onWillStart(async()=>{await this.loadData();});}
-async loadData(){this.state.loading=true;try{const data=await this.orm.call("finalisasi.kelapa.mp","get_dashboard_data",[]);this.state.products=data.products||[];this.state.isManager=data.is_manager||false;}catch(error){console.error("Error loading dashboard data:",error);}finally{this.state.loading=false;}}
+odoo.define('@coconut_receiving/js/coconut_dashboard',['@web/core/registry','@odoo/owl','@web/core/utils/hooks'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{Component,onWillStart,useState}=require("@odoo/owl");const{useService}=require("@web/core/utils/hooks");class CoconutDashboard extends Component{setup(){this.orm=useService("orm");this.actionService=useService("action");this.state=useState({products:[],isManager:false,loading:true,metrics:{receiving_qty:12500,receiving_count:3,production_qty:8750,ready_stock_qty:35200,active_employees:125,inventory:{bulat:12500,layak:8700,reject:1200,parer:2500,},production_status:{mo_active:12,mo_running:7,mo_finished_today:15,efficiency:92,},payroll:{total_employees:150,daily_wage:125450000,production_bonus:18750000,status:'Sudah Dihitung',}}});onWillStart(async()=>{await this.loadData();});}
+async loadData(){this.state.loading=true;try{const data=await this.orm.call("finalisasi.kelapa.mp","get_dashboard_data",[]);this.state.products=data.products||[];this.state.isManager=data.is_manager||false;if(data.metrics){this.state.metrics=data.metrics;}}catch(error){console.error("Error loading dashboard data:",error);}finally{this.state.loading=false;}}
+formatNumber(num){if(num===undefined||num===null)return'0';return num.toLocaleString('id-ID');}
+formatCurrency(num){if(num===undefined||num===null)return'Rp 0';return'Rp '+num.toLocaleString('id-ID');}
+openAction(actionXmlId){if(!actionXmlId)return;this.actionService.doAction(actionXmlId);}
 openProductStock(productCode){if(!productCode)return;this.actionService.doAction("coconut_receiving.action_coconut_daily_stock",{additionalContext:{selected_product_code:productCode,},});}}
 CoconutDashboard.template="coconut_receiving.CoconutDashboard";registry.category("actions").add("pt_coconut_dashboard_action",CoconutDashboard);return __exports;});;
 
@@ -36782,84 +36785,380 @@ registerTemplate("hr.EmployeeActionHelper", `/hr/static/src/views/hr_action_help
 registerTemplate("coconut_receiving.CoconutDashboard", `/coconut_receiving/static/src/xml/coconut_dashboard.xml`, `<t t-name="coconut_receiving.CoconutDashboard" owl="1" xml:space="preserve">
         <div class="o_coco_dashboard">
 
-            <div class="coco_dashboard_header d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h1 class="coco_title">Dashboard Produk Kelapa</h1>
-                    <p class="coco_subtitle text-muted">Ringkasan stok real-time PT Coco Murni Prima Jaya</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" t-on-click="loadData">
-                        <i class="fa fa-refresh mr-1"/> Segarkan
-                    </button>
+            <div class="coco_watermark"/>
 
+
+            <div class="coco_header_bar d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <img src="/web_theme_pt_coco/static/src/img/logo.png" class="coco_logo" alt="PT Coco Murni Prima Jaya Logo"/>
+                    <div class="coco_header_titles">
+                        <h1 class="coco_main_title">Coconut Manufacturing ERP</h1>
+                        <p class="coco_sub_title">PT Coco Murni Prima Jaya</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3 coco_user_nav">
+
+                    <div class="coco_nav_icon position-relative">
+                        <i class="fa fa-bell-o"/>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger coco_badge_num">3</span>
+                    </div>
+
+                    <div class="coco_nav_icon">
+                        <i class="fa fa-clock-o"/>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 coco_profile_dropdown">
+                        <div class="coco_avatar">A</div>
+                        <span class="coco_user_name">Administrator</span>
+                        <i class="fa fa-angle-down"/>
+                    </div>
                 </div>
             </div>
 
 
-            <t t-if="state.loading">
-                <div class="coco_loader d-flex justify-content-center align-items-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="sr-only">Loading...</span>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="coco_dashboard_icon_wrapper">
+                        <i class="fa fa-dashboard"/>
+                    </span>
+                    <h2 class="coco_section_title m-0">Dashboard</h2>
+                </div>
+                <div>
+                    <button class="btn btn-light coco_refresh_btn" t-on-click="loadData">
+                        <i class="fa fa-refresh mr-1"/> Segarkan
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="row g-4 mb-4">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_receipt')">
+                        <div class="card-body d-flex align-items-center justify-content-between p-4">
+                            <div>
+                                <span class="coco_kpi_label">Penerimaan Kelapa</span>
+                                <span class="coco_kpi_sublabel">Hari Ini</span>
+                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.receiving_qty)"/> Kg</h3>
+                                <span class="coco_kpi_trend text-success"><i class="fa fa-arrow-up"/> <t t-esc="state.metrics.receiving_count"/> penerimaan</span>
+                            </div>
+                            <div class="coco_kpi_icon_wrapper">
+                                <i class="fa fa-cubes"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </t>
 
 
-            <t t-else="">
-                <div class="row g-4 coco_grid">
-                    <t t-foreach="state.products" t-as="prod" t-key="prod.code">
-                        <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card coco_card shadow-sm h-100" t-on-click="() =&gt; this.openProductStock(prod.code)">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_manufacturing')">
+                        <div class="card-body d-flex align-items-center justify-content-between p-4">
+                            <div>
+                                <span class="coco_kpi_label">Produksi</span>
+                                <span class="coco_kpi_sublabel">Hari Ini</span>
+                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.production_qty)"/> Kg</h3>
+                                <span class="coco_kpi_trend_sub">Kelapa Layak Produksi</span>
+                            </div>
+                            <div class="coco_kpi_icon_wrapper">
+                                <i class="fa fa-industry"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openProductStock('COCO-LAYAK')">
+                        <div class="card-body d-flex align-items-center justify-content-between p-4">
+                            <div>
+                                <span class="coco_kpi_label">Stok Kelapa Layak</span>
+                                <span class="coco_kpi_sublabel">Produksi</span>
+                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.ready_stock_qty)"/> Kg</h3>
+                                <span class="coco_kpi_trend_sub">Ready Production</span>
+                            </div>
+                            <div class="coco_kpi_icon_wrapper">
+                                <i class="fa fa-database"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('hr.open_view_employee_list')">
+                        <div class="card-body d-flex align-items-center justify-content-between p-4">
+                            <div>
+                                <span class="coco_kpi_label">Karyawan Aktif</span>
+                                <span class="coco_kpi_sublabel">Shift Hari Ini</span>
+                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.active_employees)"/> Orang</h3>
+                                <span class="coco_kpi_trend_sub">3 Shift</span>
+                            </div>
+                            <div class="coco_kpi_icon_wrapper">
+                                <i class="fa fa-user-circle-o"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row g-4 mb-4">
+
+                <div class="col-12 col-lg-8">
+                    <div class="card coco_dashboard_card h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="coco_card_title m-0"><i class="fa fa-line-chart me-2"/>Produksi Kelapa Bulanan</h4>
+                                <div class="coco_chart_filter">
+                                    <button class="btn btn-sm btn-light">Tahun Ini <i class="fa fa-angle-down ms-1"/></button>
+                                </div>
+                            </div>
+
+
+                            <div class="coco_chart_container position-relative" style="height: 320px;">
+                                <svg class="w-100 h-100" viewBox="0 0 800 300" preserveAspectRatio="none">
+                                    <defs>
+
+                                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.25"/>
+                                            <stop offset="100%" stop-color="#E8F5E9" stop-opacity="0.0"/>
+                                        </linearGradient>
+                                    </defs>
+
+
+                                    <line x1="50" y1="20" x2="770" y2="20" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="60" x2="770" y2="60" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="100" x2="770" y2="100" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="140" x2="770" y2="140" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="180" x2="770" y2="180" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="220" x2="770" y2="220" stroke="#F1F3F5" stroke-width="1"/>
+                                    <line x1="50" y1="260" x2="770" y2="260" stroke="#F1F3F5" stroke-width="1"/>
+
+
+                                    <text x="40" y="24" class="coco_chart_text text-end">60,000</text>
+                                    <text x="40" y="64" class="coco_chart_text text-end">50,000</text>
+                                    <text x="40" y="104" class="coco_chart_text text-end">40,000</text>
+                                    <text x="40" y="144" class="coco_chart_text text-end">30,000</text>
+                                    <text x="40" y="184" class="coco_chart_text text-end">20,000</text>
+                                    <text x="40" y="224" class="coco_chart_text text-end">10,000</text>
+                                    <text x="40" y="264" class="coco_chart_text text-end">0</text>
+
+
+                                    <text x="15" y="24" class="coco_chart_legend_y" transform="rotate(-90 15 24)">Kg</text>
+
+
+                                    <text x="75" y="285" class="coco_chart_text text-center">Jan</text>
+                                    <text x="135" y="285" class="coco_chart_text text-center">Feb</text>
+                                    <text x="195" y="285" class="coco_chart_text text-center">Mar</text>
+                                    <text x="255" y="285" class="coco_chart_text text-center">Apr</text>
+                                    <text x="315" y="285" class="coco_chart_text text-center">Mei</text>
+                                    <text x="375" y="285" class="coco_chart_text text-center">Jun</text>
+                                    <text x="435" y="285" class="coco_chart_text text-center">Jul</text>
+                                    <text x="495" y="285" class="coco_chart_text text-center">Agu</text>
+                                    <text x="555" y="285" class="coco_chart_text text-center">Sep</text>
+                                    <text x="615" y="285" class="coco_chart_text text-center">Okt</text>
+                                    <text x="675" y="285" class="coco_chart_text text-center">Nov</text>
+                                    <text x="735" y="285" class="coco_chart_text text-center">Des</text>
+
+
+                                    <path d="M 75 260 L 75 188 L 135 160 L 195 148 L 255 156 L 315 124 L 375 100 L 435 116 L 495 88 L 555 80 L 615 56 L 675 72 L 735 48 L 735 260 Z" fill="url(#chartGradient)"/>
+
+
+                                    <path d="M 75 188 L 135 160 L 195 148 L 255 156 L 315 124 L 375 100 L 435 116 L 495 88 L 555 80 L 615 56 L 675 72 L 735 48" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+
+                                    <circle cx="75" cy="188" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="135" cy="160" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="195" cy="148" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="255" cy="156" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="315" cy="124" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="375" cy="100" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="435" cy="116" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="495" cy="88" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="555" cy="80" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="615" cy="56" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="675" cy="72" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                    <circle cx="735" cy="48" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
+                                </svg>
+                            </div>
+
+
+                            <div class="d-flex justify-content-center mt-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="coco_legend_color"/>
+                                    <span class="coco_legend_label">Produksi (Kg)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-lg-4">
+                    <div class="card coco_dashboard_card h-100">
+                        <div class="card-body p-4">
+                            <h4 class="coco_card_title mb-4"><i class="fa fa-cubes me-2"/>Status Persediaan</h4>
+
+                            <div class="coco_inventory_list d-flex flex-column gap-3">
+
+                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-BULAT')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="coco_inv_icon_circle">
+                                            <i class="fa fa-archive"/>
+                                        </div>
                                         <div>
-                                            <span class="badge bg-secondary mb-1"><t t-esc="prod.code"/></span>
-                                            <h4 class="card-title product_title"><t t-esc="prod.name"/></h4>
-                                        </div>
-                                        <div class="coco_icon_wrapper">
-                                            <i class="fa fa-archive text-primary"/>
+                                            <h5 class="coco_inv_item_title m-0">Kelapa Bulat</h5>
+                                            <span class="coco_inv_item_subtitle">Total Stok</span>
                                         </div>
                                     </div>
+                                    <div class="coco_inv_qty_val text-success">
+                                        <t t-esc="formatNumber(state.metrics.inventory.bulat)"/> <small>Kg</small>
+                                    </div>
+                                </div>
 
-                                    <div class="row text-center my-4">
-                                        <div class="col-6 border-end">
-                                            <div class="coco_metric_label">Stok Fisik</div>
-                                            <div class="coco_metric_val text-success"><t t-esc="prod.qty"/> <small>Kg</small></div>
+
+                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-LAYAK')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="coco_inv_icon_circle">
+                                            <i class="fa fa-check-circle"/>
                                         </div>
-                                        <div class="col-6">
-                                            <div class="coco_metric_label">Stok Tersedia</div>
-                                            <div class="coco_metric_val text-info"><t t-esc="prod.qty_available"/> <small>Kg</small></div>
+                                        <div>
+                                            <h5 class="coco_inv_item_title m-0">Kelapa Layak Produksi</h5>
+                                            <span class="coco_inv_item_subtitle">Siap Diproses</span>
                                         </div>
                                     </div>
+                                    <div class="coco_inv_qty_val text-primary">
+                                        <t t-esc="formatNumber(state.metrics.inventory.layak)"/> <small>Kg</small>
+                                    </div>
+                                </div>
 
-                                    <div class="coco_details_list">
-                                        <div class="d-flex justify-content-between py-1 border-bottom">
-                                            <span class="text-muted"><i class="fa fa-arrow-down text-success mr-1"/> Masuk Hari Ini</span>
-                                            <span class="fw-bold"><t t-esc="prod.incoming_today"/> Kg</span>
+
+                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-REJECT')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="coco_inv_icon_circle">
+                                            <i class="fa fa-times-circle"/>
                                         </div>
-                                        <div class="d-flex justify-content-between py-1 border-bottom">
-                                            <span class="text-muted"><i class="fa fa-arrow-up text-danger mr-1"/> Keluar Hari Ini</span>
-                                            <span class="fw-bold"><t t-esc="prod.outgoing_today"/> Kg</span>
+                                        <div>
+                                            <h5 class="coco_inv_item_title m-0">Reject</h5>
+                                            <span class="coco_inv_item_subtitle">Tidak Layak</span>
                                         </div>
-                                        <div class="d-flex justify-content-between py-1 border-bottom">
-                                            <span class="text-muted"><i class="fa fa-map-marker text-warning mr-1"/> Lokasi Stok</span>
-                                            <span class="fw-bold text-truncate text-end" style="max-width: 150px;" t-att-title="prod.location_name">
-                                                <t t-esc="prod.location_name"/>
-                                            </span>
+                                    </div>
+                                    <div class="coco_inv_qty_val text-danger">
+                                        <t t-esc="formatNumber(state.metrics.inventory.reject)"/> <small>Kg</small>
+                                    </div>
+                                </div>
+
+
+                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-PARER')">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="coco_inv_icon_circle">
+                                            <i class="fa fa-tasks"/>
                                         </div>
-                                        <div class="py-2">
-                                            <div class="text-muted small mb-1"><i class="fa fa-history mr-1"/> Pergerakan Terakhir</div>
-                                            <div class="small fw-bold text-truncate" t-att-title="prod.last_move">
-                                                <t t-esc="prod.last_move"/>
-                                            </div>
+                                        <div>
+                                            <h5 class="coco_inv_item_title m-0">Parrer</h5>
+                                            <span class="coco_inv_item_subtitle">Stok Tersedia</span>
                                         </div>
+                                    </div>
+                                    <div class="coco_inv_qty_val text-warning">
+                                        <t t-esc="formatNumber(state.metrics.inventory.parer)"/> <small>Kg</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </t>
+                    </div>
                 </div>
-            </t>
+            </div>
+
+
+            <div class="row g-4">
+
+                <div class="col-12 col-md-6 col-lg-5">
+                    <div class="card coco_dashboard_card h-100">
+                        <div class="card-body p-4">
+                            <h4 class="coco_card_title mb-4"><i class="fa fa-cog me-2"/>Status Produksi</h4>
+
+                            <div class="row g-3 text-center">
+
+                                <div class="col-3">
+                                    <div class="coco_status_box p-3 rounded">
+                                        <div class="coco_status_icon text-primary"><i class="fa fa-clipboard"/></div>
+                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_active"/></h3>
+                                        <span class="coco_status_label">MO Aktif</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-3">
+                                    <div class="coco_status_box p-3 rounded">
+                                        <div class="coco_status_icon text-warning"><i class="fa fa-refresh"/></div>
+                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_running"/></h3>
+                                        <span class="coco_status_label">Sedang Berjalan</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-3">
+                                    <div class="coco_status_box p-3 rounded">
+                                        <div class="coco_status_icon text-success"><i class="fa fa-check-square-o"/></div>
+                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_finished_today"/></h3>
+                                        <span class="coco_status_label">Selesai Hari Ini</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-3">
+                                    <div class="coco_status_box p-3 rounded">
+                                        <div class="coco_status_icon text-info"><i class="fa fa-tachometer"/></div>
+                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.efficiency"/>%</h3>
+                                        <span class="coco_status_label">Efisiensi Produksi</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-7">
+                    <div class="card coco_dashboard_card h-100" t-on-click="() =&gt; this.openAction('om_hr_payroll.menu_hr_payroll_employees')">
+                        <div class="card-body p-4">
+                            <h4 class="coco_card_title mb-4"><i class="fa fa-users me-2"/>Payroll Hari Ini</h4>
+
+                            <div class="row g-4 align-items-center">
+
+                                <div class="col-9">
+                                    <div class="row text-center">
+
+                                        <div class="col-4 border-end">
+                                            <span class="coco_payroll_lbl">Total Karyawan</span>
+                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatNumber(state.metrics.payroll.total_employees)"/> Orang</h3>
+                                            <span class="coco_payroll_sub">Karyawan Aktif</span>
+                                        </div>
+
+                                        <div class="col-4 border-end">
+                                            <span class="coco_payroll_lbl">Upah Hari Ini</span>
+                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatCurrency(state.metrics.payroll.daily_wage)"/></h3>
+                                            <span class="coco_payroll_sub">Total Upah</span>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <span class="coco_payroll_lbl">Premi Produksi</span>
+                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatCurrency(state.metrics.payroll.production_bonus)"/></h3>
+                                            <span class="coco_payroll_sub">Total Premi</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-3 text-center">
+                                    <span class="coco_payroll_lbl">Status Payroll</span>
+                                    <div class="coco_payroll_status_badge mt-2">
+                                        <i class="fa fa-check-circle"/>
+                                        <span>Sudah Dihitung</span>
+                                    </div>
+                                    <span class="coco_payroll_sub mt-1 d-block">Siap Dibayarkan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </t>
 `);

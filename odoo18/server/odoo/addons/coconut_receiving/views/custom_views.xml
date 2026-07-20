@@ -296,10 +296,10 @@
         <field name="action" ref="coconut_receiving.action_coconut_manufacturing"/>
     </record>
 
-    <!-- Rename Inventory root menu to "Persediaan" and set homepage to Products (Dashboard) -->
+    <!-- Rename Inventory root menu to "Persediaan" -->
     <record id="stock.menu_stock_root" model="ir.ui.menu">
         <field name="name">Persediaan</field>
-        <field name="action" ref="coconut_receiving.action_coconut_product_dashboard"/>
+        <field name="action" eval="False"/>
     </record>
 
     <!-- Direct native Manufacturing Orders in production module to custom manufacturing view -->
@@ -320,11 +320,20 @@
         </field>
     </record>
 
-    <menuitem id="menu_coconut_overview"
-              name="Overview"
-              parent="coconut_receiving.menu_coconut_receiving_root"
-              action="action_coconut_picking_type_kanban"
-              sequence="5"/>
+    <!-- Hide Overview (Dashboard) from Coconut Receiving production module -->
+    <record id="menu_coconut_overview" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
+    <!-- Hide "Dashboards" sub-menu from Dashboards navbar -->
+    <record id="spreadsheet_dashboard.spreadsheet_dashboard_menu_dashboard" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
+    <!-- Hide "Configuration" sub-menu from Dashboards navbar -->
+    <record id="spreadsheet_dashboard.spreadsheet_dashboard_menu_configuration" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
 
     <!-- Hide signup link on login page -->
     <template id="auth_signup_login_hide_signup" inherit_id="auth_signup.login">

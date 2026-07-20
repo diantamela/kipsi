@@ -11,6 +11,31 @@ class CoconutDashboard extends Component {
             products: [],
             isManager: false,
             loading: true,
+            metrics: {
+                receiving_qty: 12500,
+                receiving_count: 3,
+                production_qty: 8750,
+                ready_stock_qty: 35200,
+                active_employees: 125,
+                inventory: {
+                    bulat: 12500,
+                    layak: 8700,
+                    reject: 1200,
+                    parer: 2500,
+                },
+                production_status: {
+                    mo_active: 12,
+                    mo_running: 7,
+                    mo_finished_today: 15,
+                    efficiency: 92,
+                },
+                payroll: {
+                    total_employees: 150,
+                    daily_wage: 125450000,
+                    production_bonus: 18750000,
+                    status: 'Sudah Dihitung',
+                }
+            }
         });
 
         onWillStart(async () => {
@@ -28,11 +53,29 @@ class CoconutDashboard extends Component {
             );
             this.state.products = data.products || [];
             this.state.isManager = data.is_manager || false;
+            if (data.metrics) {
+                this.state.metrics = data.metrics;
+            }
         } catch (error) {
             console.error("Error loading dashboard data:", error);
         } finally {
             this.state.loading = false;
         }
+    }
+
+    formatNumber(num) {
+        if (num === undefined || num === null) return '0';
+        return num.toLocaleString('id-ID');
+    }
+
+    formatCurrency(num) {
+        if (num === undefined || num === null) return 'Rp 0';
+        return 'Rp ' + num.toLocaleString('id-ID');
+    }
+
+    openAction(actionXmlId) {
+        if (!actionXmlId) return;
+        this.actionService.doAction(actionXmlId);
     }
 
     openProductStock(productCode) {

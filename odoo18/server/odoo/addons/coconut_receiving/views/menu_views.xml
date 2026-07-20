@@ -6,10 +6,17 @@
         <field name="tag">pt_coconut_dashboard_action</field>
     </record>
 
-    <!-- Override Inventory -> Products -> Products to open Dashboard -->
+    <!-- Override Inventory -> Products -> Products to open custom coconut product dashboard -->
     <record id="stock.menu_product_variant_config_stock" model="ir.ui.menu">
         <field name="action" ref="coconut_receiving.action_coconut_product_dashboard"/>
     </record>
+
+    <!-- Add Dashboard menu under Dashboards module -->
+    <menuitem id="menu_dashboard_coconut"
+              name="Dashboard Produk Kelapa"
+              parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+              action="coconut_receiving.action_coconut_product_dashboard"
+              sequence="2"/>
 
     <!-- Menu for Finalisasi Kelapa MP under Inventory -> Products -->
     <menuitem id="menu_finalisasi_kelapa_mp"
