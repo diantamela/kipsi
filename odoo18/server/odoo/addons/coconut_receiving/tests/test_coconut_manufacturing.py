@@ -50,15 +50,35 @@ class TestCoconutManufacturing(TransactionCase):
             self.skipTest("Warehouse location not found.")
 
     def _get_qty(self, product):
-        if not product or not self.location_wh:
-            return 0.0
-        return self.env['stock.quant']._get_available_quantity(product, self.location_wh)
+        loc_map = {
+            'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
+            'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
+            'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
+            'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
+            'COCO-PARER': 'coconut_receiving.location_area_parer',
+        }
+        loc_xml = loc_map.get(product.default_code)
+        loc = self.env.ref(loc_xml, raise_if_not_found=False) if loc_xml else self.location_wh
+        if not loc:
+            loc = self.location_wh
+        return self.env['stock.quant']._get_available_quantity(product, loc)
 
     def _adjust_stock(self, product, quantity):
         """Helper to set product stock in warehouse."""
+        loc_map = {
+            'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
+            'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
+            'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
+            'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
+            'COCO-PARER': 'coconut_receiving.location_area_parer',
+        }
+        loc_xml = loc_map.get(product.default_code)
+        loc = self.env.ref(loc_xml, raise_if_not_found=False) if loc_xml else self.location_wh
+        if not loc:
+            loc = self.location_wh
         self.env['stock.quant'].with_context(inventory_mode=True).create({
             'product_id': product.id,
-            'location_id': self.location_wh.id,
+            'location_id': loc.id,
             'inventory_quantity': quantity,
         }).action_apply_inventory()
 
@@ -76,19 +96,15 @@ class TestCoconutManufacturing(TransactionCase):
     # ─────────────────────────────────────────────────────────────
     def test_02_edit_done_blocker(self):
         """
-        Editing a completed production document must raise UserError.
+        Editing a completed transfer document must raise UserError.
         """
         self._skip_if_no_products()
+        self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_input=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
+            machine_sheller_input=10.0,
         )
-        # Edit in confirmed state (should be fine at model level)
+        # Edit in confirmed state
         mfg.write({'notes': 'Catatan Confirmed'})
 
         # Validate
@@ -96,107 +112,53 @@ class TestCoconutManufacturing(TransactionCase):
         self.assertEqual(mfg.state, 'done')
 
         # Edit in done state (should raise UserError)
-        with self.assertRaises(UserError, msg="Completed production document must not be editable"):
+        with self.assertRaises(UserError, msg="Completed transfer document must not be editable"):
             mfg.write({'notes': 'Catatan Baru Setelah Done'})
 
     # ─────────────────────────────────────────────────────────────
-    # TEST 3: Partial Machine Sheller consumption
+    # TEST 3: Partial Machine Sheller transfer
     # ─────────────────────────────────────────────────────────────
     def test_03_partial_machine_sheller(self):
         """
         Kelapa Layak available = 25000
         Machine Sheller Input = 18000
-        Expected remaining Kelapa Layak = 7000
+        Expected remaining Kelapa Layak = 7000 in Gudang Kelapa Layak
+        Expected Kelapa Layak in Area Sheller = 18000
         """
         self._skip_if_no_products()
 
         self._adjust_stock(self.p_layak, 25000.0)
-        self._adjust_stock(self.p_sheller, 0.0)
 
         qty_layak_before = self._get_qty(self.p_layak)
         self.assertEqual(qty_layak_before, 25000.0)
 
         mfg = self._create_mfg(
             machine_sheller_input=18000.0,
-            machine_sheller_output=17500.0,
-            manual_sheller_input=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
         )
         mfg.action_validate()
 
         qty_layak_after = self._get_qty(self.p_layak)
         self.assertAlmostEqual(qty_layak_after, 7000.0, places=2)
         
-        qty_sheller = self._get_qty(self.p_sheller)
-        self.assertAlmostEqual(qty_sheller, 17500.0, places=2)
+        # In the new flow, we moved p_layak from Gudang Kelapa Layak to Area Sheller.
+        loc_sheller = self.env.ref('coconut_receiving.location_area_sheller')
+        qty_layak_in_sheller = self.env['stock.quant']._get_available_quantity(self.p_layak, loc_sheller)
+        self.assertAlmostEqual(qty_layak_in_sheller, 18000.0, places=2)
 
     # ─────────────────────────────────────────────────────────────
-    # TEST 4: Manual Sheller consumption
+    # TEST 5: Transfer validation – exceed stock blocked
     # ─────────────────────────────────────────────────────────────
-    def test_04_manual_sheller_consumption(self):
+    def test_05_transfer_exceeds_stock_blocked(self):
         """
-        Kelapa Reject available = 570
-        Manual Sheller Input = 300
-        Remaining Kelapa Reject = 270
+        Kelapa Layak available = 100
+        Transfer Input = 101 → must raise UserError
         """
         self._skip_if_no_products()
 
-        self._adjust_stock(self.p_reject, 570.0)
-        self._adjust_stock(self.p_sheller, 0.0)
+        self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_input=300.0,
-            manual_sheller_output=290.0,
-            parer_input=0.0,
-            parer_output=0.0,
-        )
-        mfg.action_validate()
-
-        qty_reject_after = self._get_qty(self.p_reject)
-        self.assertAlmostEqual(qty_reject_after, 270.0, places=2)
-
-    # ─────────────────────────────────────────────────────────────
-    # TEST 5: Parer validation – exceed stock blocked
-    # ─────────────────────────────────────────────────────────────
-    def test_05_parer_exceeds_sheller_stock_blocked(self):
-        """
-        Kelapa Sheller available = 100
-        Parer Input = 101 → must raise UserError
-        """
-        self._skip_if_no_products()
-
-        self._adjust_stock(self.p_sheller, 100.0)
-
-        mfg = self._create_mfg(
-            machine_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_input=0.0,
-            manual_sheller_output=0.0,
-            parer_input=101.0,
-            parer_output=99.0,
-        )
-        with self.assertRaises(UserError, msg="Parer exceeding Kelapa Sheller stock must be blocked"):
-            mfg.action_validate()
-
-    def test_05b_parer_exactly_18001_blocked(self):
-        """
-        Kelapa Sheller = 18000, Parer Input = 18001 → blocked.
-        """
-        self._skip_if_no_products()
-
-        self._adjust_stock(self.p_sheller, 18000.0)
-
-        mfg = self._create_mfg(
-            machine_sheller_input=0.0,
-            machine_sheller_output=0.0,
-            manual_sheller_input=0.0,
-            manual_sheller_output=0.0,
-            parer_input=18001.0,
-            parer_output=17500.0,
+            machine_sheller_input=101.0,
         )
         with self.assertRaises(UserError):
             mfg.action_validate()
@@ -205,25 +167,20 @@ class TestCoconutManufacturing(TransactionCase):
     # ─────────────────────────────────────────────────────────────
     def test_06_duplicate_manufacturing_validation_blocked(self):
         """
-        Validating a 'done' manufacturing document again must raise UserError.
+        Validating a 'done' transfer document again must raise UserError.
         """
         self._skip_if_no_products()
         self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
             machine_sheller_input=10.0,
-            machine_sheller_output=10.0,
-            manual_sheller_input=0.0,
-            manual_sheller_output=0.0,
-            parer_input=0.0,
-            parer_output=0.0,
         )
         mfg.action_validate()
         self.assertEqual(mfg.state, 'done')
 
         # Reset state to confirmed to simulate duplicate validate trigger
         mfg.state = 'confirmed'
-        with self.assertRaises(UserError, msg="Duplicate manufacturing validation must be blocked"):
+        with self.assertRaises(UserError, msg="Duplicate validation must be blocked"):
             mfg.action_validate()
 
     # TEST 7: Invalid UoM (manufacturing)
@@ -251,12 +208,7 @@ class TestCoconutManufacturing(TransactionCase):
         try:
             xml_record.write({'res_id': dummy_variant.product_tmpl_id.id})
             mfg = self._create_mfg(
-                machine_sheller_input=0.0,
-                machine_sheller_output=0.0,
-                manual_sheller_input=0.0,
-                manual_sheller_output=0.0,
-                parer_input=0.0,
-                parer_output=0.0,
+                machine_sheller_input=10.0,
             )
             with self.assertRaises(UserError):
                 mfg.action_validate()

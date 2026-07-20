@@ -375,7 +375,7 @@
                         <h1 class="headline-title">Masuk ke<br/>Sistem ERP</h1>
                         <p class="headline-desc">Kelola operasional PT Coco Murni Prima Jaya dengan aman dan efisien.</p>
                     </div>
-                    <img src="/coconut_payroll/static/src/img/coconut_illustration.png" class="coconut-deco" alt="Coconut"/>
+                    <!-- <img src="/coconut_payroll/static/src/img/coconut_illustration.png" class="coconut-deco" alt="Coconut"/> -->
                 </div>
 
                 <!-- Center Pane -->

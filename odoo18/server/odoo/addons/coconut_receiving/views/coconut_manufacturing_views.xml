@@ -7,7 +7,7 @@
         <field name="name">coconut.manufacturing.form</field>
         <field name="model">coconut.manufacturing</field>
         <field name="arch" type="xml">
-            <form string="Pemakaian Kelapa Produksi">
+            <form string="Transfer Kelapa ke Produksi">
                 <header>
                     <button name="action_confirm"
                             id="btn_confirm_mfg"
@@ -33,7 +33,7 @@
                             invisible="state != 'cancelled'"/>
                     <!-- Print PDF -->
                     <button name="%(action_report_coconut_manufacturing)d"
-                            string="Print → Laporan Pemakaian Kelapa Produksi"
+                            string="Print → Laporan Transfer Kelapa ke Produksi"
                             type="action"
                             class="btn-secondary"/>
                     <field name="state"
@@ -49,8 +49,10 @@
 
                     <!-- Header Info -->
                     <group>
-                        <group string="Informasi Pemakaian Produksi">
+                        <group string="Informasi Transfer Produksi">
                             <field name="production_date"
+                                   readonly="state != 'draft'"/>
+                            <field name="spk_number"
                                    readonly="state != 'draft'"/>
                             <field name="responsible_id"
                                    string="Operator / Karyawan"
@@ -65,135 +67,43 @@
                     </group>
 
                     <notebook>
-                        <!-- Tab 1: Sheller Mesin -->
-                        <page string="Sheller Mesin" name="tab_sheller_mesin">
-                            <group string="Input (dari Kelapa Layak Produksi)">
+                        <!-- Tab 1: Transfer Material -->
+                        <page string="Transfer Material" name="tab_transfer_material">
+                            <group string="Perpindahan Stok Kelapa Layak ke Area Sheller">
                                 <group>
                                     <field name="machine_sheller_input"
-                                           string="Kelapa Layak Produksi Digunakan (Kg)"
+                                           string="Kelapa Layak Ditransfer (Kg)"
                                            readonly="state != 'draft'"/>
                                 </group>
                                 <group string="Ketersediaan">
                                     <field name="remaining_layak"
-                                           string="Sisa Kelapa Layak Setelah Proses Ini (Kg)"
-                                           readonly="1"/>
-                                </group>
-                            </group>
-                            <group string="Output Kelapa Sheller">
-                                <group>
-                                    <field name="machine_sheller_output"
-                                           string="Kelapa Sheller dari Mesin (Kg)"
-                                           readonly="state != 'draft'"/>
-                                </group>
-                            </group>
-                        </page>
-
-                        <!-- Tab 2: Sheller Manual -->
-                        <page string="Sheller Manual" name="tab_sheller_manual">
-                            <group string="Input (dari Kelapa Reject)">
-                                <group>
-                                    <field name="manual_sheller_input"
-                                           string="Kelapa Reject Digunakan (Kg)"
-                                           readonly="state != 'draft'"/>
-                                </group>
-                                <group string="Ketersediaan">
-                                    <field name="remaining_reject"
-                                           string="Sisa Kelapa Reject Setelah Proses Ini (Kg)"
-                                           readonly="1"/>
-                                </group>
-                            </group>
-                            <group string="Output Kelapa Sheller">
-                                <group>
-                                    <field name="manual_sheller_output"
-                                           string="Kelapa Sheller dari Manual (Kg)"
-                                           readonly="state != 'draft'"/>
-                                </group>
-                            </group>
-                            <!-- Ringkasan Sheller -->
-                            <group string="Ringkasan Sheller">
-                                <group>
-                                    <field name="total_sheller_input"
-                                           string="Total Input Sheller (Kg)"
-                                           readonly="1"/>
-                                    <field name="total_sheller_output"
-                                           string="Total Output Kelapa Sheller (Kg)"
+                                           string="Sisa Kelapa Layak (Kg)"
                                            readonly="1"/>
                                 </group>
                             </group>
                         </page>
 
-                        <!-- Tab 3: Parer -->
-                        <page string="Parer" name="tab_parer">
-                            <group string="Proses Parer (dari Kelapa Sheller)">
-                                <group>
-                                    <field name="available_kelapa_sheller"
-                                           string="Kelapa Sheller Tersedia (Kg)"
-                                           readonly="1"/>
-                                    <field name="parer_input"
-                                           string="Kelapa Sheller Digunakan (Kg)"
-                                           readonly="state != 'draft'"/>
-                                    <field name="parer_output"
-                                           string="Output Parer / Kelapa Parer (Kg)"
-                                           readonly="state != 'draft'"/>
-                                    <field name="remaining_kelapa_sheller"
-                                           string="Sisa Kelapa Sheller (Kg)"
-                                           readonly="1"/>
-                                </group>
-                            </group>
-                            <group string="Catatan Parer">
-                                <field name="parer_notes"
-                                       nolabel="1"
-                                       readonly="state != 'draft'"/>
-                            </group>
-                        </page>
-
-                        <!-- Tab 4: Pergerakan Stok -->
+                        <!-- Tab 2: Pergerakan Stok -->
                         <page string="Pergerakan Stok" name="tab_stok"
-                               invisible="not shell_output_move_id and not parer_output_move_id">
-                            <group string="Sheller"
-                                   invisible="not shell_consume_layak_move_id and not shell_consume_reject_move_id">
+                               invisible="not shell_consume_layak_move_id">
+                            <group string="Pergerakan Stok">
                                 <field name="shell_consume_layak_move_id"
-                                       string="Konsumsi Kelapa Layak (Machine)"
-                                       readonly="1"
-                                       invisible="not shell_consume_layak_move_id"/>
-                                <field name="shell_consume_reject_move_id"
-                                       string="Konsumsi Kelapa Reject (Manual)"
-                                       readonly="1"
-                                       invisible="not shell_consume_reject_move_id"/>
-                                <field name="shell_output_move_id"
-                                       string="Produksi Kelapa Sheller"
-                                       readonly="1"
-                                       invisible="not shell_output_move_id"/>
-                            </group>
-                            <group string="Parer"
-                                   invisible="not parer_output_move_id">
-                                <field name="parer_consume_move_id"
-                                       string="Konsumsi Kelapa Sheller"
-                                       readonly="1"
-                                       invisible="not parer_consume_move_id"/>
-                                <field name="parer_output_move_id"
-                                       string="Produksi Kelapa Parer"
-                                       readonly="1"
-                                       invisible="not parer_output_move_id"/>
+                                       string="Pergerakan Stok Transfer"
+                                       readonly="1"/>
                             </group>
                         </page>
 
-                        <!-- Tab 5: Catatan -->
+                        <!-- Tab 3: Catatan -->
                         <page string="Catatan" name="tab_catatan">
                             <group>
                                 <field name="notes"
-                                       string="Catatan Produksi"
+                                       string="Catatan"
                                        nolabel="1"
                                        readonly="state == 'done'"/>
                             </group>
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
             </form>
         </field>
     </record>
@@ -238,21 +148,21 @@
         <field name="name">coconut.manufacturing.search</field>
         <field name="model">coconut.manufacturing</field>
         <field name="arch" type="xml">
-            <search string="Cari Pemakaian Kelapa Produksi">
-                <field name="name" string="Kode PKK"/>
+            <search string="Cari Transfer Kelapa ke Produksi">
+                <field name="name" string="Kode Transfer"/>
                 <field name="responsible_id" string="Operator"/>
-                <field name="production_date" string="Tanggal Produksi"/>
+                <field name="production_date" string="Tanggal"/>
                 <separator/>
                 <filter string="Draft"        name="draft"     domain="[('state','=','draft')]"/>
                 <filter string="Dikonfirmasi" name="confirmed" domain="[('state','=','confirmed')]"/>
                 <filter string="Selesai"      name="done"      domain="[('state','=','done')]"/>
                 <filter string="Dibatalkan"   name="cancelled" domain="[('state','=','cancelled')]"/>
                 <separator/>
-                <filter string="Tanggal Produksi" name="production_date_filter" date="production_date"/>
+                <filter string="Tanggal" name="production_date_filter" date="production_date"/>
                 <group expand="0" string="Kelompokkan Berdasarkan">
                     <filter string="Operator"         name="grp_operator"        context="{'group_by':'responsible_id'}"/>
                     <filter string="Status"           name="grp_state"           context="{'group_by':'state'}"/>
-                    <filter string="Tanggal Produksi" name="grp_production_date" context="{'group_by':'production_date'}"/>
+                    <filter string="Tanggal"          name="grp_production_date" context="{'group_by':'production_date'}"/>
                 </group>
             </search>
         </field>
@@ -262,16 +172,16 @@
          Action – coconut.manufacturing
          ═══════════════════════════════════════════════════ -->
     <record id="action_coconut_manufacturing" model="ir.actions.act_window">
-        <field name="name">Pemakaian Kelapa Produksi</field>
+        <field name="name">Transfer Kelapa ke Produksi</field>
         <field name="res_model">coconut.manufacturing</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_coconut_manufacturing_search"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Buat dokumen Pemakaian Kelapa Produksi (PKK) baru
+                Buat dokumen Transfer Kelapa ke Produksi baru
             </p>
             <p>
-                Dokumen ini mencakup proses Sheller Mesin, Sheller Manual, dan Parer.
+                Dokumen ini memindahkan Kelapa Layak Produksi ke Area Sheller.
             </p>
         </field>
     </record>
@@ -282,7 +192,7 @@
            Kelapa
            ├── Penerimaan Kelapa    (seq 10)
            ├── Sortir Kelapa        (seq 20)
-           ├── Pemakaian Kelapa Produksi (seq 30)
+           ├── Transfer Kelapa ke Produksi (seq 30)
            └── Stok Kelapa Harian   (seq 40)
          ═══════════════════════════════════════════════════ -->
 
@@ -304,9 +214,9 @@
               action="action_coconut_sorting"
               sequence="20"/>
 
-    <!-- Pemakaian Kelapa Produksi – menu langsung (bukan folder) -->
+    <!-- Transfer Kelapa ke Produksi – menu langsung (bukan folder) -->
     <menuitem id="menu_coconut_manufacturing_root"
-              name="Pemakaian Kelapa Produksi"
+              name="Transfer Kelapa ke Produksi"
               parent="coconut_receiving.menu_coconut_receiving_root"
               action="action_coconut_manufacturing"
               sequence="30"/>

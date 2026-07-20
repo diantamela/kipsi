@@ -47,6 +47,8 @@
                             <group string="Informasi Sortir">
                                 <field name="date_sorting"
                                        readonly="state != 'draft'"/>
+                                <field name="spk_number"
+                                       readonly="state != 'draft'"/>
                                 <field name="company_id" invisible="1"/>
                             </group>
                             <group string="Sumber Kelapa">
@@ -62,13 +64,19 @@
                         </group>
 
                         <!-- Input Sortir -->
-                        <group string="Input Sortir">
-                            <group>
-                                <field name="input_weight_kg"
-                                       string="Kelapa Bulat Diproses (Kg)"
-                                       force_save="1"/>
-                            </group>
-                        </group>
+                         <group string="Input Sortir">
+                             <group>
+                                 <field name="input_weight_kg"
+                                        string="Kelapa Bulat Diproses (Kg)"
+                                        force_save="1"/>
+                                 <field name="total_count"
+                                        string="Jumlah Kelapa (Butir)"
+                                        readonly="state != 'draft'"/>
+                                 <field name="avg_weight_per_coconut"
+                                        string="KG per Butir"
+                                        readonly="1"/>
+                             </group>
+                         </group>
 
                         <!-- Output Sortir -->
                         <group string="Output Sortir">
@@ -87,14 +95,10 @@
                                 <field name="reject_tunas_kg" readonly="state != 'draft'"/>
                                 <field name="reject_muda_kg" readonly="state != 'draft'"/>
                             </group>
-                            <group string="Neraca Berat">
+                            <group string="Selisih Berat">
                                 <field name="balance_diff"
-                                       string="Selisih (Kg)"
+                                       string="Selisih Berat (Kg)"
                                        readonly="1"/>
-                                <field name="is_balanced"
-                                       string="Neraca Seimbang"
-                                       readonly="1"
-                                       widget="boolean"/>
                             </group>
                         </group>
 
@@ -120,11 +124,6 @@
 
                         </group>
                     </sheet>
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids"/>
-                        <field name="activity_ids"/>
-                        <field name="message_ids"/>
-                    </div>
                 </form>
             </field>
         </record>

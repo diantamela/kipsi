@@ -101,12 +101,6 @@
                                            string="Berat Bersih Diterima (Kg)"
                                            readonly="1"
                                            class="o_field_highlight"/>
-                                    <field name="total_count"
-                                           string="Jumlah Kelapa (Butir)"
-                                           readonly="state == 'done'"/>
-                                    <field name="avg_weight_per_coconut"
-                                           string="KG per Butir"
-                                           readonly="1"/>
                                 </group>
                             </group>
                         </page>

@@ -401,7 +401,9 @@ class CoconutReceipt(models.Model):
                     "untuk perusahaan ini."
                 ))
 
-            location_dest = picking_type.default_location_dest_id
+            location_dest = self.env.ref('coconut_receiving.location_gudang_kelapa_bulat', raise_if_not_found=False)
+            if not location_dest:
+                location_dest = picking_type.default_location_dest_id
             if not location_dest:
                 raise UserError(_(
                     "Lokasi tujuan default tidak ditemukan pada tipe operasi penerimaan."

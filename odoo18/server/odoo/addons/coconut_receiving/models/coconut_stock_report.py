@@ -265,11 +265,8 @@ class CoconutDailyStock(models.Model):
         tonase_layak = sorting.good_coconut_kg if sorting else 0.0
         reject_kg = sorting.reject_coconut_kg if sorting else 0.0
 
-        kg_per_butir = (
-            receipt.net_received_weight / receipt.total_count
-            if receipt.total_count and receipt.total_count > 0
-            else 0.0
-        )
+        total_coconut_count = sorting.total_count if sorting else 0
+        kg_per_butir = sorting.avg_weight_per_coconut if sorting else 0.0
 
         vals = {
             'receipt_id': receipt.id,
@@ -278,7 +275,7 @@ class CoconutDailyStock(models.Model):
             ),
             'supplier_id': receipt.partner_id.id,
             'coconut_origin': receipt.origin or '',
-            'total_coconut_count': receipt.total_count or 0,
+            'total_coconut_count': total_coconut_count,
             'kg_per_coconut': kg_per_butir,
             'tonase_layak': tonase_layak,
             'reject_kg': reject_kg,

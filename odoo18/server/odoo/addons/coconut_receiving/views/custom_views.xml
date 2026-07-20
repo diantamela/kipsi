@@ -48,6 +48,11 @@
         <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
     </record>
 
+    <!-- Hide MRP Scheduler menu (Perencanaan -> Pengadaan: jalankan penjadwal) -->
+    <record id="mrp.menu_procurement_compute_mrp" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('group_unused_features')])]"/>
+    </record>
+
     <!-- 3. Purchase: PO form customizations -->
     <record id="purchase_order_form_inherit" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit</field>
@@ -290,16 +295,16 @@
         <field name="action" ref="coconut_receiving.action_coconut_receipt"/>
     </record>
 
-    <!-- Rename "Manufaktur" to "Pemakaian Kelapa Produksi" and direct to coconut_receiving.action_coconut_manufacturing -->
+    <!-- Rename "Manufaktur" to "Transfer Kelapa ke Produksi" and direct to coconut_receiving.action_coconut_manufacturing -->
     <record id="mrp.mrp_operation_picking" model="ir.ui.menu">
-        <field name="name">Pemakaian Kelapa Produksi</field>
+        <field name="name">Transfer Kelapa ke Produksi</field>
         <field name="action" ref="coconut_receiving.action_coconut_manufacturing"/>
     </record>
 
-    <!-- Rename Inventory root menu to "Persediaan" -->
+    <!-- Rename Inventory root menu to "Persediaan" and set homepage to Products -->
     <record id="stock.menu_stock_root" model="ir.ui.menu">
         <field name="name">Persediaan</field>
-        <field name="action" eval="False"/>
+        <field name="action" ref="stock.product_template_action_product"/>
     </record>
 
     <!-- Direct native Manufacturing Orders in production module to custom manufacturing view -->
@@ -342,6 +347,6 @@
 
     <!-- Hide signup link on login page -->
     <template id="auth_signup_login_hide_signup" inherit_id="auth_signup.login">
-        <xpath expr="//a[@t-if='signup_enabled']" position="replace"/>
+        <xpath expr="//p[a[@t-if='signup_enabled']]" position="replace"/>
     </template>
 </odoo>

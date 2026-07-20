@@ -94,8 +94,10 @@ class TestCoconutReceiving(TransactionCase):
             self.skipTest("product_kelapa_bulat not found – install module first")
 
         p_bulat = p_bulat_tmpl.product_variant_ids[:1]
-        wh = self.env['stock.warehouse'].search([('company_id', '=', self.company.id)], limit=1)
-        location = wh.lot_stock_id if wh else False
+        location = self.env.ref('coconut_receiving.location_gudang_kelapa_bulat', raise_if_not_found=False)
+        if not location:
+            wh = self.env['stock.warehouse'].search([('company_id', '=', self.company.id)], limit=1)
+            location = wh.lot_stock_id if wh else False
         if not location:
             self.skipTest("Warehouse location not found")
 

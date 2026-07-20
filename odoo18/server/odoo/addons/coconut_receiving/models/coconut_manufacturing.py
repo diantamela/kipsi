@@ -21,7 +21,7 @@ class CoconutManufacturing(models.Model):
     Pergerakan stok direkam melalui stock.move standar Odoo.
     """
     _name = 'coconut.manufacturing'
-    _description = 'Pemakaian Kelapa Produksi'
+    _description = 'Transfer Kelapa ke Produksi'
     _order = 'production_date desc, name desc'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
@@ -40,6 +40,11 @@ class CoconutManufacturing(models.Model):
         default=fields.Date.context_today,
         required=True,
         tracking=True,
+    )
+    spk_number = fields.Char(
+        string='Nomor SPK',
+        index=True,
+        help='Nomor Surat Perintah Kerja penghubung.',
     )
     responsible_id = fields.Many2one(
         'hr.employee',
@@ -327,8 +332,8 @@ class CoconutManufacturing(models.Model):
 
     def action_validate(self):
         """
-        Validasi dokumen Pemakaian Kelapa Produksi.
-        Mencakup proses Sheller (Machine + Manual) dan Parer.
+        Validasi dokumen Transfer Kelapa ke Produksi.
+        Memindahkan Kelapa Layak Produksi dari Stok Kelapa Layak ke Area Sheller.
         """
         for rec in self:
             if rec.state != 'confirmed':
@@ -336,7 +341,7 @@ class CoconutManufacturing(models.Model):
                     "Hanya dokumen yang dikonfirmasi yang dapat divalidasi."
                 ))
             # ── Idempotency guard ──
-            if rec.shell_output_move_id or rec.parer_output_move_id:
+            if rec.shell_consume_layak_move_id:
                 raise UserError(_(
                     "Dokumen '%s' sudah divalidasi dan pergerakan stok sudah tercatat. "
                     "Tidak dapat membuat pergerakan stok duplikat."
@@ -354,40 +359,44 @@ class CoconutManufacturing(models.Model):
 
             # ── Resolve products ──
             p_layak = rec._resolve_product('coconut_receiving.product_kelapa_layak', 'Kelapa Layak Produksi', uom_kg)
-            p_reject = rec._resolve_product('coconut_receiving.product_kelapa_reject', 'Kelapa Reject', uom_kg)
-            p_sheller = rec._resolve_product('coconut_receiving.product_kelapa_sheller', 'Kelapa Sheller', uom_kg)
-            p_parer = rec._resolve_product('coconut_receiving.product_kelapa_parer', 'Kelapa Parer', uom_kg)
 
             # ── Resolve locations ──
-            loc_wh = rec._get_warehouse_location()
-            loc_prod = rec._get_production_location()
+            loc_src = rec.env.ref('coconut_receiving.location_stok_kelapa_layak', raise_if_not_found=False)
+            if not loc_src:
+                loc_src = rec._get_warehouse_location()
+            loc_dest = rec.env.ref('coconut_receiving.location_area_sheller', raise_if_not_found=False)
+            if not loc_dest:
+                loc_dest = rec._get_production_location()
+
+            # ── Validate available stock ──
+            if rec.machine_sheller_input <= 0:
+                raise UserError(_("Jumlah kelapa layak ditransfer harus lebih besar dari nol."))
+
+            avail_qty = rec.env['stock.quant']._get_available_quantity(p_layak, loc_src)
+            if float_compare(avail_qty, rec.machine_sheller_input, precision_rounding=uom_kg.rounding) < 0:
+                raise UserError(_(
+                    "Stok Kelapa Layak Produksi tidak mencukupi.\n"
+                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
+                ) % {'avail': avail_qty, 'need': rec.machine_sheller_input})
 
             origin = f'{rec.name}' + (f' / {rec.receipt_id.name}' if rec.receipt_id else '')
+            move = rec.env['stock.move'].create({
+                'name': f'{origin} – Transfer Kelapa Layak ke Area Sheller',
+                'origin': origin,
+                'product_id': p_layak.id,
+                'product_uom_qty': rec.machine_sheller_input,
+                'product_uom': uom_kg.id,
+                'location_id': loc_src.id,
+                'location_dest_id': loc_dest.id,
+                'company_id': rec.company_id.id,
+            })
+            move._action_confirm()
+            move._action_assign()
+            move.quantity = move.product_uom_qty
+            move.picked = True
+            move._action_done()
 
-            # ── SHELLER ──
-            rec._validate_sheller(uom_kg, loc_wh)
-            shell_moves = rec._create_sheller_moves(
-                p_layak, p_reject, p_sheller, loc_wh, loc_prod, uom_kg, origin
-            )
-            if shell_moves:
-                if shell_moves.get('consume_layak'):
-                    rec.shell_consume_layak_move_id = shell_moves['consume_layak'].id
-                if shell_moves.get('consume_reject'):
-                    rec.shell_consume_reject_move_id = shell_moves['consume_reject'].id
-                if shell_moves.get('produce_sheller'):
-                    rec.shell_output_move_id = shell_moves['produce_sheller'].id
-
-            # ── PARER ──
-            rec._validate_parer(uom_kg, loc_wh)
-            parer_moves = rec._create_parer_moves(
-                p_sheller, p_parer, loc_wh, loc_prod, uom_kg, origin
-            )
-            if parer_moves:
-                if parer_moves.get('consume_sheller'):
-                    rec.parer_consume_move_id = parer_moves['consume_sheller'].id
-                if parer_moves.get('produce_parer'):
-                    rec.parer_output_move_id = parer_moves['produce_parer'].id
-
+            rec.shell_consume_layak_move_id = move.id
             rec.state = 'done'
 
     def action_cancel(self):
@@ -676,7 +685,7 @@ class CoconutManufacturing(models.Model):
         return variant
 
     def _get_stock_qty(self, xml_id):
-        """Get available quantity for a product identified by XML ID."""
+        """Get available quantity for a product identified by XML ID in its correct location."""
         try:
             tmpl = self.env.ref(xml_id, raise_if_not_found=False)
             if not tmpl:
@@ -684,9 +693,25 @@ class CoconutManufacturing(models.Model):
             variant = tmpl.product_variant_ids[:1]
             if not variant:
                 return 0.0
-            loc_wh = self._get_warehouse_location()
+
+            # Map product XML ID to location XML ID
+            loc_map = {
+                'coconut_receiving.product_kelapa_bulat': 'coconut_receiving.location_gudang_kelapa_bulat',
+                'coconut_receiving.product_kelapa_layak': 'coconut_receiving.location_stok_kelapa_layak',
+                'coconut_receiving.product_kelapa_reject': 'coconut_receiving.location_stok_kelapa_reject',
+                'coconut_receiving.product_kelapa_sheller': 'coconut_receiving.location_area_sheller',
+                'coconut_receiving.product_kelapa_parer': 'coconut_receiving.location_area_parer',
+            }
+            loc_xml_id = loc_map.get(xml_id)
+            location = False
+            if loc_xml_id:
+                location = self.env.ref(loc_xml_id, raise_if_not_found=False)
+            if not location:
+                location = self._get_warehouse_location()
+            if not location:
+                return 0.0
             return self.env['stock.quant']._get_available_quantity(
-                variant, loc_wh,
+                variant, location,
             )
         except Exception:
             return 0.0

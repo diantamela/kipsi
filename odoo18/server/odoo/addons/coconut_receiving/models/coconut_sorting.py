@@ -42,6 +42,22 @@ class CoconutSorting(models.Model):
         string='Tanggal Sortir',
         default=fields.Date.context_today, required=True,
     )
+    spk_number = fields.Char(
+        string='Nomor SPK',
+        index=True,
+        help='Nomor Surat Perintah Kerja penghubung.',
+    )
+    total_count = fields.Integer(
+        string='Jumlah Kelapa (Butir)',
+        default=0,
+        help='Jumlah buah kelapa yang disortir.',
+    )
+    avg_weight_per_coconut = fields.Float(
+        string='KG per Butir',
+        compute='_compute_avg_weight_per_coconut',
+        store=True,
+        readonly=True,
+    )
 
     # ─────────────────── Related fields from receipt (informational) ───────────
     supplier_id = fields.Many2one(
@@ -138,6 +154,14 @@ class CoconutSorting(models.Model):
 
 
     # ═══════════════════════════════ Compute Methods ═══════════════════════════
+
+    @api.depends('input_weight_kg', 'total_count')
+    def _compute_avg_weight_per_coconut(self):
+        for rec in self:
+            if rec.total_count > 0:
+                rec.avg_weight_per_coconut = rec.input_weight_kg / rec.total_count
+            else:
+                rec.avg_weight_per_coconut = 0.0
 
     @api.depends('receipt_id', 'receipt_id.net_received_weight')
     def _compute_input_weight_kg(self):
@@ -254,19 +278,10 @@ class CoconutSorting(models.Model):
 
             # ── Mass balance ──
             total_out = record.good_coconut_kg + record.reject_coconut_kg
-            diff = abs(round(total_out - record.input_weight_kg, 4))
-            if diff > TOLERANCE:
+            if total_out > record.input_weight_kg:
                 raise UserError(_(
-                    'Neraca berat tidak seimbang!\n\n'
-                    'Input: %(input).2f kg\n'
-                    'Total Output: %(output).2f kg\n'
-                    'Selisih: %(diff).4f kg\n\n'
-                    'Pastikan: Kelapa Layak + Kelapa Reject = Berat Input.'
-                ) % {
-                    'input': record.input_weight_kg,
-                    'output': total_out,
-                    'diff': total_out - record.input_weight_kg,
-                })
+                    'Total hasil sortir tidak boleh melebihi berat kelapa yang diproses!'
+                ))
 
             # ── Cek sisa stok dari penerimaan (hanya jika receipt_id dipilih) ──
             if record.receipt_id:
@@ -327,6 +342,18 @@ class CoconutSorting(models.Model):
             if not location_wh:
                 raise UserError(_('Lokasi stok internal (Warehouse) tidak ditemukan.'))
 
+            location_bulat = self.env.ref('coconut_receiving.location_gudang_kelapa_bulat', raise_if_not_found=False)
+            if not location_bulat:
+                location_bulat = location_wh
+
+            location_layak = self.env.ref('coconut_receiving.location_stok_kelapa_layak', raise_if_not_found=False)
+            if not location_layak:
+                location_layak = location_wh
+
+            location_reject = self.env.ref('coconut_receiving.location_stok_kelapa_reject', raise_if_not_found=False)
+            if not location_reject:
+                location_reject = location_wh
+
             location_prod = self.env.ref(
                 'coconut_sorting.stock_location_coconut_sorting',
                 raise_if_not_found=False,
@@ -340,7 +367,7 @@ class CoconutSorting(models.Model):
 
             # ── Validate available stock ──
             available_qty = self.env['stock.quant']._get_available_quantity(
-                raw_product, location_wh,
+                raw_product, location_bulat,
             )
             if float_compare(
                 available_qty, record.input_weight_kg,
@@ -362,7 +389,7 @@ class CoconutSorting(models.Model):
                 'product_id': raw_product.id,
                 'product_uom_qty': record.input_weight_kg,
                 'product_uom': uom_kg.id,
-                'location_id': location_wh.id,
+                'location_id': location_bulat.id,
                 'location_dest_id': location_prod.id,
                 'company_id': record.company_id.id,
             }
@@ -375,7 +402,7 @@ class CoconutSorting(models.Model):
                 'product_uom_qty': record.good_coconut_kg,
                 'product_uom': uom_kg.id,
                 'location_id': location_prod.id,
-                'location_dest_id': location_wh.id,
+                'location_dest_id': location_layak.id,
                 'company_id': record.company_id.id,
             }
 
@@ -387,7 +414,7 @@ class CoconutSorting(models.Model):
                 'product_uom_qty': record.reject_coconut_kg,
                 'product_uom': uom_kg.id,
                 'location_id': location_prod.id,
-                'location_dest_id': location_wh.id,
+                'location_dest_id': location_reject.id,
                 'company_id': record.company_id.id,
             }
 
@@ -430,7 +457,7 @@ class CoconutSorting(models.Model):
     # ═══════════════════════════════ Helpers ══════════════════════════════════
 
     def _get_stock_qty(self, xml_id):
-        """Get available quantity for a product identified by XML ID."""
+        """Get available quantity for a product identified by XML ID in its correct location."""
         try:
             tmpl = self.env.ref(xml_id, raise_if_not_found=False)
             if not tmpl:
@@ -438,12 +465,26 @@ class CoconutSorting(models.Model):
             variant = tmpl.product_variant_ids[:1]
             if not variant:
                 return 0.0
-            warehouse = self.env['stock.warehouse'].search(
-                [('company_id', '=', self.env.company.id)], limit=1
-            )
-            if not warehouse:
+
+            # Map product XML ID to location XML ID
+            loc_map = {
+                'coconut_receiving.product_kelapa_bulat': 'coconut_receiving.location_gudang_kelapa_bulat',
+                'coconut_receiving.product_kelapa_layak': 'coconut_receiving.location_stok_kelapa_layak',
+                'coconut_receiving.product_kelapa_reject': 'coconut_receiving.location_stok_kelapa_reject',
+                'coconut_receiving.product_kelapa_sheller': 'coconut_receiving.location_area_sheller',
+                'coconut_receiving.product_kelapa_parer': 'coconut_receiving.location_area_parer',
+            }
+            loc_xml_id = loc_map.get(xml_id)
+            location = False
+            if loc_xml_id:
+                location = self.env.ref(loc_xml_id, raise_if_not_found=False)
+            if not location:
+                warehouse = self.env['stock.warehouse'].search(
+                    [('company_id', '=', self.env.company.id)], limit=1
+                )
+                location = warehouse.lot_stock_id if warehouse else False
+            if not location:
                 return 0.0
-            location = warehouse.lot_stock_id
             return self.env['stock.quant']._get_available_quantity(variant, location)
         except Exception:
             return 0.0
