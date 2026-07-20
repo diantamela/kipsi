@@ -12,6 +12,11 @@
         <!-- Optional: Ensure it runs after stock module so we can override any stock modifications by setting higher priority -->
         <field name="priority">100</field>
         <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="action">coconut_receiving.action_coconut_manufacturing</attribute>
+                <attribute name="type">action</attribute>
+            </xpath>
+
             <!-- Inject our fields -->
             <xpath expr="//field[@name='currency_id']" position="after">
                 <field name="inventory_card_type"/>
