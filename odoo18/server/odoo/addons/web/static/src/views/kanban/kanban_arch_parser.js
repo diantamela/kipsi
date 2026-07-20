@@ -98,6 +98,7 @@ export class KanbanArchParser {
             if (node.tagName === "field") {
                 // In kanban, we display many2many fields as tags by default
                 const widget = node.getAttribute("widget");
+                if (!models[modelName].fields[node.getAttribute("name")]) { console.log("KANBAN CRASH DEBUG: model=", modelName, " missing field=", node.getAttribute("name"), "available fields=", Object.keys(models[modelName].fields)); }
                 if (
                     !widget &&
                     models[modelName].fields[node.getAttribute("name")].type === "many2many"

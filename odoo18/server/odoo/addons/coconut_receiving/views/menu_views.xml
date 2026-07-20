@@ -6,10 +6,7 @@
         <field name="tag">pt_coconut_dashboard_action</field>
     </record>
 
-    <!-- Override Inventory -> Products -> Products to open custom coconut product dashboard -->
-    <record id="stock.menu_product_variant_config_stock" model="ir.ui.menu">
-        <field name="action" ref="coconut_receiving.action_coconut_product_dashboard"/>
-    </record>
+
 
     <!-- Add Dashboard menu under Dashboards module -->
     <menuitem id="menu_dashboard_coconut"

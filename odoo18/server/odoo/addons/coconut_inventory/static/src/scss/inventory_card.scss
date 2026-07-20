@@ -1,0 +1,41 @@
+.custom_inventory_card_container {
+    padding: 0 !important;
+}
+
+.custom_inventory_card {
+    padding: 12px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* Hide hover actions by default */
+    .kanban_hover_actions {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease-in-out, visibility 0.2s;
+    }
+
+    /* Show hover actions on card hover */
+    &:hover .kanban_hover_actions {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* Style for the metrics */
+    .inventory_metric {
+        padding: 10px 0;
+        
+        .display-4 {
+            font-size: 2.5rem;
+            line-height: 1.2;
+        }
+    }
+}

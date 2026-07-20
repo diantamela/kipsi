@@ -13,7 +13,7 @@
         <field name="inherit_id" ref="stock.stock_picking_type_kanban"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='stock_picking']" position="attributes">
-                <attribute name="t-if">record.show_picking_type.raw_value &amp;&amp; record.code.raw_value != 'outgoing'</attribute>
+                <attribute name="t-if">record.show_picking_type.raw_value and record.code.raw_value != 'outgoing'</attribute>
             </xpath>
         </field>
     </record>
@@ -318,6 +318,11 @@
                 Overview Penerimaan Kelapa
             </p>
         </field>
+    </record>
+
+    <!-- Clear Dashboard action from Manufacturing root menu (was set from old config) -->
+    <record id="mrp.menu_mrp_root" model="ir.ui.menu">
+        <field name="action" eval="False"/>
     </record>
 
     <!-- Hide Overview (Dashboard) from Coconut Receiving production module -->
