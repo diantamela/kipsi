@@ -9,7 +9,7 @@
     """,
     'author': 'PT Coco Murni Prima Jaya / Custom',
     'category': 'Human Resources/Payroll',
-    'depends': ['base', 'hr'],
+    'depends': ['base', 'hr', 'coconut_receiving'],
     'data': [
         'security/payroll_security.xml',
         'security/ir.model.access.csv',
@@ -22,6 +22,7 @@
         'views/hr_employee_views.xml',
         'views/work_result_views.xml',
         'views/work_sheet_views.xml',
+        'views/coconut_manufacturing_inherit_views.xml',
         'views/payroll_tariff_views.xml',
         'views/premium_rule_views.xml',
         'views/payroll_period_views.xml',

@@ -47,9 +47,9 @@
                         </h1>
                     </div>
 
-                    <!-- Header Info -->
+                    <!-- Informasi Transfer -->
                     <group>
-                        <group string="Informasi Transfer Produksi">
+                        <group string="Informasi Transfer">
                             <field name="production_date"
                                    readonly="state != 'draft'"/>
                             <field name="spk_number"
@@ -59,25 +59,56 @@
                                    readonly="state != 'draft'"/>
                             <field name="company_id" invisible="1"/>
                         </group>
-                        <group string="Sumber Kelapa (Opsional)">
-                            <field name="receipt_id"
-                                   string="Penerimaan Kelapa"
-                                   readonly="state != 'draft'"/>
-                        </group>
                     </group>
 
                     <notebook>
                         <!-- Tab 1: Transfer Material -->
                         <page string="Transfer Material" name="tab_transfer_material">
-                            <group string="Perpindahan Stok Kelapa Layak ke Area Sheller">
+                            <!-- Transfer Sheller -->
+                            <group string="Transfer ke Sheller">
                                 <group>
-                                    <field name="machine_sheller_input"
-                                           string="Kelapa Layak Ditransfer (Kg)"
+                                    <field name="available_kelapa_layak"
+                                           string="Stok Kelapa Layak Tersedia (Kg)"
+                                           readonly="1"/>
+                                    <field name="sheller_mesin_qty"
+                                           string="Kelapa Layak ke Sheller Mesin (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="sheller_manual_qty"
+                                           string="Kelapa Layak ke Sheller Manual (Kg)"
                                            readonly="state != 'draft'"/>
                                 </group>
-                                <group string="Ketersediaan">
-                                    <field name="remaining_layak"
-                                           string="Sisa Kelapa Layak (Kg)"
+                                <group>
+                                    <field name="total_transfer_sheller"
+                                           string="Total Transfer Sheller (Kg)"
+                                           readonly="1"/>
+                                    <field name="remaining_kelapa_layak"
+                                           string="Sisa Kelapa Layak Setelah Transfer (Kg)"
+                                           readonly="1"/>
+                                </group>
+                            </group>
+
+                            <!-- Transfer Perrer -->
+                            <group string="Transfer ke Perrer">
+                                <group string="Sumber: Hasil Sheller Mesin">
+                                    <field name="available_hasil_sheller_mesin"
+                                           string="Stok Hasil Sheller Mesin Tersedia (Kg)"
+                                           readonly="1"/>
+                                    <field name="transfer_perrer_mesin_qty"
+                                           string="Hasil Sheller Mesin Ditransfer ke Perrer (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="remaining_hasil_sheller_mesin"
+                                           string="Sisa Hasil Sheller Mesin Setelah Transfer (Kg)"
+                                           readonly="1"/>
+                                </group>
+                                <group string="Sumber: Hasil Sheller Manual">
+                                    <field name="available_hasil_sheller_manual"
+                                           string="Stok Hasil Sheller Manual Tersedia (Kg)"
+                                           readonly="1"/>
+                                    <field name="transfer_perrer_manual_qty"
+                                           string="Hasil Sheller Manual Ditransfer ke Perrer (Kg)"
+                                           readonly="state != 'draft'"/>
+                                    <field name="remaining_hasil_sheller_manual"
+                                           string="Sisa Hasil Sheller Manual Setelah Transfer (Kg)"
                                            readonly="1"/>
                                 </group>
                             </group>
@@ -85,11 +116,12 @@
 
                         <!-- Tab 2: Pergerakan Stok -->
                         <page string="Pergerakan Stok" name="tab_stok"
-                               invisible="not shell_consume_layak_move_id">
+                               invisible="not sheller_mesin_move_id and not sheller_manual_move_id and not perrer_mesin_move_id and not perrer_manual_move_id">
                             <group string="Pergerakan Stok">
-                                <field name="shell_consume_layak_move_id"
-                                       string="Pergerakan Stok Transfer"
-                                       readonly="1"/>
+                                <field name="sheller_mesin_move_id" string="Pergerakan Stok Sheller Mesin" readonly="1" invisible="not sheller_mesin_move_id"/>
+                                <field name="sheller_manual_move_id" string="Pergerakan Stok Sheller Manual" readonly="1" invisible="not sheller_manual_move_id"/>
+                                <field name="perrer_mesin_move_id" string="Pergerakan Stok Perrer Mesin" readonly="1" invisible="not perrer_mesin_move_id"/>
+                                <field name="perrer_manual_move_id" string="Pergerakan Stok Perrer Manual" readonly="1" invisible="not perrer_manual_move_id"/>
                             </group>
                         </page>
 
@@ -115,22 +147,16 @@
         <field name="name">coconut.manufacturing.list</field>
         <field name="model">coconut.manufacturing</field>
         <field name="arch" type="xml">
-            <list string="Pemakaian Kelapa Produksi"
+            <list string="Transfer Kelapa ke Produksi"
                   decoration-info="state == 'draft'"
                   decoration-warning="state == 'confirmed'"
                   decoration-success="state == 'done'"
                   decoration-muted="state == 'cancelled'">
-                <field name="name" string="Kode PKK"/>
-                <field name="production_date" string="Tgl Produksi"/>
+                <field name="name" string="Kode Transfer"/>
+                <field name="production_date" string="Tgl Transfer"/>
+                <field name="spk_number" string="Nomor SPK"/>
                 <field name="responsible_id" string="Operator"/>
-                <field name="receipt_id" string="Penerimaan"/>
-                <field name="machine_sheller_input" string="Input Mesin (Kg)" sum="Total Input Mesin"/>
-                <field name="machine_sheller_output" string="Output Mesin (Kg)" sum="Total Output Mesin"/>
-                <field name="manual_sheller_input" string="Input Manual (Kg)" sum="Total Input Manual"/>
-                <field name="manual_sheller_output" string="Output Manual (Kg)" sum="Total Output Manual"/>
-                <field name="total_sheller_output" string="Total Sheller (Kg)" sum="Total Sheller"/>
-                <field name="parer_input" string="Input Parer (Kg)" sum="Total Input Parer"/>
-                <field name="parer_output" string="Output Parer (Kg)" sum="Total Output Parer"/>
+                <field name="total_transfer_sheller" string="Total Transfer Sheller (Kg)" sum="Total Transfer Sheller"/>
                 <field name="state"
                        widget="badge"
                        decoration-info="state == 'draft'"
@@ -152,6 +178,7 @@
                 <field name="name" string="Kode Transfer"/>
                 <field name="responsible_id" string="Operator"/>
                 <field name="production_date" string="Tanggal"/>
+                <field name="spk_number" string="Nomor SPK"/>
                 <separator/>
                 <filter string="Draft"        name="draft"     domain="[('state','=','draft')]"/>
                 <filter string="Dikonfirmasi" name="confirmed" domain="[('state','=','confirmed')]"/>
@@ -163,6 +190,7 @@
                     <filter string="Operator"         name="grp_operator"        context="{'group_by':'responsible_id'}"/>
                     <filter string="Status"           name="grp_state"           context="{'group_by':'state'}"/>
                     <filter string="Tanggal"          name="grp_production_date" context="{'group_by':'production_date'}"/>
+                    <filter string="Nomor SPK"        name="grp_spk_number"      context="{'group_by':'spk_number'}"/>
                 </group>
             </search>
         </field>
@@ -186,17 +214,7 @@
         </field>
     </record>
 
-    <!-- ═══════════════════════════════════════════════════
-         MENU STRUCTURE
-         Target:
-           Kelapa
-           ├── Penerimaan Kelapa    (seq 10)
-           ├── Sortir Kelapa        (seq 20)
-           ├── Transfer Kelapa ke Produksi (seq 30)
-           └── Stok Kelapa Harian   (seq 40)
-         ═══════════════════════════════════════════════════ -->
-
-    <!-- Override / Rename Root Menu from coconut_receiving to "Penerimaan Kelapa" -->
+    <!-- Override / Rename Root Menu from coconut_receiving to "Penerimaan" -->
     <menuitem id="coconut_receiving.menu_coconut_receiving_root"
               name="Penerimaan"
               sequence="40"/>
@@ -220,9 +238,4 @@
               parent="coconut_receiving.menu_coconut_receiving_root"
               action="action_coconut_manufacturing"
               sequence="30"/>
-
-
-    <!-- Stok Kelapa Harian menu removed (moved to Inventory module) -->
-
-
 </odoo>

@@ -2,11 +2,11 @@
 <odoo>
     <!-- Report Action -->
     <record id="action_report_coconut_manufacturing" model="ir.actions.report">
-        <field name="name">Laporan Pemakaian Kelapa Produksi</field>
+        <field name="name">Laporan Transfer Kelapa ke Produksi</field>
         <field name="model">coconut.manufacturing</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">coconut_sorting.report_coconut_manufacturing_template</field>
-        <field name="report_file">coconut_sorting.report_coconut_manufacturing_template</field>
+        <field name="report_name">coconut_receiving.report_coconut_manufacturing_template</field>
+        <field name="report_file">coconut_receiving.report_coconut_manufacturing_template</field>
         <field name="binding_model_id" ref="model_coconut_manufacturing"/>
         <field name="binding_type">report</field>
     </record>
@@ -50,7 +50,7 @@
                                 font-weight: bold;
                                 width: 180px;
                                 color: #555;
-                            }
+                             }
                             .info-colon {
                                 width: 10px;
                             }
@@ -132,12 +132,12 @@
 
                         <!-- ══ HEADER ══ -->
                         <div class="company-name">PT Coco Murni Prima Jaya</div>
-                        <div class="report-title">LAPORAN PEMAKAIAN KELAPA PRODUKSI</div>
+                        <div class="report-title">LAPORAN TRANSFER KELAPA KE PRODUKSI</div>
 
                         <!-- ══ INFORMASI DOKUMEN ══ -->
                         <table class="info-table">
                             <tr>
-                                <td class="info-label">Kode PKK</td>
+                                <td class="info-label">Kode Transfer</td>
                                 <td class="info-colon">:</td>
                                 <td><strong><span t-field="doc.name"/></strong></td>
                                 <td class="info-label">Operator</td>
@@ -145,10 +145,22 @@
                                 <td><span t-field="doc.responsible_id.name"/></td>
                             </tr>
                             <tr>
-                                <td class="info-label">Tanggal Produksi</td>
+                                <td class="info-label">Tanggal Transfer</td>
                                 <td class="info-colon">:</td>
                                 <td><span t-field="doc.production_date" t-options='{"widget": "date"}'/></td>
-                                <td class="info-label">Status</td>
+                                <td class="info-label">Nomor SPK</td>
+                                <td class="info-colon">:</td>
+                                <td><span t-field="doc.spk_number"/></td>
+                            </tr>
+                            <tr>
+                                <td class="info-label">Status Realisasi</td>
+                                <td class="info-colon">:</td>
+                                <td>
+                                    <span t-if="doc.realisasi_state == 'no_result'">Belum Ada Hasil Kerja</span>
+                                    <span t-elif="doc.realisasi_state == 'partial'">Sebagian</span>
+                                    <span t-elif="doc.realisasi_state == 'done'">Selesai</span>
+                                </td>
+                                <td class="info-label">Status Dokumen</td>
                                 <td class="info-colon">:</td>
                                 <td>
                                     <span t-if="doc.state == 'draft'" class="status-badge badge-draft">Draft</span>
@@ -157,153 +169,107 @@
                                     <span t-else="">Dibatalkan</span>
                                 </td>
                             </tr>
-                            <tr t-if="doc.receipt_id">
-                                <td class="info-label">Sumber Penerimaan</td>
-                                <td class="info-colon">:</td>
-                                <td><span t-field="doc.receipt_id.name"/></td>
-                                <td></td><td></td><td></td>
-                            </tr>
                         </table>
 
                         <t t-set="stock_data" t-value="doc.get_report_stock_data()"/>
 
                         <!-- ══ SECTION 1: PERSEDIAAN AWAL ══ -->
-                        <div class="section-title">1. Persediaan Awal</div>
+                        <div class="section-title">1. Persediaan Awal Bahan Baku</div>
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>Produk</th>
+                                    <th>Lokasi Asal</th>
                                     <th class="text-right">Stok Awal (Kg)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td>Kelapa Layak Produksi</td>
+                                    <td>Stok Kelapa Layak</td>
                                     <td class="text-right"><t t-esc="doc.format_kg(stock_data['layak']['awal'])"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Kelapa Reject</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['reject']['awal'])"/></td>
+                                    <td>Kelapa Sheller (Hasil Mesin)</td>
+                                    <td>Stok Hasil Sheller Mesin</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['hasil_mesin']['awal'])"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Kelapa Sheller</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['sheller']['awal'])"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Kelapa Parer</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['parer']['awal'])"/></td>
+                                    <td>Kelapa Sheller (Hasil Manual)</td>
+                                    <td>Stok Hasil Sheller Manual</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['hasil_manual']['awal'])"/></td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <!-- ══ SECTION 2: PEMAKAIAN SHELLER ══ -->
-                        <div class="section-title">2. Pemakaian Sheller</div>
+                        <!-- ══ SECTION 2: TRANSFER KE SHELLER ══ -->
+                        <div class="section-title">2. Transfer ke Sheller</div>
                         <div class="process-block">
-                            <div class="process-subtitle">Sheller Mesin:</div>
                             <div class="process-item">
-                                <span>Kelapa Layak Produksi Digunakan: </span>
-                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_input)"/></strong>
+                                <span>Kelapa Layak ke Sheller Mesin: </span>
+                                <strong><t t-esc="doc.format_kg(doc.sheller_mesin_qty)"/></strong>
                             </div>
                             <div class="process-item">
-                                <span>Output Kelapa Sheller (Mesin): </span>
-                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_output)"/></strong>
-                            </div>
-                        </div>
-                        <div class="process-block">
-                            <div class="process-subtitle">Sheller Manual:</div>
-                            <div class="process-item">
-                                <span>Kelapa Reject Digunakan: </span>
-                                <strong><t t-esc="doc.format_kg(doc.manual_sheller_input)"/></strong>
+                                <span>Kelapa Layak ke Sheller Manual: </span>
+                                <strong><t t-esc="doc.format_kg(doc.sheller_manual_qty)"/></strong>
                             </div>
                             <div class="process-item">
-                                <span>Output Kelapa Sheller (Manual): </span>
-                                <strong><t t-esc="doc.format_kg(doc.manual_sheller_output)"/></strong>
-                            </div>
-                        </div>
-                        <div class="process-block">
-                            <div class="process-subtitle">Total Output Kelapa Sheller:</div>
-                            <div class="process-item">
-                                <strong><t t-esc="doc.format_kg(doc.machine_sheller_output + doc.manual_sheller_output)"/></strong>
+                                <span>Total Transfer ke Sheller: </span>
+                                <strong><t t-esc="doc.format_kg(doc.total_transfer_sheller)"/></strong>
                             </div>
                         </div>
 
-                        <!-- ══ SECTION 3: PROSES PARER ══ -->
-                        <div class="section-title">3. Proses Parer</div>
+                        <!-- ══ SECTION 3: TRANSFER KE PERRER ══ -->
+                        <div class="section-title">3. Transfer ke Perrer (Area Parer)</div>
                         <div class="process-block">
                             <div class="process-item">
-                                <span>Kelapa Sheller Digunakan: </span>
-                                <strong><t t-esc="doc.format_kg(doc.parer_input)"/></strong>
+                                <span>Hasil Sheller Mesin Ditransfer ke Perrer: </span>
+                                <strong><t t-esc="doc.format_kg(doc.transfer_perrer_mesin_qty)"/></strong>
                             </div>
                             <div class="process-item">
-                                <span>Output Kelapa Parer: </span>
-                                <strong><t t-esc="doc.format_kg(doc.parer_output)"/></strong>
+                                <span>Hasil Sheller Manual Ditransfer ke Perrer: </span>
+                                <strong><t t-esc="doc.format_kg(doc.transfer_perrer_manual_qty)"/></strong>
                             </div>
                         </div>
 
-                        <!-- ══ SECTION 4: RINGKASAN PERGERAKAN STOK ══ -->
-                        <div class="section-title">4. Ringkasan Pergerakan Stok</div>
+                        <!-- ══ SECTION 4: REALISASI HASIL KERJA ══ -->
+                        <div class="section-title">4. Realisasi Hasil Kerja</div>
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Produk</th>
-                                    <th class="text-right">Awal</th>
-                                    <th class="text-right">Pemakaian (−)</th>
-                                    <th class="text-right">Produksi (+)</th>
-                                    <th class="text-right">Akhir</th>
+                                    <th>Proses Kerja</th>
+                                    <th class="text-right">Jumlah Ditransfer (Kg)</th>
+                                    <th class="text-right">Realisasi Hasil Kerja (Kg)</th>
+                                    <th class="text-right">Sisa Area (Kg)</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>Kelapa Layak Produksi</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['layak']['awal'])"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['layak']['used'])"/></td>
-                                    <td class="text-right">−</td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['layak']['akhir'])"/></td>
+                                    <td>Sheller Mesin</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.sheller_mesin_qty)"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_sheller_mesin)"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.sheller_mesin_qty - doc.realisasi_sheller_mesin)"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Kelapa Reject</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['reject']['awal'])"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['reject']['used'])"/></td>
-                                    <td class="text-right">−</td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['reject']['akhir'])"/></td>
+                                    <td>Sheller Manual</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.sheller_manual_qty)"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_sheller_manual)"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.sheller_manual_qty - doc.realisasi_sheller_manual)"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Kelapa Sheller</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['awal'])"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['used'])"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['sheller']['produced'])"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['sheller']['akhir'])"/></td>
+                                    <td>Perrer dari Sheller Mesin</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_mesin_qty)"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_perrer_mesin)"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_mesin_qty - doc.realisasi_perrer_mesin)"/></td>
                                 </tr>
                                 <tr>
-                                    <td>Kelapa Parer</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['parer']['awal'])"/></td>
-                                    <td class="text-right">−</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(stock_data['parer']['produced'])"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(stock_data['parer']['akhir'])"/></td>
+                                    <td>Perrer dari Sheller Manual</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_manual_qty)"/></td>
+                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_perrer_manual)"/></td>
+                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_manual_qty - doc.realisasi_perrer_manual)"/></td>
                                 </tr>
                             </tbody>
                         </table>
-
-                        <!-- ══ SECTION 5: STATUS PERGERAKAN STOK ══ -->
-                        <div class="section-title">5. Referensi Pergerakan Stok</div>
-                        <div class="process-block" style="line-height: 1.8;">
-                            <t t-if="doc.shell_consume_layak_move_id or doc.shell_consume_reject_move_id">
-                                <div><strong>Sheller:</strong>
-                                    <span t-if="doc.shell_consume_layak_move_id"> Konsumsi Kelapa Layak (Mesin) ✓</span>
-                                    <span t-if="doc.shell_consume_reject_move_id"> | Konsumsi Kelapa Reject (Manual) ✓</span>
-                                    <span t-if="doc.shell_output_move_id"> | Produksi Kelapa Sheller ✓</span>
-                                </div>
-                            </t>
-                            <t t-if="doc.parer_consume_move_id or doc.parer_output_move_id">
-                                <div><strong>Parer:</strong>
-                                    <span t-if="doc.parer_consume_move_id"> Konsumsi Kelapa Sheller ✓</span>
-                                    <span t-if="doc.parer_output_move_id"> | Produksi Kelapa Parer ✓</span>
-                                </div>
-                            </t>
-                            <t t-if="not doc.shell_output_move_id and not doc.parer_output_move_id">
-                                <div style="color: #999; font-style: italic;">Pergerakan stok belum dibuat (dokumen belum selesai).</div>
-                            </t>
-                        </div>
 
                         <!-- ══ TANDA TANGAN ══ -->
                         <div class="signature-container" style="margin-top: 60px;">

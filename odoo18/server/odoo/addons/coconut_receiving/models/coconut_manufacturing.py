@@ -12,13 +12,9 @@ _KG_ROUNDING = 0.01
 
 class CoconutManufacturing(models.Model):
     """
-    Pemakaian Kelapa Produksi – dokumen yang mencakup:
-      1. Sheller Mesin  (Kelapa Layak → Kelapa Sheller)
-      2. Sheller Manual (Kelapa Reject → Kelapa Sheller)
-      3. Parer          (Kelapa Sheller → Kelapa Parer)
-
-    Proses Sortir Kelapa dilakukan di modul terpisah (coconut.sorting).
-    Pergerakan stok direkam melalui stock.move standar Odoo.
+    Transfer Kelapa ke Produksi – dokumen yang mencakup:
+      1. Transfer ke Sheller (Kelapa Layak → Area Sheller Mesin / Manual)
+      2. Transfer ke Parer (Hasil Sheller Mesin / Manual → Area Parer)
     """
     _name = 'coconut.manufacturing'
     _description = 'Transfer Kelapa ke Produksi'
@@ -30,13 +26,13 @@ class CoconutManufacturing(models.Model):
     # ═══════════════════════════════════════════════════════════
 
     name = fields.Char(
-        string='Kode Pemakaian',
+        string='Kode Transfer',
         required=True, copy=False, readonly=True,
         default=lambda self: _('Baru'),
         tracking=True,
     )
     production_date = fields.Date(
-        string='Tanggal Produksi',
+        string='Tanggal Transfer',
         default=fields.Date.context_today,
         required=True,
         tracking=True,
@@ -57,152 +53,116 @@ class CoconutManufacturing(models.Model):
         required=True,
         default=lambda self: self.env.company,
     )
-    notes = fields.Text(string='Catatan Produksi')
+    notes = fields.Text(string='Catatan Transfer')
 
-    # ═══════════════════════════════════════════════════════════
-    # SUMBER PENERIMAAN (Opsional – hanya untuk tracing)
-    # ═══════════════════════════════════════════════════════════
-
-    receipt_id = fields.Many2one(
-        'coconut.receipt',
-        string='Penerimaan Kelapa (Opsional)',
-        required=False,
-        ondelete='restrict',
-        domain=[('state', '=', 'done')],
-        tracking=True,
-        help='Opsional. Pilih penerimaan untuk keperluan tracing.',
-    )
+    # ─── Deprecated / Unused fields to maintain history ───
+    receipt_id = fields.Many2one('coconut.receipt', string='Penerimaan Kelapa (Deprecated)', deprecated=True)
+    receipt_code = fields.Char(string='Kode Penerimaan (Deprecated)', deprecated=True)
+    supplier_id = fields.Many2one('res.partner', string='Pemasok (Deprecated)', deprecated=True)
+    coconut_origin = fields.Char(string='Asal Kelapa (Deprecated)', deprecated=True)
+    receipt_date = fields.Datetime(string='Tanggal Penerimaan (Deprecated)', deprecated=True)
+    net_received_weight = fields.Float(string='Berat Bersih Diterima (Deprecated)', deprecated=True)
+    vehicle_number = fields.Char(string='Nomor Polisi (Deprecated)', deprecated=True)
+    driver_name = fields.Char(string='Nama Supir (Deprecated)', deprecated=True)
+    
+    machine_sheller_input = fields.Float(string='Machine Sheller Input (Deprecated)', default=0.0, deprecated=True)
+    manual_sheller_input = fields.Float(string='Manual Sheller Input (Deprecated)', default=0.0, deprecated=True)
+    machine_sheller_output = fields.Float(string='Machine Sheller Output (Deprecated)', default=0.0, deprecated=True)
+    manual_sheller_output = fields.Float(string='Manual Sheller Output (Deprecated)', default=0.0, deprecated=True)
+    total_sheller_input = fields.Float(string='Total Sheller Input (Deprecated)', default=0.0, deprecated=True)
+    total_sheller_output = fields.Float(string='Total Sheller Output (Deprecated)', default=0.0, deprecated=True)
+    remaining_layak = fields.Float(string='Remaining Layak (Deprecated)', default=0.0, deprecated=True)
+    remaining_reject = fields.Float(string='Remaining Reject (Deprecated)', default=0.0, deprecated=True)
+    available_kelapa_sheller = fields.Float(string='Available Kelapa Sheller (Deprecated)', default=0.0, deprecated=True)
+    parer_input = fields.Float(string='Parer Input (Deprecated)', default=0.0, deprecated=True)
+    parer_output = fields.Float(string='Parer Output (Deprecated)', default=0.0, deprecated=True)
+    remaining_kelapa_sheller = fields.Float(string='Remaining Kelapa Sheller (Deprecated)', default=0.0, deprecated=True)
+    parer_notes = fields.Text(string='Parer Notes (Deprecated)', deprecated=True)
+    
+    shell_consume_layak_move_id = fields.Many2one('stock.move', string='Move Cons. Layak (Deprecated)', deprecated=True)
+    shell_consume_reject_move_id = fields.Many2one('stock.move', string='Move Cons. Reject (Deprecated)', deprecated=True)
+    shell_output_move_id = fields.Many2one('stock.move', string='Move Output Sheller (Deprecated)', deprecated=True)
+    parer_consume_move_id = fields.Many2one('stock.move', string='Move Cons. Sheller (Deprecated)', deprecated=True)
+    parer_output_move_id = fields.Many2one('stock.move', string='Move Output Parer (Deprecated)', deprecated=True)
 
     # Initial Stock stored fields (snapshot saat validasi)
     initial_stock_layak = fields.Float(string='Stok Awal Layak (Kg)', readonly=True, copy=False)
     initial_stock_reject = fields.Float(string='Stok Awal Reject (Kg)', readonly=True, copy=False)
     initial_stock_sheller = fields.Float(string='Stok Awal Sheller (Kg)', readonly=True, copy=False)
     initial_stock_parer = fields.Float(string='Stok Awal Parer (Kg)', readonly=True, copy=False)
+    
+    initial_stock_hasil_sheller_mesin = fields.Float(string='Stok Awal Hasil Sheller Mesin (Kg)', readonly=True, copy=False)
+    initial_stock_hasil_sheller_manual = fields.Float(string='Stok Awal Hasil Sheller Manual (Kg)', readonly=True, copy=False)
 
-    # ─── Related / readonly display from receipt ───
-    receipt_code = fields.Char(
-        string='Kode Penerimaan',
-        related='receipt_id.name',
-        readonly=True,
+    # ═══════════════════════════════════════════════════════════
+    # 1. KETERSEDIAAN STOK & TRANSFER SHELLER
+    # ═══════════════════════════════════════════════════════════
+
+    available_kelapa_layak = fields.Float(
+        string='Stok Kelapa Layak Tersedia (Kg)',
+        compute='_compute_kelapa_layak_stock',
         store=False,
-    )
-    supplier_id = fields.Many2one(
-        'res.partner',
-        string='Pemasok',
-        related='receipt_id.partner_id',
         readonly=True,
+    )
+    sheller_mesin_qty = fields.Float(
+        string='Kelapa Layak ke Sheller Mesin (Kg)',
+        default=0.0,
+    )
+    sheller_manual_qty = fields.Float(
+        string='Kelapa Layak ke Sheller Manual (Kg)',
+        default=0.0,
+    )
+    total_transfer_sheller = fields.Float(
+        string='Total Transfer Sheller (Kg)',
+        compute='_compute_total_transfer_sheller',
         store=True,
     )
-    coconut_origin = fields.Char(
-        string='Asal Kelapa',
-        related='receipt_id.origin',
-        readonly=True,
-        store=True,
-    )
-    receipt_date = fields.Datetime(
-        string='Tanggal Penerimaan',
-        related='receipt_id.entry_datetime',
-        readonly=True,
+    remaining_kelapa_layak = fields.Float(
+        string='Sisa Kelapa Layak Setelah Transfer (Kg)',
+        compute='_compute_kelapa_layak_stock',
         store=False,
-    )
-    net_received_weight = fields.Float(
-        string='Berat Bersih Diterima (Kg)',
-        related='receipt_id.net_received_weight',
         readonly=True,
-        store=False,
-    )
-    vehicle_number = fields.Char(
-        string='Nomor Polisi',
-        related='receipt_id.vehicle_plate',
-        readonly=True,
-        store=False,
-    )
-    driver_name = fields.Char(
-        string='Nama Supir',
-        related='receipt_id.driver_name',
-        readonly=True,
-        store=False,
     )
 
     # ═══════════════════════════════════════════════════════════
-    # SHELLER
+    # 2. TRANSFER KE PERRER
     # ═══════════════════════════════════════════════════════════
 
-    machine_sheller_input = fields.Float(
-        string='Kelapa Layak Produksi Digunakan (Kg)',
-        default=0.0,
-        help='Kelapa Layak Produksi yang dimasukkan ke Machine Sheller.',
+    # Mesin
+    available_hasil_sheller_mesin = fields.Float(
+        string='Stok Hasil Sheller Mesin Tersedia (Kg)',
+        compute='_compute_hasil_sheller_mesin_stock',
+        store=False,
+        readonly=True,
     )
-    manual_sheller_input = fields.Float(
-        string='Kelapa Reject Digunakan (Kg)',
-        default=0.0,
-        help='Kelapa Reject yang dimasukkan ke Manual Sheller.',
-    )
-    machine_sheller_output = fields.Float(
-        string='Output Machine Sheller / Kelapa Sheller (Kg)',
+    transfer_perrer_mesin_qty = fields.Float(
+        string='Hasil Sheller Mesin Ditransfer ke Perrer (Kg)',
         default=0.0,
     )
-    manual_sheller_output = fields.Float(
-        string='Output Manual Sheller / Kelapa Sheller (Kg)',
-        default=0.0,
+    remaining_hasil_sheller_mesin = fields.Float(
+        string='Sisa Hasil Sheller Mesin Setelah Transfer (Kg)',
+        compute='_compute_hasil_sheller_mesin_stock',
+        store=False,
+        readonly=True,
     )
 
-    # computed
-    total_sheller_input = fields.Float(
-        string='Total Input Sheller (Kg)',
-        compute='_compute_sheller_derived',
+    # Manual
+    available_hasil_sheller_manual = fields.Float(
+        string='Stok Hasil Sheller Manual Tersedia (Kg)',
+        compute='_compute_hasil_sheller_manual_stock',
         store=False,
         readonly=True,
     )
-    total_sheller_output = fields.Float(
-        string='Total Output Kelapa Sheller (Kg)',
-        compute='_compute_sheller_derived',
-        store=False,
-        readonly=True,
-    )
-    remaining_layak = fields.Float(
-        string='Sisa Kelapa Layak Setelah Proses Ini (Kg)',
-        compute='_compute_sheller_derived',
-        store=False,
-        readonly=True,
-        help='Kelapa Layak Produksi yang tersedia dikurangi Machine Sheller Input (dokumen ini).',
-    )
-    remaining_reject = fields.Float(
-        string='Sisa Kelapa Reject Setelah Proses Ini (Kg)',
-        compute='_compute_sheller_derived',
-        store=False,
-        readonly=True,
-        help='Kelapa Reject yang tersedia dikurangi Manual Sheller Input (dokumen ini).',
-    )
-
-    # ═══════════════════════════════════════════════════════════
-    # PARER
-    # ═══════════════════════════════════════════════════════════
-
-    available_kelapa_sheller = fields.Float(
-        string='Kelapa Sheller Tersedia (Kg)',
-        compute='_compute_available_sheller',
-        store=False,
-        readonly=True,
-        help='Stok Kelapa Sheller yang tersedia di gudang saat ini.',
-    )
-    parer_input = fields.Float(
-        string='Kelapa Sheller Digunakan / Input Parer (Kg)',
-        default=0.0,
-        help='Kelapa Sheller yang dimasukkan ke proses Parer.',
-    )
-    parer_output = fields.Float(
-        string='Output Parer / Kelapa Parer (Kg)',
+    transfer_perrer_manual_qty = fields.Float(
+        string='Hasil Sheller Manual Ditransfer ke Perrer (Kg)',
         default=0.0,
     )
-    remaining_kelapa_sheller = fields.Float(
-        string='Sisa Kelapa Sheller (Kg)',
-        compute='_compute_parer_derived',
+    remaining_hasil_sheller_manual = fields.Float(
+        string='Sisa Hasil Sheller Manual Setelah Transfer (Kg)',
+        compute='_compute_hasil_sheller_manual_stock',
         store=False,
         readonly=True,
-        help='Kelapa Sheller tersedia dikurangi Parer Input (dokumen ini).',
     )
-    parer_notes = fields.Text(string='Catatan Parer')
 
     # ═══════════════════════════════════════════════════════════
     # WORKFLOW STATE
@@ -216,70 +176,52 @@ class CoconutManufacturing(models.Model):
     ], string='Status', default='draft', required=True, tracking=True)
 
     # ═══════════════════════════════════════════════════════════
-    # REFERENSI PERGERAKAN STOK
+    # REFERENSI PERGERAKAN STOK BARU
     # ═══════════════════════════════════════════════════════════
 
-    # Sheller moves
-    shell_consume_layak_move_id = fields.Many2one(
-        'stock.move', string='Move: Konsumsi Kelapa Layak (Machine)',
-        readonly=True, copy=False,
-    )
-    shell_consume_reject_move_id = fields.Many2one(
-        'stock.move', string='Move: Konsumsi Kelapa Reject (Manual)',
-        readonly=True, copy=False,
-    )
-    shell_output_move_id = fields.Many2one(
-        'stock.move', string='Move: Produksi Kelapa Sheller',
-        readonly=True, copy=False,
-    )
-    # Parer moves
-    parer_consume_move_id = fields.Many2one(
-        'stock.move', string='Move: Konsumsi Kelapa Sheller',
-        readonly=True, copy=False,
-    )
-    parer_output_move_id = fields.Many2one(
-        'stock.move', string='Move: Produksi Kelapa Parer',
-        readonly=True, copy=False,
-    )
+    sheller_mesin_move_id = fields.Many2one('stock.move', string='Move: Transfer Sheller Mesin', readonly=True, copy=False)
+    sheller_manual_move_id = fields.Many2one('stock.move', string='Move: Transfer Sheller Manual', readonly=True, copy=False)
+    perrer_mesin_move_id = fields.Many2one('stock.move', string='Move: Transfer Perrer Mesin', readonly=True, copy=False)
+    perrer_manual_move_id = fields.Many2one('stock.move', string='Move: Transfer Perrer Manual', readonly=True, copy=False)
 
     # ═══════════════════════════════════════════════════════════
     # COMPUTED METHODS
     # ═══════════════════════════════════════════════════════════
 
-    @api.depends(
-        'machine_sheller_input', 'manual_sheller_input',
-        'machine_sheller_output', 'manual_sheller_output',
-    )
-    def _compute_sheller_derived(self):
-        uom_kg = self.env.ref('uom.product_uom_kgm')
-        for rec in self:
-            rec.total_sheller_input = (
-                rec.machine_sheller_input + rec.manual_sheller_input
-            )
-            rec.total_sheller_output = (
-                rec.machine_sheller_output + rec.manual_sheller_output
-            )
-            # Available Layak/Reject from stock minus this doc's planned input
-            layak_stock = rec._get_stock_qty('coconut_receiving.product_kelapa_layak')
-            reject_stock = rec._get_stock_qty('coconut_receiving.product_kelapa_reject')
-            rec.remaining_layak = layak_stock - rec.machine_sheller_input
-            rec.remaining_reject = reject_stock - rec.manual_sheller_input
-
-    @api.depends('machine_sheller_output', 'manual_sheller_output', 'state')
-    def _compute_available_sheller(self):
+    @api.depends('sheller_mesin_qty', 'sheller_manual_qty', 'state')
+    def _compute_kelapa_layak_stock(self):
         for rec in self:
             if rec.state == 'done':
-                rec.available_kelapa_sheller = rec.initial_stock_sheller + rec.machine_sheller_output + rec.manual_sheller_output
+                avail = rec.initial_stock_layak
             else:
-                existing = rec._get_stock_qty('coconut_receiving.product_kelapa_sheller')
-                rec.available_kelapa_sheller = existing + rec.machine_sheller_output + rec.manual_sheller_output
+                avail = rec._get_stock_qty('coconut_receiving.product_kelapa_layak')
+            rec.available_kelapa_layak = avail
+            rec.remaining_kelapa_layak = avail - rec.total_transfer_sheller
 
-    @api.depends('parer_input', 'available_kelapa_sheller')
-    def _compute_parer_derived(self):
+    @api.depends('sheller_mesin_qty', 'sheller_manual_qty')
+    def _compute_total_transfer_sheller(self):
         for rec in self:
-            rec.remaining_kelapa_sheller = (
-                rec.available_kelapa_sheller - rec.parer_input
-            )
+            rec.total_transfer_sheller = rec.sheller_mesin_qty + rec.sheller_manual_qty
+
+    @api.depends('transfer_perrer_mesin_qty', 'state')
+    def _compute_hasil_sheller_mesin_stock(self):
+        for rec in self:
+            if rec.state == 'done':
+                avail = rec.initial_stock_hasil_sheller_mesin
+            else:
+                avail = rec._get_stock_qty_in_loc('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_stok_hasil_sheller_mesin')
+            rec.available_hasil_sheller_mesin = avail
+            rec.remaining_hasil_sheller_mesin = avail - rec.transfer_perrer_mesin_qty
+
+    @api.depends('transfer_perrer_manual_qty', 'state')
+    def _compute_hasil_sheller_manual_stock(self):
+        for rec in self:
+            if rec.state == 'done':
+                avail = rec.initial_stock_hasil_sheller_manual
+            else:
+                avail = rec._get_stock_qty_in_loc('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_stok_hasil_sheller_manual')
+            rec.available_hasil_sheller_manual = avail
+            rec.remaining_hasil_sheller_manual = avail - rec.transfer_perrer_manual_qty
 
     # ═══════════════════════════════════════════════════════════
     # ORM OVERRIDES
@@ -298,7 +240,6 @@ class CoconutManufacturing(models.Model):
     def write(self, vals):
         for rec in self:
             if rec.state == 'done':
-                # Allow chatter, activities, and workflow state updates, but block other edits
                 user_fields = [
                     k for k in vals.keys()
                     if k != 'state'
@@ -320,435 +261,210 @@ class CoconutManufacturing(models.Model):
     def action_confirm(self):
         for rec in self:
             if rec.state != 'draft':
-                raise UserError(_(
-                    "Hanya dokumen Draft yang dapat dikonfirmasi."
-                ))
-            if rec.receipt_id and rec.receipt_id.state != 'done':
-                raise UserError(_(
-                    "Penerimaan Kelapa yang dipilih belum divalidasi. "
-                    "Selesaikan proses penerimaan terlebih dahulu."
-                ))
+                raise UserError(_("Hanya dokumen Draft yang dapat dikonfirmasi."))
             rec.state = 'confirmed'
 
     def action_validate(self):
         """
         Validasi dokumen Transfer Kelapa ke Produksi.
-        Memindahkan Kelapa Layak Produksi dari Stok Kelapa Layak ke Area Sheller.
+        Memindahkan Kelapa Layak Produksi ke Area Sheller Mesin/Manual,
+        dan memindahkan Hasil Sheller ke Area Parer.
         """
         for rec in self:
             if rec.state != 'confirmed':
-                raise UserError(_(
-                    "Hanya dokumen yang dikonfirmasi yang dapat divalidasi."
-                ))
-            # ── Idempotency guard ──
-            if rec.shell_consume_layak_move_id:
-                raise UserError(_(
-                    "Dokumen '%s' sudah divalidasi dan pergerakan stok sudah tercatat. "
-                    "Tidak dapat membuat pergerakan stok duplikat."
-                ) % rec.name)
+                raise UserError(_("Hanya dokumen yang dikonfirmasi yang dapat divalidasi."))
+            
+            # Idempotency check
+            if rec.sheller_mesin_move_id or rec.sheller_manual_move_id or rec.perrer_mesin_move_id or rec.perrer_manual_move_id:
+                raise UserError(_("Dokumen ini sudah divalidasi."))
 
             uom_kg = self.env.ref('uom.product_uom_kgm')
 
+            # Validation checks against available stocks
+            if rec.total_transfer_sheller > rec.available_kelapa_layak:
+                raise UserError(_(
+                    "Total transfer ke Sheller (%(need)s kg) melebihi stok Kelapa Layak tersedia (%(avail)s kg)."
+                ) % {'need': rec.total_transfer_sheller, 'avail': rec.available_kelapa_layak})
+
+            if rec.transfer_perrer_mesin_qty > rec.available_hasil_sheller_mesin:
+                raise UserError(_(
+                    "Transfer Hasil Sheller Mesin ke Perrer (%(need)s kg) melebihi stok tersedia (%(avail)s kg)."
+                ) % {'need': rec.transfer_perrer_mesin_qty, 'avail': rec.available_hasil_sheller_mesin})
+
+            if rec.transfer_perrer_manual_qty > rec.available_hasil_sheller_manual:
+                raise UserError(_(
+                    "Transfer Hasil Sheller Manual ke Perrer (%(need)s kg) melebihi stok tersedia (%(avail)s kg)."
+                ) % {'need': rec.transfer_perrer_manual_qty, 'avail': rec.available_hasil_sheller_manual})
+
             # Store initial stock levels before stock movements
             rec.write({
-                'initial_stock_layak': rec._get_stock_qty('coconut_receiving.product_kelapa_layak'),
-                'initial_stock_reject': rec._get_stock_qty('coconut_receiving.product_kelapa_reject'),
-                'initial_stock_sheller': rec._get_stock_qty('coconut_receiving.product_kelapa_sheller'),
-                'initial_stock_parer': rec._get_stock_qty('coconut_receiving.product_kelapa_parer'),
+                'initial_stock_layak': rec.available_kelapa_layak,
+                'initial_stock_hasil_sheller_mesin': rec.available_hasil_sheller_mesin,
+                'initial_stock_hasil_sheller_manual': rec.available_hasil_sheller_manual,
             })
 
-            # ── Resolve products ──
+            # Resolve products
             p_layak = rec._resolve_product('coconut_receiving.product_kelapa_layak', 'Kelapa Layak Produksi', uom_kg)
+            p_sheller = rec._resolve_product('coconut_receiving.product_kelapa_sheller', 'Kelapa Sheller', uom_kg)
 
-            # ── Resolve locations ──
-            loc_src = rec.env.ref('coconut_receiving.location_stok_kelapa_layak', raise_if_not_found=False)
-            if not loc_src:
-                loc_src = rec._get_warehouse_location()
-            loc_dest = rec.env.ref('coconut_receiving.location_area_sheller', raise_if_not_found=False)
-            if not loc_dest:
-                loc_dest = rec._get_production_location()
+            # Resolve locations
+            loc_layak = rec.env.ref('coconut_receiving.location_stok_kelapa_layak')
+            loc_sheller_mesin = rec.env.ref('coconut_receiving.location_area_sheller_mesin')
+            loc_sheller_manual = rec.env.ref('coconut_receiving.location_area_sheller_manual')
+            loc_hasil_mesin = rec.env.ref('coconut_receiving.location_stok_hasil_sheller_mesin')
+            loc_hasil_manual = rec.env.ref('coconut_receiving.location_stok_hasil_sheller_manual')
+            loc_parer = rec.env.ref('coconut_receiving.location_area_parer')
 
-            # ── Validate available stock ──
-            if rec.machine_sheller_input <= 0:
-                raise UserError(_("Jumlah kelapa layak ditransfer harus lebih besar dari nol."))
+            origin = f'{rec.name}'
 
-            avail_qty = rec.env['stock.quant']._get_available_quantity(p_layak, loc_src)
-            if float_compare(avail_qty, rec.machine_sheller_input, precision_rounding=uom_kg.rounding) < 0:
-                raise UserError(_(
-                    "Stok Kelapa Layak Produksi tidak mencukupi.\n"
-                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
-                ) % {'avail': avail_qty, 'need': rec.machine_sheller_input})
+            # Move 1: Sheller Mesin
+            if rec.sheller_mesin_qty > 0:
+                move = rec.env['stock.move'].create({
+                    'name': f'{origin} – Transfer Kelapa Layak ke Area Sheller Mesin',
+                    'origin': origin,
+                    'product_id': p_layak.id,
+                    'product_uom_qty': rec.sheller_mesin_qty,
+                    'product_uom': uom_kg.id,
+                    'location_id': loc_layak.id,
+                    'location_dest_id': loc_sheller_mesin.id,
+                    'company_id': rec.company_id.id,
+                })
+                move._action_confirm()
+                move._action_assign()
+                move.quantity = move.product_uom_qty
+                move.picked = True
+                move._action_done()
+                rec.sheller_mesin_move_id = move.id
 
-            origin = f'{rec.name}' + (f' / {rec.receipt_id.name}' if rec.receipt_id else '')
-            move = rec.env['stock.move'].create({
-                'name': f'{origin} – Transfer Kelapa Layak ke Area Sheller',
-                'origin': origin,
-                'product_id': p_layak.id,
-                'product_uom_qty': rec.machine_sheller_input,
-                'product_uom': uom_kg.id,
-                'location_id': loc_src.id,
-                'location_dest_id': loc_dest.id,
-                'company_id': rec.company_id.id,
-            })
-            move._action_confirm()
-            move._action_assign()
-            move.quantity = move.product_uom_qty
-            move.picked = True
-            move._action_done()
+            # Move 2: Sheller Manual
+            if rec.sheller_manual_qty > 0:
+                move = rec.env['stock.move'].create({
+                    'name': f'{origin} – Transfer Kelapa Layak ke Area Sheller Manual',
+                    'origin': origin,
+                    'product_id': p_layak.id,
+                    'product_uom_qty': rec.sheller_manual_qty,
+                    'product_uom': uom_kg.id,
+                    'location_id': loc_layak.id,
+                    'location_dest_id': loc_sheller_manual.id,
+                    'company_id': rec.company_id.id,
+                })
+                move._action_confirm()
+                move._action_assign()
+                move.quantity = move.product_uom_qty
+                move.picked = True
+                move._action_done()
+                rec.sheller_manual_move_id = move.id
 
-            rec.shell_consume_layak_move_id = move.id
+            # Move 3: Perrer Mesin
+            if rec.transfer_perrer_mesin_qty > 0:
+                move = rec.env['stock.move'].create({
+                    'name': f'{origin} – Transfer Hasil Sheller Mesin ke Area Parer',
+                    'origin': origin,
+                    'product_id': p_sheller.id,
+                    'product_uom_qty': rec.transfer_perrer_mesin_qty,
+                    'product_uom': uom_kg.id,
+                    'location_id': loc_hasil_mesin.id,
+                    'location_dest_id': loc_parer.id,
+                    'company_id': rec.company_id.id,
+                })
+                move._action_confirm()
+                move._action_assign()
+                move.quantity = move.product_uom_qty
+                move.picked = True
+                move._action_done()
+                rec.perrer_mesin_move_id = move.id
+
+            # Move 4: Perrer Manual
+            if rec.transfer_perrer_manual_qty > 0:
+                move = rec.env['stock.move'].create({
+                    'name': f'{origin} – Transfer Hasil Sheller Manual ke Area Parer',
+                    'origin': origin,
+                    'product_id': p_sheller.id,
+                    'product_uom_qty': rec.transfer_perrer_manual_qty,
+                    'product_uom': uom_kg.id,
+                    'location_id': loc_hasil_manual.id,
+                    'location_dest_id': loc_parer.id,
+                    'company_id': rec.company_id.id,
+                })
+                move._action_confirm()
+                move._action_assign()
+                move.quantity = move.product_uom_qty
+                move.picked = True
+                move._action_done()
+                rec.perrer_manual_move_id = move.id
+
             rec.state = 'done'
 
     def action_cancel(self):
         for rec in self:
             if rec.state == 'done':
                 raise UserError(_(
-                    "Dokumen '%s' sudah selesai. Pergerakan stok yang sudah dicatat "
-                    "tidak dapat dibatalkan secara otomatis. Hubungi administrator "
-                    "untuk pembalikan stok manual."
+                    "Dokumen '%s' sudah selesai. Pergerakan stok tidak dapat dibatalkan secara otomatis."
                 ) % rec.name)
             rec.state = 'cancelled'
 
     def action_reset_draft(self):
         for rec in self:
             if rec.state != 'cancelled':
-                raise UserError(_(
-                    "Hanya dokumen yang dibatalkan yang dapat dikembalikan ke Draft."
-                ))
+                raise UserError(_("Hanya dokumen yang dibatalkan yang dapat dikembalikan ke Draft."))
             rec.state = 'draft'
-
-    # ═══════════════════════════════════════════════════════════
-    # VALIDATION HELPERS
-    # ═══════════════════════════════════════════════════════════
-
-    def _validate_sheller(self, uom_kg, loc_wh):
-        """Validate all sheller business rules."""
-        rec = self
-        if rec.machine_sheller_input < 0:
-            raise UserError(_("Input Machine Sheller tidak boleh negatif."))
-        if rec.manual_sheller_input < 0:
-            raise UserError(_("Input Manual Sheller tidak boleh negatif."))
-        if rec.machine_sheller_output < 0:
-            raise UserError(_("Output Machine Sheller tidak boleh negatif."))
-        if rec.manual_sheller_output < 0:
-            raise UserError(_("Output Manual Sheller tidak boleh negatif."))
-
-        if float_compare(
-            rec.machine_sheller_output,
-            rec.machine_sheller_input,
-            precision_rounding=uom_kg.rounding,
-        ) > 0:
-            raise UserError(_(
-                "Output Machine Sheller (%(out)s kg) tidak boleh melebihi "
-                "Input Machine Sheller (%(inp)s kg)."
-            ) % {'out': rec.machine_sheller_output, 'inp': rec.machine_sheller_input})
-
-        if float_compare(
-            rec.manual_sheller_output,
-            rec.manual_sheller_input,
-            precision_rounding=uom_kg.rounding,
-        ) > 0:
-            raise UserError(_(
-                "Output Manual Sheller (%(out)s kg) tidak boleh melebihi "
-                "Input Manual Sheller (%(inp)s kg)."
-            ) % {'out': rec.manual_sheller_output, 'inp': rec.manual_sheller_input})
-
-        # Check Kelapa Layak stock vs machine_sheller_input
-        if not float_is_zero(rec.machine_sheller_input, precision_rounding=uom_kg.rounding):
-            layak_avail = self._get_stock_qty('coconut_receiving.product_kelapa_layak')
-            if float_compare(
-                layak_avail,
-                rec.machine_sheller_input,
-                precision_rounding=uom_kg.rounding,
-            ) < 0:
-                raise UserError(_(
-                    "Sheller: Stok Kelapa Layak Produksi tidak mencukupi untuk Machine Sheller.\n"
-                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
-                ) % {'avail': layak_avail, 'need': rec.machine_sheller_input})
-
-        # Check Kelapa Reject stock vs manual_sheller_input
-        if not float_is_zero(rec.manual_sheller_input, precision_rounding=uom_kg.rounding):
-            reject_avail = self._get_stock_qty('coconut_receiving.product_kelapa_reject')
-            if float_compare(
-                reject_avail,
-                rec.manual_sheller_input,
-                precision_rounding=uom_kg.rounding,
-            ) < 0:
-                raise UserError(_(
-                    "Sheller: Stok Kelapa Reject tidak mencukupi untuk Manual Sheller.\n"
-                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
-                ) % {'avail': reject_avail, 'need': rec.manual_sheller_input})
-
-    def _validate_parer(self, uom_kg, loc_wh):
-        """Validate parer business rules."""
-        rec = self
-        if rec.parer_input < 0:
-            raise UserError(_("Input Parer tidak boleh negatif."))
-        if rec.parer_output < 0:
-            raise UserError(_("Output Parer tidak boleh negatif."))
-
-        if float_compare(
-            rec.parer_output,
-            rec.parer_input,
-            precision_rounding=uom_kg.rounding,
-        ) > 0:
-            raise UserError(_(
-                "Output Parer (%(out)s kg) tidak boleh melebihi "
-                "Input Parer (%(inp)s kg)."
-            ) % {'out': rec.parer_output, 'inp': rec.parer_input})
-
-        if not float_is_zero(rec.parer_input, precision_rounding=uom_kg.rounding):
-            sheller_avail = self._get_stock_qty('coconut_receiving.product_kelapa_sheller')
-            if float_compare(
-                sheller_avail,
-                rec.parer_input,
-                precision_rounding=uom_kg.rounding,
-            ) < 0:
-                raise UserError(_(
-                    "Parer: Stok Kelapa Sheller tidak mencukupi.\n"
-                    "Tersedia: %(avail)s kg | Dibutuhkan: %(need)s kg"
-                ) % {'avail': sheller_avail, 'need': rec.parer_input})
-
-    # ═══════════════════════════════════════════════════════════
-    # STOCK MOVE CREATORS
-    # ═══════════════════════════════════════════════════════════
-
-    def _create_sheller_moves(self, p_layak, p_reject, p_sheller,
-                              loc_wh, loc_prod, uom_kg, origin):
-        """Create stock moves for sheller section. Returns dict of moves."""
-        rec = self
-        result = {}
-        moves_to_create = []
-        move_keys = []
-
-        if not float_is_zero(rec.machine_sheller_input, precision_rounding=uom_kg.rounding):
-            moves_to_create.append({
-                'name': f'{origin} – Sheller Mesin: Konsumsi Kelapa Layak',
-                'origin': origin,
-                'product_id': p_layak.id,
-                'product_uom_qty': rec.machine_sheller_input,
-                'product_uom': uom_kg.id,
-                'location_id': loc_wh.id,
-                'location_dest_id': loc_prod.id,
-                'company_id': rec.company_id.id,
-            })
-            move_keys.append('consume_layak')
-
-        if not float_is_zero(rec.manual_sheller_input, precision_rounding=uom_kg.rounding):
-            moves_to_create.append({
-                'name': f'{origin} – Sheller Manual: Konsumsi Kelapa Reject',
-                'origin': origin,
-                'product_id': p_reject.id,
-                'product_uom_qty': rec.manual_sheller_input,
-                'product_uom': uom_kg.id,
-                'location_id': loc_wh.id,
-                'location_dest_id': loc_prod.id,
-                'company_id': rec.company_id.id,
-            })
-            move_keys.append('consume_reject')
-
-        total_sheller_out = rec.machine_sheller_output + rec.manual_sheller_output
-        if not float_is_zero(total_sheller_out, precision_rounding=uom_kg.rounding):
-            moves_to_create.append({
-                'name': f'{origin} – Produksi Kelapa Sheller',
-                'origin': origin,
-                'product_id': p_sheller.id,
-                'product_uom_qty': total_sheller_out,
-                'product_uom': uom_kg.id,
-                'location_id': loc_prod.id,
-                'location_dest_id': loc_wh.id,
-                'company_id': rec.company_id.id,
-            })
-            move_keys.append('produce_sheller')
-
-        if moves_to_create:
-            moves = self.env['stock.move'].create(moves_to_create)
-            moves._action_confirm()
-            moves._action_assign()
-            for move in moves:
-                move.quantity = move.product_uom_qty
-                move.picked = True
-            moves._action_done()
-            for key, move in zip(move_keys, moves):
-                result[key] = move
-
-        return result
-
-    def _create_parer_moves(self, p_sheller, p_parer,
-                            loc_wh, loc_prod, uom_kg, origin):
-        """Create stock moves for parer section. Returns dict of moves."""
-        rec = self
-        result = {}
-
-        if float_is_zero(rec.parer_input, precision_rounding=uom_kg.rounding):
-            return result
-
-        moves_to_create = [
-            # Consume Kelapa Sheller (WH → Production)
-            {
-                'name': f'{origin} – Parer: Konsumsi Kelapa Sheller',
-                'origin': origin,
-                'product_id': p_sheller.id,
-                'product_uom_qty': rec.parer_input,
-                'product_uom': uom_kg.id,
-                'location_id': loc_wh.id,
-                'location_dest_id': loc_prod.id,
-                'company_id': rec.company_id.id,
-            },
-        ]
-        move_keys = ['consume_sheller']
-
-        if not float_is_zero(rec.parer_output, precision_rounding=uom_kg.rounding):
-            moves_to_create.append({
-                'name': f'{origin} – Parer: Produksi Kelapa Parer',
-                'origin': origin,
-                'product_id': p_parer.id,
-                'product_uom_qty': rec.parer_output,
-                'product_uom': uom_kg.id,
-                'location_id': loc_prod.id,
-                'location_dest_id': loc_wh.id,
-                'company_id': rec.company_id.id,
-            })
-            move_keys.append('produce_parer')
-
-        moves = self.env['stock.move'].create(moves_to_create)
-        moves._action_confirm()
-        moves._action_assign()
-        for move in moves:
-            move.quantity = move.product_uom_qty
-            move.picked = True
-        moves._action_done()
-        for key, move in zip(move_keys, moves):
-            result[key] = move
-
-        return result
 
     # ═══════════════════════════════════════════════════════════
     # LOCATION & PRODUCT HELPERS
     # ═══════════════════════════════════════════════════════════
 
-    def _get_warehouse_location(self):
-        """Return the main internal stock location for this company."""
-        warehouse = self.env['stock.warehouse'].search(
-            [('company_id', '=', self.company_id.id)], limit=1,
-        )
-        loc = warehouse.lot_stock_id if warehouse else False
-        if not loc:
-            loc = self.env['stock.location'].search(
-                [('usage', '=', 'internal'),
-                 ('company_id', '=', self.company_id.id)],
-                limit=1,
-            )
-        if not loc:
-            raise UserError(_(
-                "Lokasi stok internal (Gudang) tidak ditemukan untuk perusahaan ini."
-            ))
-        return loc
-
-    def _get_production_location(self):
-        """Return the virtual production location for manufacturing."""
-        loc = self.env.ref(
-            'coconut_sorting.stock_location_coconut_manufacturing',
-            raise_if_not_found=False,
-        )
-        if not loc:
-            # Fallback to any production location
-            loc = self.env['stock.location'].search(
-                [('usage', '=', 'production')], limit=1,
-            )
-        if not loc:
-            raise UserError(_(
-                "Lokasi produksi virtual tidak ditemukan. "
-                "Pastikan modul coconut_sorting terinstal dengan benar."
-            ))
-        return loc
-
     def _resolve_product(self, xml_id, label, uom_kg):
         """Resolve product variant by XML ID with UoM validation."""
         tmpl = self.env.ref(xml_id, raise_if_not_found=False)
         if not tmpl:
-            raise UserError(_(
-                "Produk '%(label)s' (XML ID: %(xml_id)s) tidak ditemukan. "
-                "Harap perbarui modul coconut_receiving."
-            ) % {'label': label, 'xml_id': xml_id})
+            raise UserError(_("Produk '%s' tidak ditemukan.") % label)
         variant = tmpl.product_variant_ids[:1]
         if not variant:
-            raise UserError(_(
-                "Varian produk '%(label)s' tidak ditemukan. "
-                "Pastikan produk memiliki varian yang aktif."
-            ) % {'label': label})
-        if variant.uom_id.category_id != uom_kg.category_id:
-            raise UserError(_(
-                "Produk '%(name)s' menggunakan satuan '%(uom)s' yang bukan kategori Berat. "
-                "Silakan ubah satuan produk menjadi kg sebelum melanjutkan."
-            ) % {'name': variant.name, 'uom': variant.uom_id.name})
+            raise UserError(_("Varian produk '%s' tidak ditemukan.") % label)
         return variant
 
     def _get_stock_qty(self, xml_id):
-        """Get available quantity for a product identified by XML ID in its correct location."""
+        """Get available quantity for a product in its default location mapping."""
+        loc_map = {
+            'coconut_receiving.product_kelapa_layak': 'coconut_receiving.location_stok_kelapa_layak',
+        }
+        loc_xml_id = loc_map.get(xml_id)
+        if not loc_xml_id:
+            return 0.0
+        return self._get_stock_qty_in_loc(xml_id, loc_xml_id)
+
+    def _get_stock_qty_in_loc(self, product_xml_id, location_xml_id):
+        """Helper to fetch quantity in specific location."""
         try:
-            tmpl = self.env.ref(xml_id, raise_if_not_found=False)
+            tmpl = self.env.ref(product_xml_id, raise_if_not_found=False)
             if not tmpl:
                 return 0.0
             variant = tmpl.product_variant_ids[:1]
             if not variant:
                 return 0.0
-
-            # Map product XML ID to location XML ID
-            loc_map = {
-                'coconut_receiving.product_kelapa_bulat': 'coconut_receiving.location_gudang_kelapa_bulat',
-                'coconut_receiving.product_kelapa_layak': 'coconut_receiving.location_stok_kelapa_layak',
-                'coconut_receiving.product_kelapa_reject': 'coconut_receiving.location_stok_kelapa_reject',
-                'coconut_receiving.product_kelapa_sheller': 'coconut_receiving.location_area_sheller',
-                'coconut_receiving.product_kelapa_parer': 'coconut_receiving.location_area_parer',
-            }
-            loc_xml_id = loc_map.get(xml_id)
-            location = False
-            if loc_xml_id:
-                location = self.env.ref(loc_xml_id, raise_if_not_found=False)
-            if not location:
-                location = self._get_warehouse_location()
+            location = self.env.ref(location_xml_id, raise_if_not_found=False)
             if not location:
                 return 0.0
-            return self.env['stock.quant']._get_available_quantity(
-                variant, location,
-            )
+            return self.env['stock.quant']._get_available_quantity(variant, location)
         except Exception:
             return 0.0
 
     def get_report_stock_data(self):
-        """Returns dictionary of stock data for the report."""
-        # Determine Awal based on state
-        if self.state == 'done':
-            awal_layak = self.initial_stock_layak
-            awal_reject = self.initial_stock_reject
-            awal_sheller = self.initial_stock_sheller
-            awal_parer = self.initial_stock_parer
-        else:
-            awal_layak = self._get_stock_qty('coconut_receiving.product_kelapa_layak')
-            awal_reject = self._get_stock_qty('coconut_receiving.product_kelapa_reject')
-            awal_sheller = self._get_stock_qty('coconut_receiving.product_kelapa_sheller')
-            awal_parer = self._get_stock_qty('coconut_receiving.product_kelapa_parer')
-
-        # Pemakaian / Produced
-        used_layak = self.machine_sheller_input
-        used_reject = self.manual_sheller_input
-        used_sheller = self.parer_input
-
-        produced_sheller = self.machine_sheller_output + self.manual_sheller_output
-        produced_parer = self.parer_output
-
-        # Akhir
-        akhir_layak = awal_layak - used_layak
-        akhir_reject = awal_reject - used_reject
-        akhir_sheller = awal_sheller + produced_sheller - used_sheller
-        akhir_parer = awal_parer + produced_parer
-
+        """Returns stock data dictionary for report rendering."""
         return {
-            'layak': {'awal': awal_layak, 'used': used_layak, 'akhir': akhir_layak},
-            'reject': {'awal': awal_reject, 'used': used_reject, 'akhir': akhir_reject},
-            'sheller': {'awal': awal_sheller, 'used': used_sheller, 'akhir': akhir_sheller, 'produced': produced_sheller},
-            'parer': {'awal': awal_parer, 'used': 0.0, 'akhir': akhir_parer, 'produced': produced_parer},
+            'layak': {
+                'awal': self.initial_stock_layak if self.state == 'done' else self._get_stock_qty('coconut_receiving.product_kelapa_layak'),
+                'transfer_mesin': self.sheller_mesin_qty,
+                'transfer_manual': self.sheller_manual_qty,
+            },
+            'hasil_mesin': {
+                'awal': self.initial_stock_hasil_sheller_mesin if self.state == 'done' else self._get_stock_qty_in_loc('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_stok_hasil_sheller_mesin'),
+                'transfer': self.transfer_perrer_mesin_qty,
+            },
+            'hasil_manual': {
+                'awal': self.initial_stock_hasil_sheller_manual if self.state == 'done' else self._get_stock_qty_in_loc('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_stok_hasil_sheller_manual'),
+                'transfer': self.transfer_perrer_manual_qty,
+            }
         }
 
     def format_kg(self, value):

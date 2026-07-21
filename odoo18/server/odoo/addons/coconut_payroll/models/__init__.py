@@ -11,4 +11,5 @@ from . import salary_rule
 from . import employee_loan
 from . import work_sheet
 from . import payroll_recap
+from . import coconut_manufacturing_inherit
 

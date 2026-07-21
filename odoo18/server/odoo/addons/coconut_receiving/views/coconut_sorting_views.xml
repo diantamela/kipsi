@@ -252,8 +252,9 @@
                                   decoration-muted="state == 'cancelled'">
                                 <field name="name" string="Kode PKK"/>
                                 <field name="production_date" string="Tgl Produksi"/>
-                                <field name="total_sheller_output" string="Output Sheller (Kg)"/>
-                                <field name="parer_output" string="Output Parer (Kg)"/>
+                                <field name="total_transfer_sheller" string="Transfer Sheller (Kg)"/>
+                                <field name="transfer_perrer_mesin_qty" string="Transfer Perrer Mesin (Kg)"/>
+                                <field name="transfer_perrer_manual_qty" string="Transfer Perrer Manual (Kg)"/>
                                 <field name="state"
                                        widget="badge"
                                        decoration-success="state == 'done'"

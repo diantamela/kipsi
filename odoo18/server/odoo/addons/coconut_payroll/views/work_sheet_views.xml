@@ -24,6 +24,8 @@
                             <field name="day_type" readonly="state != 'draft'"/>
                         </group>
                         <group>
+                            <field name="transfer_id" readonly="state != 'draft'"/>
+                            <field name="parer_source" readonly="state != 'draft'" invisible="worker_type != 'parer'" required="worker_type == 'parer'"/>
                             <field name="production_reference" readonly="state != 'draft'"/>
                             <field name="total_production_qty" readonly="state != 'draft'"/>
                             <field name="company_id" readonly="state != 'draft'" groups="base.group_multi_company"/>

@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import UserError, ValidationError
+from odoo import fields
 
 
 class TestCoconutManufacturing(TransactionCase):
     """
-    Tests for coconut_sorting module (coconut.manufacturing model).
-
-    TEST 2: Edit Done Blocker
-    TEST 3: Partial machine consumption (remaining Layak preserved)
-    TEST 4: Manual sheller consumption (remaining Reject preserved)
-    TEST 5: Parer validation (exceeding stock blocked)
-    TEST 6: Duplicate validation blocked (manufacturing)
-    TEST 7: Invalid UoM blocked
-    TEST 8: No Washing/Blanching/Drying in any active flow
+    Tests for coconut_receiving and coconut_payroll (coconut.manufacturing & coconut.work.sheet models).
     """
 
     @classmethod
@@ -49,31 +42,37 @@ class TestCoconutManufacturing(TransactionCase):
         if not self.location_wh:
             self.skipTest("Warehouse location not found.")
 
-    def _get_qty(self, product):
-        loc_map = {
-            'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
-            'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
-            'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
-            'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
-            'COCO-PARER': 'coconut_receiving.location_area_parer',
-        }
-        loc_xml = loc_map.get(product.default_code)
-        loc = self.env.ref(loc_xml, raise_if_not_found=False) if loc_xml else self.location_wh
+    def _get_qty(self, product, loc_xml=None):
+        if loc_xml:
+            loc = self.env.ref(loc_xml)
+        else:
+            loc_map = {
+                'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
+                'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
+                'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
+                'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
+                'COCO-PARER': 'coconut_receiving.location_area_parer',
+            }
+            loc_xml_id = loc_map.get(product.default_code)
+            loc = self.env.ref(loc_xml_id, raise_if_not_found=False) if loc_xml_id else self.location_wh
         if not loc:
             loc = self.location_wh
         return self.env['stock.quant']._get_available_quantity(product, loc)
 
-    def _adjust_stock(self, product, quantity):
+    def _adjust_stock(self, product, quantity, loc_xml=None):
         """Helper to set product stock in warehouse."""
-        loc_map = {
-            'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
-            'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
-            'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
-            'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
-            'COCO-PARER': 'coconut_receiving.location_area_parer',
-        }
-        loc_xml = loc_map.get(product.default_code)
-        loc = self.env.ref(loc_xml, raise_if_not_found=False) if loc_xml else self.location_wh
+        if loc_xml:
+            loc = self.env.ref(loc_xml)
+        else:
+            loc_map = {
+                'COCO-BULAT': 'coconut_receiving.location_gudang_kelapa_bulat',
+                'COCO-LAYAK': 'coconut_receiving.location_stok_kelapa_layak',
+                'COCO-REJECT': 'coconut_receiving.location_stok_kelapa_reject',
+                'COCO-SHELLER': 'coconut_receiving.location_area_sheller',
+                'COCO-PARER': 'coconut_receiving.location_area_parer',
+            }
+            loc_xml_id = loc_map.get(product.default_code)
+            loc = self.env.ref(loc_xml_id, raise_if_not_found=False) if loc_xml_id else self.location_wh
         if not loc:
             loc = self.location_wh
         self.env['stock.quant'].with_context(inventory_mode=True).create({
@@ -83,7 +82,7 @@ class TestCoconutManufacturing(TransactionCase):
         }).action_apply_inventory()
 
     def _create_mfg(self, **kwargs):
-        """Create and confirm a manufacturing document."""
+        """Create and confirm a transfer document."""
         mfg = self.env['coconut.manufacturing'].create({
             'company_id': self.company.id,
             **kwargs,
@@ -102,7 +101,7 @@ class TestCoconutManufacturing(TransactionCase):
         self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=10.0,
+            sheller_mesin_qty=10.0,
         )
         # Edit in confirmed state
         mfg.write({'notes': 'Catatan Confirmed'})
@@ -121,9 +120,9 @@ class TestCoconutManufacturing(TransactionCase):
     def test_03_partial_machine_sheller(self):
         """
         Kelapa Layak available = 25000
-        Machine Sheller Input = 18000
+        Sheller Mesin Qty = 18000
         Expected remaining Kelapa Layak = 7000 in Gudang Kelapa Layak
-        Expected Kelapa Layak in Area Sheller = 18000
+        Expected Kelapa Layak in Area Sheller Mesin = 18000
         """
         self._skip_if_no_products()
 
@@ -133,15 +132,14 @@ class TestCoconutManufacturing(TransactionCase):
         self.assertEqual(qty_layak_before, 25000.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=18000.0,
+            sheller_mesin_qty=18000.0,
         )
         mfg.action_validate()
 
         qty_layak_after = self._get_qty(self.p_layak)
         self.assertAlmostEqual(qty_layak_after, 7000.0, places=2)
         
-        # In the new flow, we moved p_layak from Gudang Kelapa Layak to Area Sheller.
-        loc_sheller = self.env.ref('coconut_receiving.location_area_sheller')
+        loc_sheller = self.env.ref('coconut_receiving.location_area_sheller_mesin')
         qty_layak_in_sheller = self.env['stock.quant']._get_available_quantity(self.p_layak, loc_sheller)
         self.assertAlmostEqual(qty_layak_in_sheller, 18000.0, places=2)
 
@@ -158,7 +156,7 @@ class TestCoconutManufacturing(TransactionCase):
         self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=101.0,
+            sheller_mesin_qty=101.0,
         )
         with self.assertRaises(UserError):
             mfg.action_validate()
@@ -173,7 +171,7 @@ class TestCoconutManufacturing(TransactionCase):
         self._adjust_stock(self.p_layak, 100.0)
 
         mfg = self._create_mfg(
-            machine_sheller_input=10.0,
+            sheller_mesin_qty=10.0,
         )
         mfg.action_validate()
         self.assertEqual(mfg.state, 'done')
@@ -208,14 +206,12 @@ class TestCoconutManufacturing(TransactionCase):
         try:
             xml_record.write({'res_id': dummy_variant.product_tmpl_id.id})
             mfg = self._create_mfg(
-                machine_sheller_input=10.0,
+                sheller_mesin_qty=10.0,
             )
             with self.assertRaises(UserError):
                 mfg.action_validate()
         finally:
             xml_record.write({'res_id': original_res_id})
-
-
 
     # ─────────────────────────────────────────────────────────────
     # TEST 8: Removed processes not in active manufacturing
@@ -233,3 +229,78 @@ class TestCoconutManufacturing(TransactionCase):
                     kw, field_name.lower(),
                     msg=f"Field '{field_name}' referencing '{kw}' must not exist in coconut.manufacturing"
                 )
+
+    # ─────────────────────────────────────────────────────────────
+    # TEST 9: Worksheet validation, limits, and stock moves
+    # ─────────────────────────────────────────────────────────────
+    def test_09_worksheet_validation_and_limits(self):
+        """
+        Verify that:
+        1. Realisasi computes properly based on linked validated worksheets.
+        2. Worksheets cannot exceed transfer limits.
+        3. Stock is produced in separate locations upon worksheet validation.
+        """
+        self._skip_if_no_products()
+        
+        # Prepare stocks
+        self._adjust_stock(self.p_layak, 1000.0)
+        self._adjust_stock(self.p_sheller, 0.0, 'coconut_receiving.location_stok_hasil_sheller_mesin')
+        self._adjust_stock(self.p_sheller, 0.0, 'coconut_receiving.location_stok_hasil_sheller_manual')
+        
+        # Create transfer
+        mfg = self._create_mfg(
+            sheller_mesin_qty=500.0,
+            sheller_manual_qty=300.0,
+        )
+        mfg.action_validate()
+        
+        # Create worksheet for sheller mesin (within limit)
+        employee_sheller = self.env['hr.employee'].create({
+            'name': 'Sheller Employee',
+            'payroll_job_type': 'sheller_mesin',
+        })
+        
+        ws = self.env['coconut.work.sheet'].create({
+            'date': fields.Date.today(),
+            'worker_type': 'sheller_mesin',
+            'day_type': 'biasa',
+            'transfer_id': mfg.id,
+        })
+        ws.work_result_ids.unlink() # clear auto-populated employees
+        self.env['coconut.work.result'].create({
+            'work_sheet_id': ws.id,
+            'employee_id': employee_sheller.id,
+            'quantity_kg': 400.0,
+        })
+        ws._compute_total_production_qty()
+        
+        # Validate worksheet (under limit of 500) -> should succeed
+        ws.action_validate()
+        self.assertEqual(ws.state, 'validated')
+        
+        # Check stock was produced in location_stok_hasil_sheller_mesin
+        qty_mesin = self._get_qty(self.p_sheller, 'coconut_receiving.location_stok_hasil_sheller_mesin')
+        self.assertEqual(qty_mesin, 400.0)
+        
+        # Check realisasi on manufacturing doc
+        self.assertEqual(mfg.realisasi_sheller_mesin, 400.0)
+        self.assertEqual(mfg.realisasi_state, 'partial')
+        
+        # Create worksheet exceeding remaining limit (remaining limit = 100)
+        ws_exceed = self.env['coconut.work.sheet'].create({
+            'date': fields.Date.today(),
+            'worker_type': 'sheller_mesin',
+            'day_type': 'biasa',
+            'transfer_id': mfg.id,
+        })
+        ws_exceed.work_result_ids.unlink()
+        self.env['coconut.work.result'].create({
+            'work_sheet_id': ws_exceed.id,
+            'employee_id': employee_sheller.id,
+            'quantity_kg': 101.0,
+        })
+        ws_exceed._compute_total_production_qty()
+        
+        # Should raise validation error
+        with self.assertRaises(ValidationError):
+            ws_exceed.action_validate()

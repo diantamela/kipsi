@@ -43,6 +43,34 @@
             <field name="company_id" ref="base.main_company"/>
         </record>
 
+        <record id="location_area_sheller_mesin" model="stock.location">
+            <field name="name">Area Sheller Mesin</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_area_sheller_manual" model="stock.location">
+            <field name="name">Area Sheller Manual</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_stok_hasil_sheller_mesin" model="stock.location">
+            <field name="name">Stok Hasil Sheller Mesin</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
+        <record id="location_stok_hasil_sheller_manual" model="stock.location">
+            <field name="name">Stok Hasil Sheller Manual</field>
+            <field name="location_id" ref="stock.stock_location_stock"/>
+            <field name="usage">internal</field>
+            <field name="company_id" ref="base.main_company"/>
+        </record>
+
         <record id="location_area_parer" model="stock.location">
             <field name="name">Area Parer</field>
             <field name="location_id" ref="stock.stock_location_stock"/>
