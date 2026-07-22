@@ -31,6 +31,8 @@
         'views/coconut_stock_report_views.xml',
         'views/coconut_sorting_views.xml',
         'views/coconut_manufacturing_views.xml',
+        'views/hasil_kerja_harian_views.xml',
+        'views/material_terbuang_views.xml',
         'views/finalisasi_kelapa_mp_views.xml',
         'views/menu_views.xml',
         'views/custom_views.xml',

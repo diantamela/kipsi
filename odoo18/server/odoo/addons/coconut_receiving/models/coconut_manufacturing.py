@@ -37,11 +37,99 @@ class CoconutManufacturing(models.Model):
         required=True,
         tracking=True,
     )
-    spk_number = fields.Char(
-        string='Nomor SPK',
-        index=True,
-        help='Nomor Surat Perintah Kerja penghubung.',
+    hasil_kerja_ids = fields.One2many(
+        'coconut.hasil.kerja.harian', 'transfer_id',
+        string='Hasil Kerja Harian',
     )
+    material_terbuang_ids = fields.One2many(
+        'coconut.material.terbuang', 'transfer_id',
+        string='Material Terbuang',
+    )
+    layak_to_sheller_mesin = fields.Float(string='Kelapa Layak ke Sheller Mesin (Kg)', related='sheller_mesin_qty', readonly=True)
+    layak_to_sheller_manual = fields.Float(string='Kelapa Layak ke Sheller Manual (Kg)', related='sheller_manual_qty', readonly=True)
+    hasil_to_parer_mesin = fields.Float(string='Hasil Sheller Mesin Ditransfer ke Parer (Kg)', related='transfer_perrer_mesin_qty', readonly=True)
+    hasil_to_parer_manual = fields.Float(string='Hasil Sheller Manual Ditransfer ke Parer (Kg)', related='transfer_perrer_manual_qty', readonly=True)
+
+    hkh_sheller_mesin = fields.Float(string='Hasil Sheller Mesin (Kg)', compute='_compute_spk_stats', store=True)
+    hkh_sheller_manual = fields.Float(string='Hasil Sheller Manual (Kg)', compute='_compute_spk_stats', store=True)
+    hkh_parer_mesin = fields.Float(string='Hasil Parer Mesin (Kg)', compute='_compute_spk_stats', store=True)
+    hkh_parer_manual = fields.Float(string='Hasil Parer Manual (Kg)', compute='_compute_spk_stats', store=True)
+
+    waste_rusak = fields.Float(string='Material Terbuang: Rusak/Busuk (Kg)', compute='_compute_spk_stats', store=True)
+    waste_tumpah = fields.Float(string='Material Terbuang: Tumpah/Hancur (Kg)', compute='_compute_spk_stats', store=True)
+    waste_lainnya = fields.Float(string='Material Terbuang: Lainnya (Kg)', compute='_compute_spk_stats', store=True)
+    total_material_terbuang = fields.Float(string='Total Material Terbuang (Kg)', compute='_compute_spk_stats', store=True)
+
+    efficiency_percentage = fields.Float(string='Persentase Efisiensi Produksi (%)', compute='_compute_spk_stats', store=True)
+
+    material_in = fields.Float(string='Material Masuk (Kg)', compute='_compute_spk_stats', store=True)
+    qty_hasil = fields.Float(string='Total Hasil Produksi (Kg)', compute='_compute_spk_stats', store=True)
+    material_wasted = fields.Float(string='Total Material Terbuang (Kg)', compute='_compute_spk_stats', store=True)
+    remaining_material = fields.Float(string='Sisa Material Belum Diproses (Kg)', compute='_compute_spk_stats', store=True)
+    status_produksi = fields.Selection([
+        ('draft', 'Draft / Belum Dimulai'),
+        ('progress', 'Dalam Proses'),
+        ('done', 'Selesai'),
+    ], string='Status Produksi SPK', compute='_compute_spk_stats', store=True, default='draft')
+
+    @api.depends(
+        'state',
+        'sheller_mesin_qty',
+        'sheller_manual_qty',
+        'transfer_perrer_mesin_qty',
+        'transfer_perrer_manual_qty',
+        'hasil_kerja_ids.state',
+        'hasil_kerja_ids.qty_hasil',
+        'hasil_kerja_ids.process_type',
+        'material_terbuang_ids.state',
+        'material_terbuang_ids.qty',
+        'material_terbuang_ids.reason'
+    )
+    def _compute_spk_stats(self):
+        for rec in self:
+            mat_in = 0.0
+            if rec.state == 'done':
+                mat_in = (
+                    rec.sheller_mesin_qty + rec.sheller_manual_qty +
+                    rec.transfer_perrer_mesin_qty + rec.transfer_perrer_manual_qty
+                )
+            rec.material_in = mat_in
+
+            h_mesin = sum(rec.hasil_kerja_ids.filtered(lambda h: h.state == 'confirmed' and h.process_type == 'sheller_mesin').mapped('qty_hasil'))
+            h_manual = sum(rec.hasil_kerja_ids.filtered(lambda h: h.state == 'confirmed' and h.process_type == 'sheller_manual').mapped('qty_hasil'))
+            p_mesin = sum(rec.hasil_kerja_ids.filtered(lambda h: h.state == 'confirmed' and h.process_type == 'parer_mesin').mapped('qty_hasil'))
+            p_manual = sum(rec.hasil_kerja_ids.filtered(lambda h: h.state == 'confirmed' and h.process_type == 'parer_manual').mapped('qty_hasil'))
+
+            rec.hkh_sheller_mesin = h_mesin
+            rec.hkh_sheller_manual = h_manual
+            rec.hkh_parer_mesin = p_mesin
+            rec.hkh_parer_manual = p_manual
+            
+            qty_h = h_mesin + h_manual + p_mesin + p_manual
+            rec.qty_hasil = qty_h
+
+            w_rusak = sum(rec.material_terbuang_ids.filtered(lambda w: w.state == 'done' and w.reason == 'rusak').mapped('qty'))
+            w_tumpah = sum(rec.material_terbuang_ids.filtered(lambda w: w.state == 'done' and w.reason == 'tumpah').mapped('qty'))
+            w_lainnya = sum(rec.material_terbuang_ids.filtered(lambda w: w.state == 'done' and w.reason == 'lainnya').mapped('qty'))
+
+            rec.waste_rusak = w_rusak
+            rec.waste_tumpah = w_tumpah
+            rec.waste_lainnya = w_lainnya
+
+            mat_w = w_rusak + w_tumpah + w_lainnya
+            rec.total_material_terbuang = mat_w
+            rec.material_wasted = mat_w
+
+            rec.remaining_material = mat_in - qty_h - mat_w
+
+            rec.efficiency_percentage = (qty_h / mat_in) * 100.0 if mat_in > 0 else 0.0
+
+            if qty_h <= 0:
+                rec.status_produksi = 'draft'
+            elif rec.remaining_material > 0:
+                rec.status_produksi = 'progress'
+            else:
+                rec.status_produksi = 'done'
     responsible_id = fields.Many2one(
         'hr.employee',
         string='Operator / Karyawan',

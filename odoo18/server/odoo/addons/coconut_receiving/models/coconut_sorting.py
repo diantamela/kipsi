@@ -42,10 +42,10 @@ class CoconutSorting(models.Model):
         string='Tanggal Sortir',
         default=fields.Date.context_today, required=True,
     )
-    spk_number = fields.Char(
-        string='Nomor SPK',
-        index=True,
-        help='Nomor Surat Perintah Kerja penghubung.',
+    transfer_id = fields.Many2one(
+        'coconut.manufacturing',
+        string='Transfer Kelapa Terkait',
+        domain=[('state', '!=', 'cancelled')],
     )
     total_count = fields.Integer(
         string='Jumlah Kelapa (Butir)',

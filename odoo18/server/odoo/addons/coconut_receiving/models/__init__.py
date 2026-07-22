@@ -6,3 +6,5 @@ from . import coconut_manufacturing
 from . import coconut_stock_report
 from . import stock_picking_type
 from . import finalisasi_kelapa_mp
+from . import hasil_kerja_harian
+from . import material_terbuang

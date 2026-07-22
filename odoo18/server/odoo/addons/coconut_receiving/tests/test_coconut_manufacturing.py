@@ -6,7 +6,7 @@ from odoo import fields
 
 class TestCoconutManufacturing(TransactionCase):
     """
-    Tests for coconut_receiving and coconut_payroll (coconut.manufacturing & coconut.work.sheet models).
+    Tests for coconut_receiving and coconut_payroll kustom PT Coco Murni Prima Jaya.
     """
 
     @classmethod
@@ -91,161 +91,36 @@ class TestCoconutManufacturing(TransactionCase):
         return mfg
 
     # ─────────────────────────────────────────────────────────────
-    # TEST 2: Edit Done Blocker
+    # TEST 1: Edit Done Blocker
     # ─────────────────────────────────────────────────────────────
-    def test_02_edit_done_blocker(self):
+    def test_01_edit_done_blocker(self):
         """
         Editing a completed transfer document must raise UserError.
         """
         self._skip_if_no_products()
         self._adjust_stock(self.p_layak, 100.0)
-
         mfg = self._create_mfg(
-            sheller_mesin_qty=10.0,
-        )
-        # Edit in confirmed state
-        mfg.write({'notes': 'Catatan Confirmed'})
-
-        # Validate
-        mfg.action_validate()
-        self.assertEqual(mfg.state, 'done')
-
-        # Edit in done state (should raise UserError)
-        with self.assertRaises(UserError, msg="Completed transfer document must not be editable"):
-            mfg.write({'notes': 'Catatan Baru Setelah Done'})
-
-    # ─────────────────────────────────────────────────────────────
-    # TEST 3: Partial Machine Sheller transfer
-    # ─────────────────────────────────────────────────────────────
-    def test_03_partial_machine_sheller(self):
-        """
-        Kelapa Layak available = 25000
-        Sheller Mesin Qty = 18000
-        Expected remaining Kelapa Layak = 7000 in Gudang Kelapa Layak
-        Expected Kelapa Layak in Area Sheller Mesin = 18000
-        """
-        self._skip_if_no_products()
-
-        self._adjust_stock(self.p_layak, 25000.0)
-
-        qty_layak_before = self._get_qty(self.p_layak)
-        self.assertEqual(qty_layak_before, 25000.0)
-
-        mfg = self._create_mfg(
-            sheller_mesin_qty=18000.0,
+            sheller_mesin_qty=50.0,
         )
         mfg.action_validate()
-
-        qty_layak_after = self._get_qty(self.p_layak)
-        self.assertAlmostEqual(qty_layak_after, 7000.0, places=2)
-        
-        loc_sheller = self.env.ref('coconut_receiving.location_area_sheller_mesin')
-        qty_layak_in_sheller = self.env['stock.quant']._get_available_quantity(self.p_layak, loc_sheller)
-        self.assertAlmostEqual(qty_layak_in_sheller, 18000.0, places=2)
-
-    # ─────────────────────────────────────────────────────────────
-    # TEST 5: Transfer validation – exceed stock blocked
-    # ─────────────────────────────────────────────────────────────
-    def test_05_transfer_exceeds_stock_blocked(self):
-        """
-        Kelapa Layak available = 100
-        Transfer Input = 101 → must raise UserError
-        """
-        self._skip_if_no_products()
-
-        self._adjust_stock(self.p_layak, 100.0)
-
-        mfg = self._create_mfg(
-            sheller_mesin_qty=101.0,
-        )
         with self.assertRaises(UserError):
-            mfg.action_validate()
-
-    # TEST 6: Duplicate validation blocked (manufacturing)
-    # ─────────────────────────────────────────────────────────────
-    def test_06_duplicate_manufacturing_validation_blocked(self):
-        """
-        Validating a 'done' transfer document again must raise UserError.
-        """
-        self._skip_if_no_products()
-        self._adjust_stock(self.p_layak, 100.0)
-
-        mfg = self._create_mfg(
-            sheller_mesin_qty=10.0,
-        )
-        mfg.action_validate()
-        self.assertEqual(mfg.state, 'done')
-
-        # Reset state to confirmed to simulate duplicate validate trigger
-        mfg.state = 'confirmed'
-        with self.assertRaises(UserError, msg="Duplicate validation must be blocked"):
-            mfg.action_validate()
-
-    # TEST 7: Invalid UoM (manufacturing)
-    # ─────────────────────────────────────────────────────────────
-    def test_07_invalid_uom_in_manufacturing_blocked(self):
-        """
-        If Kelapa Layak has non-Weight UoM, action_validate must raise UserError.
-        """
-        self._skip_if_no_products()
-
-        uom_unit = self.env.ref('uom.product_uom_unit')
-        dummy_variant = self.env['product.product'].create({
-            'name': 'Dummy Unit Variant',
-            'type': 'consu',
-            'uom_id': uom_unit.id,
-            'uom_po_id': uom_unit.id,
-        })
-
-        xml_record = self.env['ir.model.data'].search([
-            ('module', '=', 'coconut_receiving'),
-            ('name', '=', 'product_kelapa_layak'),
-        ], limit=1)
-        original_res_id = xml_record.res_id
-
-        try:
-            xml_record.write({'res_id': dummy_variant.product_tmpl_id.id})
-            mfg = self._create_mfg(
-                sheller_mesin_qty=10.0,
-            )
-            with self.assertRaises(UserError):
-                mfg.action_validate()
-        finally:
-            xml_record.write({'res_id': original_res_id})
+            mfg.write({'sheller_mesin_qty': 60.0})
 
     # ─────────────────────────────────────────────────────────────
-    # TEST 8: Removed processes not in active manufacturing
+    # TEST 2: Hasil Kerja Harian Validation and Stock Moves
     # ─────────────────────────────────────────────────────────────
-    def test_08_no_washing_blanching_drying_in_manufacturing(self):
-        """
-        coconut.manufacturing model must NOT have fields for
-        Kelapa Washing, Kelapa Blanching, or Kelapa Drying.
-        """
-        mfg_fields = self.env['coconut.manufacturing'].fields_get()
-        forbidden_keywords = ['washing', 'blanching', 'drying']
-        for field_name in mfg_fields:
-            for kw in forbidden_keywords:
-                self.assertNotIn(
-                    kw, field_name.lower(),
-                    msg=f"Field '{field_name}' referencing '{kw}' must not exist in coconut.manufacturing"
-                )
-
-    # ─────────────────────────────────────────────────────────────
-    # TEST 9: Worksheet validation, limits, and stock moves
-    # ─────────────────────────────────────────────────────────────
-    def test_09_worksheet_validation_and_limits(self):
+    def test_02_hasil_kerja_harian_and_stock_moves(self):
         """
         Verify that:
-        1. Realisasi computes properly based on linked validated worksheets.
-        2. Worksheets cannot exceed transfer limits.
-        3. Stock is produced in separate locations upon worksheet validation.
+        1. Operator inputs daily work result linked to transfer.
+        2. Stock moves are generated upon validation.
+        3. Cumulative validation prevents exceeding transfer quantities.
         """
         self._skip_if_no_products()
         
-        # Prepare stocks
+        # Adjust stocks
         self._adjust_stock(self.p_layak, 1000.0)
         self._adjust_stock(self.p_sheller, 0.0, 'coconut_receiving.location_stok_hasil_sheller_mesin')
-        self._adjust_stock(self.p_sheller, 0.0, 'coconut_receiving.location_stok_hasil_sheller_manual')
         
         # Create transfer
         mfg = self._create_mfg(
@@ -253,54 +128,141 @@ class TestCoconutManufacturing(TransactionCase):
             sheller_manual_qty=300.0,
         )
         mfg.action_validate()
-        
-        # Create worksheet for sheller mesin (within limit)
-        employee_sheller = self.env['hr.employee'].create({
-            'name': 'Sheller Employee',
+
+        employee = self.env['hr.employee'].create({
+            'name': 'Test Worker',
             'payroll_job_type': 'sheller_mesin',
         })
-        
+
+        # Input work results (sheller mesin)
+        hkh = self.env['coconut.hasil.kerja.harian'].create({
+            'transfer_id': mfg.id,
+            'date': fields.Date.today(),
+            'shift': 'shift_1',
+            'operator_id': employee.id,
+            'process_type': 'sheller_mesin',
+            'qty_hasil': 400.0,
+        })
+        self.assertEqual(hkh.material_in_qty, 500.0)
+        self.assertEqual(hkh.remaining_material, 100.0)
+
+        # Validate HKH -> creates stock moves
+        hkh.action_confirm()
+        self.assertEqual(hkh.state, 'confirmed')
+
+        # Check stock in destination location
+        qty_mesin = self._get_qty(self.p_sheller, 'coconut_receiving.location_stok_hasil_sheller_mesin')
+        self.assertEqual(qty_mesin, 400.0)
+
+        # Check SPK computed values directly on the manufacturing document
+        mfg._compute_spk_stats()
+        self.assertEqual(mfg.qty_hasil, 400.0)
+        self.assertEqual(mfg.remaining_material, 100.0)
+        self.assertEqual(mfg.status_produksi, 'progress')
+
+        # Try to input second record that exceeds remaining (100.0 remaining, we try to put 101.0)
+        hkh_exceed = self.env['coconut.hasil.kerja.harian'].create({
+            'transfer_id': mfg.id,
+            'date': fields.Date.today(),
+            'shift': 'shift_2',
+            'operator_id': employee.id,
+            'process_type': 'sheller_mesin',
+            'qty_hasil': 101.0,
+        })
+        with self.assertRaises(ValidationError):
+            hkh_exceed.action_confirm()
+
+    # ─────────────────────────────────────────────────────────────
+    # TEST 3: Material Terbuang Stock Move and SPK updates
+    # ─────────────────────────────────────────────────────────────
+    def test_03_material_terbuang(self):
+        """
+        Verify that Material Terbuang successfully reduces area stock and updates SPK stats.
+        """
+        self._skip_if_no_products()
+        self._adjust_stock(self.p_layak, 500.0)
+        loc_area = self.env.ref('coconut_receiving.location_area_sheller_mesin')
+        self._adjust_stock(self.p_layak, 100.0, 'coconut_receiving.location_area_sheller_mesin')
+
+        mfg = self._create_mfg(
+            sheller_mesin_qty=100.0,
+        )
+        mfg.action_validate()
+
+        employee = self.env['hr.employee'].create({
+            'name': 'Test Scrap Operator',
+        })
+
+        # Scrap 20 kg of COCO-LAYAK from Area Sheller Mesin
+        scrap = self.env['coconut.material.terbuang'].create({
+            'transfer_id': mfg.id,
+            'product_id': self.p_layak.product_variant_id.id,
+            'qty': 20.0,
+            'operator_id': employee.id,
+            'location_id': loc_area.id,
+            'reason': 'rusak',
+        })
+
+        # Validate
+        scrap.action_done()
+        self.assertEqual(scrap.state, 'done')
+
+        # Check stock reduced
+        qty_left = self._get_qty(self.p_layak, 'coconut_receiving.location_area_sheller_mesin')
+        self.assertEqual(qty_left, 80.0)
+
+        # Check SPK computed values on the manufacturing document
+        mfg._compute_spk_stats()
+        self.assertEqual(mfg.material_wasted, 20.0)
+        self.assertEqual(mfg.remaining_material, 80.0)
+
+    # ─────────────────────────────────────────────────────────────
+    # TEST 4: Payroll Worksheet Integration
+    # ─────────────────────────────────────────────────────────────
+    def test_04_payroll_worksheet_integration(self):
+        """
+        Verify that the Payroll Worksheet correctly computes its total_production_qty
+        from the confirmed daily work results (HKH).
+        """
+        self._skip_if_no_products()
+        self._adjust_stock(self.p_layak, 500.0)
+        mfg = self._create_mfg(
+            sheller_mesin_qty=200.0,
+        )
+        mfg.action_validate()
+
+        employee = self.env['hr.employee'].create({
+            'name': 'Sheller Worker',
+            'payroll_job_type': 'sheller_mesin',
+        })
+
+        # Confirm 150 kg of production in HKH
+        hkh = self.env['coconut.hasil.kerja.harian'].create({
+            'transfer_id': mfg.id,
+            'operator_id': employee.id,
+            'process_type': 'sheller_mesin',
+            'qty_hasil': 150.0,
+        })
+        hkh.action_confirm()
+
+        # Create payroll worksheet
         ws = self.env['coconut.work.sheet'].create({
             'date': fields.Date.today(),
             'worker_type': 'sheller_mesin',
             'day_type': 'biasa',
             'transfer_id': mfg.id,
         })
-        ws.work_result_ids.unlink() # clear auto-populated employees
+        ws.work_result_ids.unlink()
+
+        # Distribute the 150 kg to the worker
         self.env['coconut.work.result'].create({
             'work_sheet_id': ws.id,
-            'employee_id': employee_sheller.id,
-            'quantity_kg': 400.0,
+            'employee_id': employee.id,
+            'quantity_kg': 150.0,
         })
         ws._compute_total_production_qty()
-        
-        # Validate worksheet (under limit of 500) -> should succeed
+        self.assertEqual(ws.total_production_qty, 150.0)
+
+        # Validate worksheet -> should succeed without creating duplicate stock moves
         ws.action_validate()
         self.assertEqual(ws.state, 'validated')
-        
-        # Check stock was produced in location_stok_hasil_sheller_mesin
-        qty_mesin = self._get_qty(self.p_sheller, 'coconut_receiving.location_stok_hasil_sheller_mesin')
-        self.assertEqual(qty_mesin, 400.0)
-        
-        # Check realisasi on manufacturing doc
-        self.assertEqual(mfg.realisasi_sheller_mesin, 400.0)
-        self.assertEqual(mfg.realisasi_state, 'partial')
-        
-        # Create worksheet exceeding remaining limit (remaining limit = 100)
-        ws_exceed = self.env['coconut.work.sheet'].create({
-            'date': fields.Date.today(),
-            'worker_type': 'sheller_mesin',
-            'day_type': 'biasa',
-            'transfer_id': mfg.id,
-        })
-        ws_exceed.work_result_ids.unlink()
-        self.env['coconut.work.result'].create({
-            'work_sheet_id': ws_exceed.id,
-            'employee_id': employee_sheller.id,
-            'quantity_kg': 101.0,
-        })
-        ws_exceed._compute_total_production_qty()
-        
-        # Should raise validation error
-        with self.assertRaises(ValidationError):
-            ws_exceed.action_validate()

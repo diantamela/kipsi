@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form View – coconut.material.terbuang -->
+    <record id="view_coconut_material_terbuang_form" model="ir.ui.view">
+        <field name="name">coconut.material.terbuang.form</field>
+        <field name="model">coconut.material.terbuang</field>
+        <field name="arch" type="xml">
+            <form string="Material Terbuang">
+                <header>
+                    <button name="action_done"
+                            id="btn_done_mt"
+                            string="Validasi &amp; Potong Stok"
+                            type="object"
+                            invisible="state != 'draft'"
+                            class="oe_highlight"/>
+                    <button name="action_cancel"
+                            id="btn_cancel_mt"
+                            string="Batalkan"
+                            type="object"
+                            invisible="state != 'done'"/>
+                    <button name="action_reset_draft"
+                            id="btn_reset_mt"
+                            string="Kembalikan ke Draft"
+                            type="object"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Informasi Transaksi">
+                            <field name="transfer_id" readonly="state != 'draft'"/>
+                            <field name="operator_id" readonly="state != 'draft'"/>
+                        </group>
+                        <group string="Detail Material &amp; Area">
+                            <field name="product_id" readonly="state != 'draft'"/>
+                            <field name="qty" string="Kuantitas (Kg)" readonly="state != 'draft'"/>
+                            <field name="location_id" string="Lokasi / Area Produksi" readonly="state != 'draft'"/>
+                            <field name="reason" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    <group string="Keterangan / Alasan Tambahan">
+                        <field name="notes" nolabel="1" readonly="state == 'done'"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- List View – coconut.material.terbuang -->
+    <record id="view_coconut_material_terbuang_list" model="ir.ui.view">
+        <field name="name">coconut.material.terbuang.list</field>
+        <field name="model">coconut.material.terbuang</field>
+        <field name="arch" type="xml">
+            <list string="Material Terbuang"
+                  decoration-info="state == 'draft'"
+                  decoration-success="state == 'done'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="transfer_id" string="Transfer Kelapa"/>
+                <field name="product_id"/>
+                <field name="qty" string="Jumlah (Kg)" sum="Total Terbuang"/>
+                <field name="location_id"/>
+                <field name="reason"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Search View – coconut.material.terbuang -->
+    <record id="view_coconut_material_terbuang_search" model="ir.ui.view">
+        <field name="name">coconut.material.terbuang.search</field>
+        <field name="model">coconut.material.terbuang</field>
+        <field name="arch" type="xml">
+            <search string="Cari Material Terbuang">
+                <field name="name"/>
+                <field name="transfer_id" string="Transfer Kelapa"/>
+                <field name="product_id"/>
+                <separator/>
+                <filter string="Draft" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Selesai" name="done" domain="[('state','=','done')]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action – coconut.material.terbuang -->
+    <record id="action_coconut_material_terbuang" model="ir.actions.act_window">
+        <field name="name">Material Terbuang</field>
+        <field name="res_model">coconut.material.terbuang</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_material_terbuang_search"/>
+    </record>
+
+    <!-- Menu Item under mrp.menu_mrp_manufacturing -->
+    <menuitem id="menu_coconut_material_terbuang"
+              name="Material Terbuang"
+              parent="mrp.menu_mrp_manufacturing"
+              action="action_coconut_material_terbuang"
+              sequence="15"/>
+</odoo>

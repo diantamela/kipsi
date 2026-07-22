@@ -32,107 +32,154 @@
                             type="object"
                             invisible="state != 'cancelled'"/>
                     <!-- Print PDF -->
-                    <button name="%(action_report_coconut_manufacturing)d"
-                            string="Print → Laporan Transfer Kelapa ke Produksi"
-                            type="action"
-                            class="btn-secondary"/>
+                     <button name="%(action_report_coconut_manufacturing)d"
+                             string="Print → Laporan Transfer Kelapa ke Produksi"
+                             type="action"
+                             class="btn-secondary"/>
                     <field name="state"
                            widget="statusbar"
                            statusbar_visible="draft,confirmed,done"/>
                 </header>
                 <sheet>
+                    <!-- Header Title -->
                     <div class="oe_title">
                         <h1>
                             <field name="name" readonly="1"/>
                         </h1>
                     </div>
 
-                    <!-- Informasi Transfer -->
-                    <group>
+                    <!-- ==========================================
+                         FORM INPUT - Draft State Only
+                         ========================================== -->
+                    <group invisible="state != 'draft'">
                         <group string="Informasi Transfer">
-                            <field name="production_date"
-                                   readonly="state != 'draft'"/>
-                            <field name="spk_number"
-                                   readonly="state != 'draft'"/>
-                            <field name="responsible_id"
-                                   string="Operator / Karyawan"
-                                   readonly="state != 'draft'"/>
+                            <field name="production_date" readonly="state != 'draft'"/>
+                            <field name="responsible_id" string="Operator / Karyawan" readonly="state != 'draft'"/>
                             <field name="company_id" invisible="1"/>
                         </group>
                     </group>
 
-                    <notebook>
+                    <notebook invisible="state != 'draft'">
                         <!-- Tab 1: Transfer Material -->
                         <page string="Transfer Material" name="tab_transfer_material">
                             <!-- Transfer Sheller -->
                             <group string="Transfer ke Sheller">
                                 <group>
-                                    <field name="available_kelapa_layak"
-                                           string="Stok Kelapa Layak Tersedia (Kg)"
-                                           readonly="1"/>
-                                    <field name="sheller_mesin_qty"
-                                           string="Kelapa Layak ke Sheller Mesin (Kg)"
-                                           readonly="state != 'draft'"/>
-                                    <field name="sheller_manual_qty"
-                                           string="Kelapa Layak ke Sheller Manual (Kg)"
-                                           readonly="state != 'draft'"/>
+                                    <field name="available_kelapa_layak" string="Stok Kelapa Layak Tersedia (Kg)" readonly="1"/>
+                                    <field name="sheller_mesin_qty" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="state != 'draft'"/>
+                                    <field name="sheller_manual_qty" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="state != 'draft'"/>
                                 </group>
                                 <group>
-                                    <field name="total_transfer_sheller"
-                                           string="Total Transfer Sheller (Kg)"
-                                           readonly="1"/>
-                                    <field name="remaining_kelapa_layak"
-                                           string="Sisa Kelapa Layak Setelah Transfer (Kg)"
-                                           readonly="1"/>
+                                    <field name="total_transfer_sheller" string="Total Transfer Sheller (Kg)" readonly="1"/>
+                                    <field name="remaining_kelapa_layak" string="Sisa Kelapa Layak Setelah Transfer (Kg)" readonly="1"/>
                                 </group>
                             </group>
 
                             <!-- Transfer Perrer -->
                             <group string="Transfer ke Perrer">
                                 <group string="Sumber: Hasil Sheller Mesin">
-                                    <field name="available_hasil_sheller_mesin"
-                                           string="Stok Hasil Sheller Mesin Tersedia (Kg)"
-                                           readonly="1"/>
-                                    <field name="transfer_perrer_mesin_qty"
-                                           string="Hasil Sheller Mesin Ditransfer ke Perrer (Kg)"
-                                           readonly="state != 'draft'"/>
-                                    <field name="remaining_hasil_sheller_mesin"
-                                           string="Sisa Hasil Sheller Mesin Setelah Transfer (Kg)"
-                                           readonly="1"/>
+                                    <field name="available_hasil_sheller_mesin" string="Stok Hasil Sheller Mesin Tersedia (Kg)" readonly="1"/>
+                                    <field name="transfer_perrer_mesin_qty" string="Hasil Sheller Mesin Ditransfer ke Perrer (Kg)" readonly="state != 'draft'"/>
+                                    <field name="remaining_hasil_sheller_mesin" string="Sisa Hasil Sheller Mesin Setelah Transfer (Kg)" readonly="1"/>
                                 </group>
                                 <group string="Sumber: Hasil Sheller Manual">
-                                    <field name="available_hasil_sheller_manual"
-                                           string="Stok Hasil Sheller Manual Tersedia (Kg)"
-                                           readonly="1"/>
-                                    <field name="transfer_perrer_manual_qty"
-                                           string="Hasil Sheller Manual Ditransfer ke Perrer (Kg)"
-                                           readonly="state != 'draft'"/>
-                                    <field name="remaining_hasil_sheller_manual"
-                                           string="Sisa Hasil Sheller Manual Setelah Transfer (Kg)"
-                                           readonly="1"/>
+                                    <field name="available_hasil_sheller_manual" string="Stok Hasil Sheller Manual Tersedia (Kg)" readonly="1"/>
+                                    <field name="transfer_perrer_manual_qty" string="Hasil Sheller Manual Ditransfer ke Perrer (Kg)" readonly="state != 'draft'"/>
+                                    <field name="remaining_hasil_sheller_manual" string="Sisa Hasil Sheller Manual Setelah Transfer (Kg)" readonly="1"/>
                                 </group>
                             </group>
                         </page>
 
-                        <!-- Tab 2: Pergerakan Stok -->
-                        <page string="Pergerakan Stok" name="tab_stok"
-                               invisible="not sheller_mesin_move_id and not sheller_manual_move_id and not perrer_mesin_move_id and not perrer_manual_move_id">
-                            <group string="Pergerakan Stok">
-                                <field name="sheller_mesin_move_id" string="Pergerakan Stok Sheller Mesin" readonly="1" invisible="not sheller_mesin_move_id"/>
-                                <field name="sheller_manual_move_id" string="Pergerakan Stok Sheller Manual" readonly="1" invisible="not sheller_manual_move_id"/>
-                                <field name="perrer_mesin_move_id" string="Pergerakan Stok Perrer Mesin" readonly="1" invisible="not perrer_mesin_move_id"/>
-                                <field name="perrer_manual_move_id" string="Pergerakan Stok Perrer Manual" readonly="1" invisible="not perrer_manual_move_id"/>
-                            </group>
-                        </page>
-
-                        <!-- Tab 3: Catatan -->
+                        <!-- Tab 2: Catatan -->
                         <page string="Catatan" name="tab_catatan">
                             <group>
-                                <field name="notes"
-                                       string="Catatan"
-                                       nolabel="1"
-                                       readonly="state == 'done'"/>
+                                <field name="notes" string="Catatan" nolabel="1" readonly="state == 'done'"/>
                             </group>
+                        </page>
+                    </notebook>
+
+                    <!-- ==========================================
+                         DASHBOARD PRODUKSI (SPK) - Confirmed / Done State
+                         ========================================== -->
+                    <div class="oe_title" invisible="state == 'draft'">
+                        <h2 class="text-primary font-weight-bold mb-3">DASHBOARD PRODUKSI &amp; ALUR MATERIAL (SPK)</h2>
+                    </div>
+
+                    <group invisible="state == 'draft'">
+                        <!-- Kelompok 1: Informasi Umum & Ringkasan -->
+                        <group string="Informasi Umum SPK">
+                            <field name="production_date" string="Tanggal Produksi" readonly="1"/>
+                            <field name="responsible_id" string="Operator / PIC Utama" readonly="1"/>
+                            <field name="status_produksi" string="Status Produksi SPK" widget="badge" decoration-info="status_produksi == 'draft'" decoration-warning="status_produksi == 'progress'" decoration-success="status_produksi == 'done'"/>
+                        </group>
+
+                        <group string="Ringkasan Produksi &amp; Efisiensi">
+                            <field name="material_in" string="Material Masuk (Kg)" readonly="1"/>
+                            <field name="qty_hasil" string="Total Hasil Produksi (Kg)" readonly="1"/>
+                            <field name="total_material_terbuang" string="Total Material Terbuang (Kg)" readonly="1"/>
+                            <field name="remaining_material" string="Sisa Material Belum Diproses (Kg)" readonly="1"/>
+                            <field name="efficiency_percentage" string="Persentase Efisiensi Produksi" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group invisible="state == 'draft'">
+                        <!-- Kelompok 2: Alur Perjalanan Material -->
+                        <group string="Transfer Bahan Baku ke Sheller">
+                            <field name="layak_to_sheller_mesin" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="1"/>
+                            <field name="layak_to_sheller_manual" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="1"/>
+                        </group>
+
+                        <group string="Transfer Bahan Baku ke Parer">
+                            <field name="hasil_to_parer_mesin" string="Hasil Sheller Mesin Ditransfer ke Parer (Kg)" readonly="1"/>
+                            <field name="hasil_to_parer_manual" string="Hasil Sheller Manual Ditransfer ke Parer (Kg)" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group invisible="state == 'draft'">
+                        <!-- Kelompok 3: Akumulasi Hasil Kerja Harian -->
+                        <group string="Akumulasi Hasil Kerja Harian">
+                            <field name="hkh_sheller_mesin" string="Sheller Mesin (Kg)" readonly="1"/>
+                            <field name="hkh_sheller_manual" string="Sheller Manual (Kg)" readonly="1"/>
+                            <field name="hkh_parer_mesin" string="Parer Mesin (Kg)" readonly="1"/>
+                            <field name="hkh_parer_manual" string="Parer Manual (Kg)" readonly="1"/>
+                        </group>
+
+                        <!-- Kelompok 4: Akumulasi Material Terbuang (Scrap) -->
+                        <group string="Detail Material Terbuang">
+                            <field name="waste_rusak" string="Rusak / Busuk (Kg)" readonly="1"/>
+                            <field name="waste_tumpah" string="Tumpah / Hancur (Kg)" readonly="1"/>
+                            <field name="waste_lainnya" string="Lainnya (Kg)" readonly="1"/>
+                            <field name="total_material_terbuang" string="Total Terbuang (Kg)" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Embedded Transaction Lists for Audit -->
+                    <notebook invisible="state == 'draft'">
+                        <page string="Detail Transaksi Hasil Kerja Harian" name="tab_hasil_kerja">
+                            <field name="hasil_kerja_ids" readonly="1" mode="list">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="name" string="No. Hasil Kerja"/>
+                                    <field name="date" string="Tanggal"/>
+                                    <field name="shift" string="Shift"/>
+                                    <field name="operator_id" string="Operator / Karyawan"/>
+                                    <field name="process_type" string="Jenis Proses"/>
+                                    <field name="qty_hasil" string="Qty Hasil (Kg)" sum="Total"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Detail Transaksi Material Terbuang" name="tab_material_terbuang">
+                            <field name="material_terbuang_ids" readonly="1" mode="list">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="name" string="No. Transaksi"/>
+                                    <field name="product_id" string="Produk"/>
+                                    <field name="qty" string="Jumlah (Kg)" sum="Total"/>
+                                    <field name="operator_id" string="Operator"/>
+                                    <field name="location_id" string="Lokasi Asal"/>
+                                    <field name="reason" string="Alasan"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+                                </list>
+                            </field>
                         </page>
                     </notebook>
                 </sheet>
@@ -154,7 +201,6 @@
                   decoration-muted="state == 'cancelled'">
                 <field name="name" string="Kode Transfer"/>
                 <field name="production_date" string="Tgl Transfer"/>
-                <field name="spk_number" string="Nomor SPK"/>
                 <field name="responsible_id" string="Operator"/>
                 <field name="total_transfer_sheller" string="Total Transfer Sheller (Kg)" sum="Total Transfer Sheller"/>
                 <field name="state"
@@ -178,7 +224,6 @@
                 <field name="name" string="Kode Transfer"/>
                 <field name="responsible_id" string="Operator"/>
                 <field name="production_date" string="Tanggal"/>
-                <field name="spk_number" string="Nomor SPK"/>
                 <separator/>
                 <filter string="Draft"        name="draft"     domain="[('state','=','draft')]"/>
                 <filter string="Dikonfirmasi" name="confirmed" domain="[('state','=','confirmed')]"/>
@@ -190,7 +235,6 @@
                     <filter string="Operator"         name="grp_operator"        context="{'group_by':'responsible_id'}"/>
                     <filter string="Status"           name="grp_state"           context="{'group_by':'state'}"/>
                     <filter string="Tanggal"          name="grp_production_date" context="{'group_by':'production_date'}"/>
-                    <filter string="Nomor SPK"        name="grp_spk_number"      context="{'group_by':'spk_number'}"/>
                 </group>
             </search>
         </field>
@@ -238,4 +282,220 @@
               parent="coconut_receiving.menu_coconut_receiving_root"
               action="action_coconut_manufacturing"
               sequence="30"/>
+
+    <!-- ═══════════════════════════════════════════════════
+         SPK Read-only Dashboard Views
+         ═══════════════════════════════════════════════════ -->
+    <record id="view_coconut_manufacturing_spk_list" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.spk.list</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <list string="Laporan SPK Produksi"
+                  create="false" edit="false" delete="false" duplicate="false" import="false"
+                  decoration-info="status_produksi == 'draft'"
+                  decoration-warning="status_produksi == 'progress'"
+                  decoration-success="status_produksi == 'done'">
+                <field name="name" string="Nomor SPK / Transfer"/>
+                <field name="production_date" string="Tanggal Produksi"/>
+                <field name="material_in" string="Material Masuk (Kg)" sum="Total"/>
+                <field name="qty_hasil" string="Hasil Produksi (Kg)" sum="Total"/>
+                <field name="total_material_terbuang" string="Terbuang (Kg)" sum="Total"/>
+                <field name="remaining_material" string="Sisa (Kg)" sum="Total"/>
+                <field name="status_produksi" widget="badge" decoration-info="status_produksi == 'draft'" decoration-warning="status_produksi == 'progress'" decoration-success="status_produksi == 'done'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coconut_manufacturing_spk_form" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.spk.form</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <form string="SPK Dashboard" create="false" edit="false" delete="false" duplicate="false" import="false">
+                <header>
+                    <button name="%(action_report_coconut_manufacturing)d"
+                            string="Print → Laporan SPK"
+                            type="action"
+                            class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                        <h2 class="text-primary font-weight-bold mb-3">DASHBOARD PRODUKSI &amp; ALUR MATERIAL (SPK)</h2>
+                    </div>
+
+                    <group>
+                        <group string="Informasi Umum SPK">
+                            <field name="production_date" string="Tanggal Produksi" readonly="1"/>
+                            <field name="responsible_id" string="Operator / PIC Utama" readonly="1"/>
+                            <field name="status_produksi" string="Status Produksi SPK" widget="badge" decoration-info="status_produksi == 'draft'" decoration-warning="status_produksi == 'progress'" decoration-success="status_produksi == 'done'"/>
+                        </group>
+
+                        <group string="Ringkasan Produksi &amp; Efisiensi">
+                            <field name="material_in" string="Material Masuk (Kg)" readonly="1"/>
+                            <field name="qty_hasil" string="Total Hasil Produksi (Kg)" readonly="1"/>
+                            <field name="total_material_terbuang" string="Total Material Terbuang (Kg)" readonly="1"/>
+                            <field name="remaining_material" string="Sisa Material Belum Diproses (Kg)" readonly="1"/>
+                            <field name="efficiency_percentage" string="Persentase Efisiensi Produksi" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Transfer Bahan Baku ke Sheller">
+                            <field name="layak_to_sheller_mesin" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="1"/>
+                            <field name="layak_to_sheller_manual" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="1"/>
+                        </group>
+
+                        <group string="Transfer Bahan Baku ke Parer">
+                            <field name="hasil_to_parer_mesin" string="Hasil Sheller Mesin Ditransfer ke Parer (Kg)" readonly="1"/>
+                            <field name="hasil_to_parer_manual" string="Hasil Sheller Manual Ditransfer ke Parer (Kg)" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Akumulasi Hasil Kerja Harian">
+                            <field name="hkh_sheller_mesin" string="Sheller Mesin (Kg)" readonly="1"/>
+                            <field name="hkh_sheller_manual" string="Sheller Manual (Kg)" readonly="1"/>
+                            <field name="hkh_parer_mesin" string="Parer Mesin (Kg)" readonly="1"/>
+                            <field name="hkh_parer_manual" string="Parer Manual (Kg)" readonly="1"/>
+                        </group>
+
+                        <group string="Detail Material Terbuang">
+                            <field name="waste_rusak" string="Rusak / Busuk (Kg)" readonly="1"/>
+                            <field name="waste_tumpah" string="Tumpah / Hancur (Kg)" readonly="1"/>
+                            <field name="waste_lainnya" string="Lainnya (Kg)" readonly="1"/>
+                            <field name="total_material_terbuang" string="Total Terbuang (Kg)" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Detail Transaksi Hasil Kerja Harian" name="tab_hasil_kerja">
+                            <field name="hasil_kerja_ids" readonly="1" mode="list">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="name" string="No. Hasil Kerja"/>
+                                    <field name="date" string="Tanggal"/>
+                                    <field name="shift" string="Shift"/>
+                                    <field name="operator_id" string="Operator / Karyawan"/>
+                                    <field name="process_type" string="Jenis Proses"/>
+                                    <field name="qty_hasil" string="Qty Hasil (Kg)" sum="Total"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'confirmed'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Detail Transaksi Material Terbuang" name="tab_material_terbuang">
+                            <field name="material_terbuang_ids" readonly="1" mode="list">
+                                <list create="false" edit="false" delete="false">
+                                    <field name="name" string="No. Transaksi"/>
+                                    <field name="product_id" string="Produk"/>
+                                    <field name="qty" string="Jumlah (Kg)" sum="Total"/>
+                                    <field name="operator_id" string="Operator"/>
+                                    <field name="location_id" string="Lokasi Asal"/>
+                                    <field name="reason" string="Alasan"/>
+                                    <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'done'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════
+         SPK Analysis Views (Graph & Pivot)
+         ═══════════════════════════════════════════════════ -->
+    <record id="view_coconut_manufacturing_graph" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.graph</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <graph string="Analisis SPK Produksi" type="bar">
+                <field name="production_date" interval="day"/>
+                <field name="qty_hasil" type="measure"/>
+                <field name="material_in" type="measure"/>
+                <field name="total_material_terbuang" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_coconut_manufacturing_pivot" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.pivot</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="arch" type="xml">
+            <pivot string="Analisis SPK Produksi">
+                <field name="production_date" interval="month" type="row"/>
+                <field name="material_in" type="measure"/>
+                <field name="qty_hasil" type="measure"/>
+                <field name="total_material_terbuang" type="measure"/>
+                <field name="remaining_material" type="measure"/>
+                <field name="efficiency_percentage" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <!-- ═══════════════════════════════════════════════════
+         Actions & Menus
+         ═══════════════════════════════════════════════════ -->
+
+    <!-- SPK Operations Menu (Produksi -> Operasi -> SPK) -->
+    <record id="action_coconut_manufacturing_spk_ops" model="ir.actions.act_window">
+        <field name="name">SPK</field>
+        <field name="res_model">coconut.manufacturing</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', 'in', ('confirmed', 'done'))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada data SPK yang aktif. Konfirmasikan Transfer Kelapa ke Produksi terlebih dahulu.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_coconut_manufacturing_spk_ops_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_coconut_manufacturing_spk_list"/>
+        <field name="act_window_id" ref="action_coconut_manufacturing_spk_ops"/>
+    </record>
+
+    <record id="action_coconut_manufacturing_spk_ops_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_coconut_manufacturing_spk_form"/>
+        <field name="act_window_id" ref="action_coconut_manufacturing_spk_ops"/>
+    </record>
+
+    <menuitem id="menu_coconut_manufacturing_spk_ops"
+              name="SPK"
+              parent="mrp.menu_mrp_manufacturing"
+              action="action_coconut_manufacturing_spk_ops"
+              sequence="1"/>
+
+    <!-- SPK Analysis Menu (Produksi -> Laporan -> SPK) -->
+    <record id="action_coconut_manufacturing_spk_report_analysis" model="ir.actions.act_window">
+        <field name="name">SPK</field>
+        <field name="res_model">coconut.manufacturing</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="domain">[('state', 'in', ('confirmed', 'done'))]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Belum ada data SPK untuk dianalisis.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_coconut_manufacturing_spk_report_analysis"
+              name="SPK"
+              parent="mrp.menu_mrp_reporting"
+              action="action_coconut_manufacturing_spk_report_analysis"
+              sequence="2"/>
+
+    <!-- Deactivate default MRP Work Order menus (translates as SPK in Indonesian) -->
+    <record id="mrp.menu_mrp_workorder_todo" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="mrp.menu_mrp_work_order_report" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
 </odoo>

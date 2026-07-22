@@ -92,4 +92,70 @@
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_coconut_work_sheet_search"/>
     </record>
+    <record id="view_coconut_manufacturing_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.form.inherit.payroll</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="inherit_id" ref="coconut_receiving.view_coconut_manufacturing_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@invisible=&quot;state == 'draft'&quot;][last()]" position="after">
+                <group invisible="state == 'draft'" string="Ringkasan Payroll (Wage-relevant)">
+                    <group>
+                        <field name="payroll_sheller_mesin" string="Total Produksi Sheller Mesin (Kg)" readonly="1"/>
+                        <field name="payroll_sheller_manual" string="Total Produksi Sheller Manual (Kg)" readonly="1"/>
+                        <field name="payroll_parer" string="Total Produksi Parer (Kg)" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="payroll_operator_count" string="Jumlah Operator Terdaftar" readonly="1"/>
+                        <field name="payroll_status" string="Status Penggajian" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//notebook[@invisible=&quot;state == 'draft'&quot;]" position="inside">
+                <page string="Detail Payroll Worksheet" name="tab_payroll_worksheets">
+                    <field name="work_sheet_ids" readonly="1" mode="list">
+                        <list create="false" edit="false" delete="false">
+                            <field name="name" string="No. Lembar Kerja"/>
+                            <field name="date" string="Tanggal"/>
+                            <field name="worker_type" string="Jenis Pekerjaan"/>
+                            <field name="total_production_qty" string="Total Produksi (Kg)" sum="Total"/>
+                            <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'validated'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_coconut_manufacturing_spk_form_inherit_payroll" model="ir.ui.view">
+        <field name="name">coconut.manufacturing.spk.form.inherit.payroll</field>
+        <field name="model">coconut.manufacturing</field>
+        <field name="inherit_id" ref="coconut_receiving.view_coconut_manufacturing_spk_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='total_material_terbuang']/.." position="after">
+                <group string="Ringkasan Payroll (Wage-relevant)">
+                    <group>
+                        <field name="payroll_sheller_mesin" string="Total Produksi Sheller Mesin (Kg)" readonly="1"/>
+                        <field name="payroll_sheller_manual" string="Total Produksi Sheller Manual (Kg)" readonly="1"/>
+                        <field name="payroll_parer" string="Total Produksi Parer (Kg)" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="payroll_operator_count" string="Jumlah Operator Terdaftar" readonly="1"/>
+                        <field name="payroll_status" string="Status Penggajian" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Detail Payroll Worksheet" name="tab_payroll_worksheets">
+                    <field name="work_sheet_ids" readonly="1" mode="list">
+                        <list create="false" edit="false" delete="false">
+                            <field name="name" string="No. Lembar Kerja"/>
+                            <field name="date" string="Tanggal"/>
+                            <field name="worker_type" string="Jenis Pekerjaan"/>
+                            <field name="total_production_qty" string="Total Produksi (Kg)" sum="Total"/>
+                            <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'validated'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
 </odoo>

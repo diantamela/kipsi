@@ -47,7 +47,7 @@
                             <group string="Informasi Sortir">
                                 <field name="date_sorting"
                                        readonly="state != 'draft'"/>
-                                <field name="spk_number"
+                                <field name="transfer_id"
                                        readonly="state != 'draft'"/>
                                 <field name="company_id" invisible="1"/>
                             </group>

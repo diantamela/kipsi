@@ -34,4 +34,9 @@
         <field name="name">Stok</field>
         <field name="action" ref="coconut_receiving.action_coconut_daily_stock"/>
     </record>
+
+    <!-- Hide Bill of Materials (BoM) menu from regular users -->
+    <record id="mrp.menu_mrp_bom_form_action" model="ir.ui.menu">
+        <field name="groups_id" eval="[(6, 0, [ref('base.group_no_one')])]"/>
+    </record>
 </odoo>

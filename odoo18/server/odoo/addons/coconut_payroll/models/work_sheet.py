@@ -47,10 +47,28 @@ class CoconutWorkSheet(models.Model):
         readonly=True,
     )
 
-    @api.depends('work_result_ids.quantity_kg')
+    @api.depends('transfer_id', 'worker_type', 'parer_source')
     def _compute_total_production_qty(self):
         for record in self:
-            record.total_production_qty = sum(record.work_result_ids.mapped('quantity_kg'))
+            qty = 0.0
+            if record.transfer_id and record.worker_type:
+                domain = [
+                    ('transfer_id', '=', record.transfer_id.id),
+                    ('state', '=', 'confirmed'),
+                ]
+                if record.worker_type == 'sheller_mesin':
+                    domain.append(('process_type', '=', 'sheller_mesin'))
+                elif record.worker_type == 'sheller_manual':
+                    domain.append(('process_type', '=', 'sheller_manual'))
+                elif record.worker_type == 'parer':
+                    if record.parer_source == 'mesin':
+                        domain.append(('process_type', '=', 'parer_mesin'))
+                    elif record.parer_source == 'manual':
+                        domain.append(('process_type', '=', 'parer_manual'))
+                
+                hkh_records = self.env['coconut.hasil.kerja.harian'].search(domain)
+                qty = sum(hkh_records.mapped('qty_hasil'))
+            record.total_production_qty = qty
 
     state = fields.Selection([
         ('draft', 'Draft'),
@@ -186,52 +204,6 @@ class CoconutWorkSheet(models.Model):
                     else:
                         raise ValidationError(_("Silakan pilih Sumber Sheller (Dari Sheller Mesin/Manual) untuk jenis pekerjaan Parer."))
 
-            # Stock movement generation
-            uom_kg = self.env.ref('uom.product_uom_kgm')
-            
-            # Resolve product & locations
-            loc_prod = self.env.ref('coconut_receiving.stock_location_coconut_manufacturing', raise_if_not_found=False)
-            if not loc_prod:
-                loc_prod = self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
-            if not loc_prod:
-                raise UserError(_("Lokasi produksi virtual tidak ditemukan."))
-
-            product_xml = ''
-            dest_location_xml = ''
-            
-            if record.worker_type == 'sheller_mesin':
-                product_xml = 'coconut_receiving.product_kelapa_sheller'
-                dest_location_xml = 'coconut_receiving.location_stok_hasil_sheller_mesin'
-            elif record.worker_type == 'sheller_manual':
-                product_xml = 'coconut_receiving.product_kelapa_sheller'
-                dest_location_xml = 'coconut_receiving.location_stok_hasil_sheller_manual'
-            elif record.worker_type == 'parer':
-                product_xml = 'coconut_receiving.product_kelapa_parer'
-                dest_location_xml = 'coconut_receiving.location_area_parer'
-
-            p_template = self.env.ref(product_xml, raise_if_not_found=False)
-            product = p_template.product_variant_ids[:1] if p_template else False
-            loc_dest = self.env.ref(dest_location_xml, raise_if_not_found=False)
-            
-            if product and loc_dest:
-                origin = record.name
-                move = self.env['stock.move'].create({
-                    'name': f'{origin} – Hasil Kerja {dict(self._fields["worker_type"].selection).get(record.worker_type)}',
-                    'origin': origin,
-                    'product_id': product.id,
-                    'product_uom_qty': record.total_production_qty,
-                    'product_uom': uom_kg.id,
-                    'location_id': loc_prod.id,
-                    'location_dest_id': loc_dest.id,
-                    'company_id': record.company_id.id,
-                })
-                move._action_confirm()
-                move._action_assign()
-                move.quantity = move.product_uom_qty
-                move.picked = True
-                move._action_done()
-                record.stock_move_id = move.id
-
             # Ensure detail lines have correct rate, basic wage, and premium populated and stored as snapshot
             for res in record.work_result_ids:
                 # Compute rules dynamically
@@ -246,9 +218,6 @@ class CoconutWorkSheet(models.Model):
                 raise UserError(_("Hasil kerja yang sudah diproses ke rekapitulasi tidak dapat diubah ke Draft."))
             if any(res.state in ['processed', 'paid'] for res in record.work_result_ids):
                 raise UserError(_("Hasil kerja tidak dapat diubah ke Draft karena ada hasil kerja yang sudah diproses atau dibayar."))
-            if record.stock_move_id:
-                record.stock_move_id._action_cancel()
-                record.stock_move_id.unlink()
             record.state = 'draft'
             record.work_result_ids.write({'state': 'draft'})
 
@@ -256,9 +225,6 @@ class CoconutWorkSheet(models.Model):
         for record in self:
             if record.state == 'processed':
                 raise UserError(_("Hasil kerja yang sudah diproses ke rekapitulasi tidak dapat dibatalkan."))
-            if record.stock_move_id:
-                record.stock_move_id._action_cancel()
-                record.stock_move_id.unlink()
             record.state = 'cancelled'
             record.work_result_ids.write({'state': 'cancelled'})
 
@@ -273,3 +239,43 @@ class CoconutWorkSheet(models.Model):
             if record.state in ['validated', 'processed']:
                 raise ValidationError(_("Dokumen yang sudah divalidasi atau diproses tidak dapat dihapus."))
         return super().unlink()
+
+
+class CoconutManufacturingInheritPayroll(models.Model):
+    _inherit = 'coconut.manufacturing'
+
+    work_sheet_ids = fields.One2many(
+        'coconut.work.sheet', 'transfer_id',
+        string='Payroll / Lembar Kerja Harian',
+    )
+
+    payroll_sheller_mesin = fields.Float(string='Total Produksi Sheller Mesin (Payroll) (Kg)', compute='_compute_payroll_stats', store=True)
+    payroll_sheller_manual = fields.Float(string='Total Produksi Sheller Manual (Payroll) (Kg)', compute='_compute_payroll_stats', store=True)
+    payroll_parer = fields.Float(string='Total Produksi Parer (Payroll) (Kg)', compute='_compute_payroll_stats', store=True)
+    payroll_operator_count = fields.Integer(string='Jumlah Operator Payroll', compute='_compute_payroll_stats', store=True)
+    payroll_status = fields.Selection([
+        ('draft', 'Draft'),
+        ('validated', 'Validated'),
+        ('processed', 'Processed'),
+        ('none', 'Tidak Ada'),
+    ], string='Status Payroll', compute='_compute_payroll_stats', store=True, default='none')
+
+    @api.depends('work_sheet_ids.state', 'work_sheet_ids.total_production_qty', 'work_sheet_ids.worker_type', 'work_sheet_ids.work_result_ids.employee_id')
+    def _compute_payroll_stats(self):
+        for rec in self:
+            p_sheets = rec.work_sheet_ids.filtered(lambda w: w.state in ('validated', 'processed'))
+            rec.payroll_sheller_mesin = sum(p_sheets.filtered(lambda w: w.worker_type == 'sheller_mesin').mapped('total_production_qty'))
+            rec.payroll_sheller_manual = sum(p_sheets.filtered(lambda w: w.worker_type == 'sheller_manual').mapped('total_production_qty'))
+            rec.payroll_parer = sum(p_sheets.filtered(lambda w: w.worker_type == 'parer').mapped('total_production_qty'))
+
+            employees = rec.work_sheet_ids.mapped('work_result_ids.employee_id')
+            rec.payroll_operator_count = len(employees)
+
+            if not rec.work_sheet_ids:
+                rec.payroll_status = 'none'
+            elif all(w.state == 'processed' for w in rec.work_sheet_ids):
+                rec.payroll_status = 'processed'
+            elif any(w.state == 'validated' for w in rec.work_sheet_ids):
+                rec.payroll_status = 'validated'
+            else:
+                rec.payroll_status = 'draft'
