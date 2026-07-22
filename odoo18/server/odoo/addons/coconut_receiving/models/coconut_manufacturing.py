@@ -182,6 +182,14 @@ class CoconutManufacturing(models.Model):
     initial_stock_hasil_sheller_mesin = fields.Float(string='Stok Awal Hasil Sheller Mesin (Kg)', readonly=True, copy=False)
     initial_stock_hasil_sheller_manual = fields.Float(string='Stok Awal Hasil Sheller Manual (Kg)', readonly=True, copy=False)
 
+    def _register_hook(self):
+        super()._register_hook()
+        menu = self.env.ref('mrp.menu_mrp_unbuild', raise_if_not_found=False)
+        if menu:
+            menu.write({'name': 'Penerimaan Kelapa'})
+            menu.with_context(lang='id_ID').write({'name': 'Penerimaan Kelapa'})
+            menu.with_context(lang='en_US').write({'name': 'Penerimaan Kelapa'})
+
     # ═══════════════════════════════════════════════════════════
     # 1. KETERSEDIAAN STOK & TRANSFER SHELLER
     # ═══════════════════════════════════════════════════════════

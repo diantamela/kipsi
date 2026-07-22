@@ -498,4 +498,24 @@
     <record id="mrp.menu_mrp_work_order_report" model="ir.ui.menu">
         <field name="active" eval="False"/>
     </record>
+
+    <!-- Deactivate default Scrap / Pembuangan menus -->
+    <record id="mrp.menu_mrp_scrap" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="stock.menu_stock_scrap" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Redirect Unbuild Orders (Order Pembongkaran) to Penerimaan Kelapa -->
+    <record id="mrp.menu_mrp_unbuild" model="ir.ui.menu">
+        <field name="action" ref="coconut_receiving.action_coconut_receipt"/>
+        <field name="name">Penerimaan Kelapa</field>
+    </record>
+
+    <!-- Deactivate Hasil Kerja Harian menu under Produksi -> Operasi -->
+    <record id="coconut_receiving.menu_coconut_hasil_kerja_harian" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
 </odoo>

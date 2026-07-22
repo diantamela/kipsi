@@ -2,12 +2,20 @@ import psycopg2
 try:
     conn = psycopg2.connect("dbname=diansukses user=openpg password=openpgpwd host=localhost")
     cur = conn.cursor()
-    cur.execute("select id, name::text, parent_id, action from ir_ui_menu where name::text ilike '%spk%';")
-    rows = cur.fetchall()
-    for row in rows:
-        cur.execute("select module, name from ir_model_data where model='ir.ui.menu' and res_id=%s;", (row[0],))
-        xml_id = cur.fetchone()
-        print(f"ID: {row[0]}, Name: {row[1]}, Parent: {row[2]}, Action: {row[3]}, XML_ID: {xml_id}")
+    # Query specific menus
+    for xml_id in ['mrp.menu_mrp_unbuild', 'coconut_receiving.menu_coconut_hasil_kerja_harian']:
+        module, name = xml_id.split('.')
+        cur.execute("""
+            select m.id, m.name::text, m.active, m.action, m.parent_id 
+            from ir_ui_menu m
+            join ir_model_data d on d.res_id = m.id and d.model = 'ir.ui.menu'
+            where d.module = %s and d.name = %s;
+        """, (module, name))
+        row = cur.fetchone()
+        if row:
+            print(f"XML_ID: {xml_id}, ID: {row[0]}, Name: {row[1]}, Active: {row[2]}, Action: {row[3]}, Parent: {row[4]}")
+        else:
+            print(f"XML_ID: {xml_id} not found")
     conn.close()
 except Exception as e:
     print("Error:", e)
