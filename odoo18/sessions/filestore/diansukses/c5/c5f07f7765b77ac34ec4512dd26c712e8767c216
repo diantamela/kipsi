@@ -36796,34 +36796,6 @@ registerTemplate("coconut_receiving.CoconutDashboard", `/coconut_receiving/stati
             <div class="coco_watermark"/>
 
 
-            <div class="coco_header_bar d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-3">
-                    <img src="/web_theme_pt_coco/static/src/img/logo.png" class="coco_logo" alt="PT Coco Murni Prima Jaya Logo"/>
-                    <div class="coco_header_titles">
-                        <h1 class="coco_main_title">Coconut Manufacturing ERP</h1>
-                        <p class="coco_sub_title">PT Coco Murni Prima Jaya</p>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-3 coco_user_nav">
-
-                    <div class="coco_nav_icon position-relative">
-                        <i class="fa fa-bell-o"/>
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger coco_badge_num">3</span>
-                    </div>
-
-                    <div class="coco_nav_icon">
-                        <i class="fa fa-clock-o"/>
-                    </div>
-
-                    <div class="d-flex align-items-center gap-2 coco_profile_dropdown">
-                        <div class="coco_avatar">A</div>
-                        <span class="coco_user_name">Administrator</span>
-                        <i class="fa fa-angle-down"/>
-                    </div>
-                </div>
-            </div>
-
-
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div class="d-flex align-items-center gap-2">
                     <span class="coco_dashboard_icon_wrapper">
