@@ -9,12 +9,14 @@ class HrEmployee(models.Model):
         ('parer', 'Parer'),
         ('sheller_manual', 'Sheller Manual'),
         ('sheller_mesin', 'Sheller Mesin'),
+        ('rmp', 'RMP'),
     ], string='Jenis Penggajian', compute='_compute_payroll_worker_type', store=True, readonly=False)
 
     payroll_job_type = fields.Selection([
         ('parer', 'Parer'),
         ('sheller_manual', 'Sheller Manual'),
         ('sheller_mesin', 'Sheller Mesin'),
+        ('rmp', 'RMP'),
     ], string='Jenis Pekerjaan Payroll', store=True)
 
     @api.onchange('department_id')
@@ -28,6 +30,8 @@ class HrEmployee(models.Model):
                 self.payroll_job_type = 'sheller_manual'
             elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
                 self.payroll_job_type = 'sheller_mesin'
+            elif 'RMP' in dep_name or 'Raw Material Preparation' in dep_name or 'RMP' in dep_display or 'Raw Material Preparation' in dep_display:
+                self.payroll_job_type = 'rmp'
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -42,6 +46,8 @@ class HrEmployee(models.Model):
                     vals['payroll_job_type'] = 'sheller_manual'
                 elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
                     vals['payroll_job_type'] = 'sheller_mesin'
+                elif 'RMP' in dep_name or 'Raw Material Preparation' in dep_name or 'RMP' in dep_display or 'Raw Material Preparation' in dep_display:
+                    vals['payroll_job_type'] = 'rmp'
         return super(HrEmployee, self).create(vals_list)
 
     def write(self, vals):
@@ -55,6 +61,8 @@ class HrEmployee(models.Model):
                 vals['payroll_job_type'] = 'sheller_manual'
             elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
                 vals['payroll_job_type'] = 'sheller_mesin'
+            elif 'RMP' in dep_name or 'Raw Material Preparation' in dep_name or 'RMP' in dep_display or 'Raw Material Preparation' in dep_display:
+                vals['payroll_job_type'] = 'rmp'
         return super(HrEmployee, self).write(vals)
 
     def init(self):
@@ -71,6 +79,8 @@ class HrEmployee(models.Model):
                     employee.payroll_job_type = 'sheller_manual'
                 elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
                     employee.payroll_job_type = 'sheller_mesin'
+                elif 'RMP' in dep_name or 'Raw Material Preparation' in dep_name or 'RMP' in dep_display or 'Raw Material Preparation' in dep_display:
+                    employee.payroll_job_type = 'rmp'
 
     @api.depends('department_id')
     def _compute_payroll_worker_type(self):
@@ -83,6 +93,8 @@ class HrEmployee(models.Model):
                 employee.payroll_worker_type = 'sheller_manual'
             elif 'Sheller Mesin' in dep_name or 'Sheller Mesin' in dep_display:
                 employee.payroll_worker_type = 'sheller_mesin'
+            elif 'RMP' in dep_name or 'Raw Material Preparation' in dep_name or 'RMP' in dep_display or 'Raw Material Preparation' in dep_display:
+                employee.payroll_worker_type = 'rmp'
             else:
                 employee.payroll_worker_type = False
 

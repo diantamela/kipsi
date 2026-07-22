@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- RMP Payroll Recap List View -->
+    <record id="view_coconut_payroll_rmp_tree" model="ir.ui.view">
+        <field name="name">coconut.payroll.rmp.list</field>
+        <field name="model">coconut.payroll.rmp</field>
+        <field name="arch" type="xml">
+            <list string="Rekapitulasi Penggajian RMP" decoration-info="state == 'draft'" decoration-warning="state == 'generated'" decoration-success="state in ('approved', 'paid')" decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="total_net_salary" sum="Total Gaji Bersih" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'generated'" decoration-success="state in ('approved', 'paid')" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- RMP Payroll Recap Form View -->
+    <record id="view_coconut_payroll_rmp_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.rmp.form</field>
+        <field name="model">coconut.payroll.rmp</field>
+        <field name="arch" type="xml">
+            <form string="Rekapitulasi Penggajian RMP">
+                <header>
+                    <button name="action_generate" string="Hitung Payroll" type="object" class="oe_highlight" invisible="state not in ('draft', 'generated')"/>
+                    <button name="action_approve" string="Setujui" type="object" class="oe_highlight" invisible="state != 'generated'" groups="coconut_payroll.group_coconut_payroll_manager"/>
+                    <button name="action_paid" string="Bayar" type="object" class="oe_highlight" invisible="state != 'approved'" groups="coconut_payroll.group_coconut_payroll_manager"/>
+                    <button name="action_draft" string="Kembalikan ke Draft" type="object" invisible="state not in ('generated', 'approved')"/>
+                    <button name="action_cancel" string="Batalkan" type="object" invisible="state not in ('generated', 'approved')" groups="coconut_payroll.group_coconut_payroll_manager"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,generated,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="company_id" readonly="state != 'draft'" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_net_salary" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Rincian Gaji RMP" name="rmp_lines">
+                            <field name="line_ids" readonly="state != 'draft'">
+                                <list string="Rincian Gaji RMP" editable="bottom" create="false" delete="false">
+                                    <field name="employee_id" readonly="1"/>
+                                    <field name="department_id" readonly="1"/>
+                                    <field name="period_display" string="Period" readonly="1"/>
+                                    <field name="hari_hadir" sum="Total Hari Hadir"/>
+                                    <field name="hari_alpha" sum="Total Hari Alpha"/>
+                                    <field name="jam_kerja" sum="Total Jam Kerja"/>
+                                    <field name="jam_lembur" sum="Total Jam Lembur"/>
+                                    <field name="terlambat" sum="Total Hari Terlambat"/>
+                                    <field name="pulang_cepat" sum="Total Hari Pulang Cepat"/>
+                                    <field name="wage_pokok" widget="monetary" sum="Total Gaji Pokok"/>
+                                    <field name="wage_lembur" widget="monetary" sum="Total Gaji Lembur"/>
+                                    <field name="premi_kehadiran" widget="monetary" sum="Total Premi Kehadiran"/>
+                                    <field name="premi_disiplin" widget="monetary" sum="Total Premi Disiplin"/>
+                                    <field name="uang_makan" widget="monetary" sum="Total Uang Makan"/>
+                                    <field name="potongan" widget="monetary" sum="Total Potongan"/>
+                                    <field name="net_salary" widget="monetary" sum="Total Gaji Bersih"/>
+                                    <field name="currency_id" column_invisible="True"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- RMP Payroll Recap Search View -->
+    <record id="view_coconut_payroll_rmp_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.rmp.search</field>
+        <field name="model">coconut.payroll.rmp</field>
+        <field name="arch" type="xml">
+            <search string="Cari Rekapitulasi RMP">
+                <field name="name"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <filter string="Draft" name="draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Generated" name="generated" domain="[('state', '=', 'generated')]"/>
+                <filter string="Disetujui" name="approved" domain="[('state', '=', 'approved')]"/>
+                <filter string="Lunas" name="paid" domain="[('state', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="state" context="{'group_by': 'state'}"/>
+                    <filter string="Tanggal Mulai" name="group_by_date_start" context="{'group_by': 'date_start'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action for RMP Payroll Recap -->
+    <record id="action_coconut_payroll_rmp" model="ir.actions.act_window">
+        <field name="name">Penggajian Harian RMP</field>
+        <field name="res_model">coconut.payroll.rmp</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_rmp_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Buat rekapitulasi penggajian harian RMP baru
+            </p>
+            <p>
+                Sistem ini menghitung gaji pokok, lembur, premi kehadiran, premi disiplin, uang makan, dan potongan secara otomatis berdasarkan data kehadiran.
+            </p>
+        </field>
+    </record>
+
+    <!-- RMP Payroll Line List View (individual lookup if needed) -->
+    <record id="view_coconut_payroll_rmp_line_tree" model="ir.ui.view">
+        <field name="name">coconut.payroll.rmp.line.list</field>
+        <field name="model">coconut.payroll.rmp.line</field>
+        <field name="arch" type="xml">
+            <list string="Slip Gaji RMP" create="false" edit="false" delete="false">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="period_display" string="Period"/>
+                <field name="hari_hadir"/>
+                <field name="hari_alpha"/>
+                <field name="jam_kerja"/>
+                <field name="jam_lembur"/>
+                <field name="terlambat"/>
+                <field name="pulang_cepat"/>
+                <field name="wage_pokok" widget="monetary"/>
+                <field name="wage_lembur" widget="monetary"/>
+                <field name="premi_kehadiran" widget="monetary"/>
+                <field name="premi_disiplin" widget="monetary"/>
+                <field name="uang_makan" widget="monetary"/>
+                <field name="potongan" widget="monetary"/>
+                <field name="net_salary" widget="monetary"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_coconut_payroll_rmp_line" model="ir.actions.act_window">
+        <field name="name">Slip Gaji RMP</field>
+        <field name="res_model">coconut.payroll.rmp.line</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p>
+                Rincian slip gaji harian karyawan departemen RMP.
+            </p>
+        </field>
+    </record>
+</odoo>

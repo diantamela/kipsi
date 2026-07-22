@@ -1,7 +1,12 @@
-import os
-for root, dirs, files in os.walk("c:\\odoo"):
-    for d in dirs:
-        if d in ['coconut_receiving', 'coconut_payroll']:
-            print(f"Found module {d} in: {os.path.join(root, d)}")
+import psycopg2
+conn = psycopg2.connect('dbname=diansukses user=openpg host=localhost port=5432 password=openpgpwd')
+cur=conn.cursor()
+cur.execute('''
+    SELECT table_name FROM information_schema.tables WHERE table_name LIKE '%attendance%'
+''')
+results = cur.fetchall()
+for row in results:
+    print(row)
+
 
 

@@ -16,11 +16,23 @@
               action="action_coconut_payroll_recap"
               sequence="20"/>
 
+    <menuitem id="menu_coconut_payroll_rmp"
+              name="Penggajian Harian RMP"
+              parent="menu_coconut_payroll_root"
+              action="action_coconut_payroll_rmp"
+              sequence="25"/>
+
     <menuitem id="menu_coconut_payroll_line"
               name="Slip Gaji"
               parent="menu_coconut_payroll_root"
               action="action_coconut_payroll_line"
               sequence="30"/>
+
+    <menuitem id="menu_coconut_payroll_rmp_line"
+              name="Slip Gaji RMP"
+              parent="menu_coconut_payroll_root"
+              action="action_coconut_payroll_rmp_line"
+              sequence="35"/>
 
     <menuitem id="menu_coconut_employee_loan"
               name="Pinjaman Karyawan"
