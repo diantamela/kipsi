@@ -1,57 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Form view inheritance to add realisasi fields -->
+    <!-- Form view inheritance to add worksheets tab -->
     <record id="view_coconut_manufacturing_form_inherit" model="ir.ui.view">
         <field name="name">coconut.manufacturing.form.inherit.payroll</field>
         <field name="model">coconut.manufacturing</field>
         <field name="inherit_id" ref="coconut_receiving.view_coconut_manufacturing_form"/>
         <field name="arch" type="xml">
-            <!-- Add realisasi_state near Informasi Transfer group -->
-            <xpath expr="//group" position="after">
-                <group string="Status Realisasi">
-                    <field name="realisasi_state"
-                           widget="badge"
-                           decoration-info="realisasi_state == 'no_result'"
-                           decoration-warning="realisasi_state == 'partial'"
-                           decoration-success="realisasi_state == 'done'"
-                           readonly="1"/>
-                </group>
-            </xpath>
-
-            <!-- Add Realisasi group inside notebook/page[@name='tab_transfer_material'] -->
-            <xpath expr="//page[@name='tab_transfer_material']" position="inside">
-                <group string="Realisasi Hasil Kerja">
-                    <group string="Proses Sheller (Mesin &amp; Manual)">
-                        <field name="realisasi_sheller_mesin"
-                               string="Hasil Kerja Sheller Mesin (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_sheller_manual"
-                               string="Hasil Kerja Sheller Manual (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_total_sheller"
-                               string="Total Hasil Sheller (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_sisa_sheller"
-                               string="Sisa Area Sheller (Kg)"
-                               readonly="1"/>
-                    </group>
-                    <group string="Proses Perrer">
-                        <field name="realisasi_perrer_mesin"
-                               string="Hasil Kerja Perrer dari Sheller Mesin (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_perrer_manual"
-                               string="Hasil Kerja Perrer dari Sheller Manual (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_total_perrer"
-                               string="Total Hasil Perrer (Kg)"
-                               readonly="1"/>
-                        <field name="realisasi_sisa_perrer"
-                               string="Sisa Area Perrer (Kg)"
-                               readonly="1"/>
-                    </group>
-                </group>
-            </xpath>
-
             <!-- Add page for related worksheets -->
             <xpath expr="//page[@name='tab_transfer_material']" position="after">
                 <page string="Lembar Kerja Terkait" name="tab_work_sheets">
@@ -66,19 +20,6 @@
                         </list>
                     </field>
                 </page>
-            </xpath>
-        </field>
-    </record>
-
-    <!-- List view inheritance to add realisasi total & status columns -->
-    <record id="view_coconut_manufacturing_list_inherit" model="ir.ui.view">
-        <field name="name">coconut.manufacturing.list.inherit.payroll</field>
-        <field name="model">coconut.manufacturing</field>
-        <field name="inherit_id" ref="coconut_receiving.view_coconut_manufacturing_list"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='total_transfer_sheller']" position="after">
-                <field name="realisasi_total_sheller" string="Realisasi Sheller (Kg)" sum="Total Realisasi Sheller"/>
-                <field name="realisasi_state" widget="badge" decoration-info="realisasi_state == 'no_result'" decoration-warning="realisasi_state == 'partial'" decoration-success="realisasi_state == 'done'"/>
             </xpath>
         </field>
     </record>

@@ -47,7 +47,7 @@ class CoconutWorkSheet(models.Model):
         readonly=True,
     )
 
-    @api.depends('transfer_id', 'worker_type', 'parer_source')
+    @api.depends('transfer_id', 'worker_type', 'parer_source', 'work_result_ids.quantity_kg')
     def _compute_total_production_qty(self):
         for record in self:
             qty = 0.0
@@ -68,6 +68,8 @@ class CoconutWorkSheet(models.Model):
                 
                 hkh_records = self.env['coconut.hasil.kerja.harian'].search(domain)
                 qty = sum(hkh_records.mapped('qty_hasil'))
+            else:
+                qty = sum(record.work_result_ids.mapped('quantity_kg'))
             record.total_production_qty = qty
 
     state = fields.Selection([
@@ -148,6 +150,7 @@ class CoconutWorkSheet(models.Model):
             raise UserError(_("Hanya Supervisor atau Manager Penggajian yang dapat memvalidasi hasil kerja."))
 
         for record in self:
+            record._compute_total_production_qty()
             if record.state != 'draft':
                 raise UserError(_("Hanya dokumen berstatus Draft yang dapat divalidasi."))
 
@@ -196,7 +199,7 @@ class CoconutWorkSheet(models.Model):
                                 "Total hasil kerja Perrer dari Sheller Mesin (%(total)s kg) melebihi batas transfer (%(limit)s kg)."
                             ) % {'total': total_with_current, 'limit': limit})
                     elif record.parer_source == 'manual':
-                        limit = record.transfer_id.transfer_perrer_manual_qty
+                        limit = 0.0
                         if total_with_current > limit:
                             raise ValidationError(_(
                                 "Total hasil kerja Perrer dari Sheller Manual (%(total)s kg) melebihi batas transfer (%(limit)s kg)."

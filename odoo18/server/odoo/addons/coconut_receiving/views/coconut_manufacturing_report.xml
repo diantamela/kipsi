@@ -148,18 +148,6 @@
                                 <td class="info-label">Tanggal Transfer</td>
                                 <td class="info-colon">:</td>
                                 <td><span t-field="doc.production_date" t-options='{"widget": "date"}'/></td>
-                                <td class="info-label">Nomor SPK</td>
-                                <td class="info-colon">:</td>
-                                <td><span t-field="doc.spk_number"/></td>
-                            </tr>
-                            <tr>
-                                <td class="info-label">Status Realisasi</td>
-                                <td class="info-colon">:</td>
-                                <td>
-                                    <span t-if="doc.realisasi_state == 'no_result'">Belum Ada Hasil Kerja</span>
-                                    <span t-elif="doc.realisasi_state == 'partial'">Sebagian</span>
-                                    <span t-elif="doc.realisasi_state == 'done'">Selesai</span>
-                                </td>
                                 <td class="info-label">Status Dokumen</td>
                                 <td class="info-colon">:</td>
                                 <td>
@@ -190,14 +178,14 @@
                                     <td class="text-right"><t t-esc="doc.format_kg(stock_data['layak']['awal'])"/></td>
                                 </tr>
                                 <tr>
+                                    <td>Kelapa Reject</td>
+                                    <td>Stok Kelapa Reject</td>
+                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['reject']['awal'])"/></td>
+                                </tr>
+                                <tr>
                                     <td>Kelapa Sheller (Hasil Mesin)</td>
                                     <td>Stok Hasil Sheller Mesin</td>
                                     <td class="text-right"><t t-esc="doc.format_kg(stock_data['hasil_mesin']['awal'])"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Kelapa Sheller (Hasil Manual)</td>
-                                    <td>Stok Hasil Sheller Manual</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg(stock_data['hasil_manual']['awal'])"/></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -210,7 +198,7 @@
                                 <strong><t t-esc="doc.format_kg(doc.sheller_mesin_qty)"/></strong>
                             </div>
                             <div class="process-item">
-                                <span>Kelapa Layak ke Sheller Manual: </span>
+                                <span>Kelapa Reject ke Sheller Manual: </span>
                                 <strong><t t-esc="doc.format_kg(doc.sheller_manual_qty)"/></strong>
                             </div>
                             <div class="process-item">
@@ -226,50 +214,7 @@
                                 <span>Hasil Sheller Mesin Ditransfer ke Perrer: </span>
                                 <strong><t t-esc="doc.format_kg(doc.transfer_perrer_mesin_qty)"/></strong>
                             </div>
-                            <div class="process-item">
-                                <span>Hasil Sheller Manual Ditransfer ke Perrer: </span>
-                                <strong><t t-esc="doc.format_kg(doc.transfer_perrer_manual_qty)"/></strong>
-                            </div>
                         </div>
-
-                        <!-- ══ SECTION 4: REALISASI HASIL KERJA ══ -->
-                        <div class="section-title">4. Realisasi Hasil Kerja</div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Proses Kerja</th>
-                                    <th class="text-right">Jumlah Ditransfer (Kg)</th>
-                                    <th class="text-right">Realisasi Hasil Kerja (Kg)</th>
-                                    <th class="text-right">Sisa Area (Kg)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Sheller Mesin</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.sheller_mesin_qty)"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_sheller_mesin)"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.sheller_mesin_qty - doc.realisasi_sheller_mesin)"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Sheller Manual</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.sheller_manual_qty)"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_sheller_manual)"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.sheller_manual_qty - doc.realisasi_sheller_manual)"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Perrer dari Sheller Mesin</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_mesin_qty)"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_perrer_mesin)"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_mesin_qty - doc.realisasi_perrer_mesin)"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Perrer dari Sheller Manual</td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_manual_qty)"/></td>
-                                    <td class="text-right"><t t-esc="doc.format_kg_raw(doc.realisasi_perrer_manual)"/></td>
-                                    <td class="text-right text-bold"><t t-esc="doc.format_kg_raw(doc.transfer_perrer_manual_qty - doc.realisasi_perrer_manual)"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
 
                         <!-- ══ TANDA TANGAN ══ -->
                         <div class="signature-container" style="margin-top: 60px;">

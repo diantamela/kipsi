@@ -88,7 +88,7 @@ class CoconutHasilKerjaHarian(models.Model):
                 elif rec.process_type == 'parer_mesin':
                     qty = rec.transfer_id.transfer_perrer_mesin_qty
                 elif rec.process_type == 'parer_manual':
-                    qty = rec.transfer_id.transfer_perrer_manual_qty
+                    qty = 0.0
             rec.material_in_qty = qty
 
     @api.depends('material_in_qty', 'qty_hasil')
@@ -197,9 +197,9 @@ class CoconutHasilKerjaHarian(models.Model):
             })
         elif self.process_type == 'sheller_manual':
             raw_move = self.env['stock.move'].create({
-                'name': f'{origin} – Konsumsi Kelapa Layak (Sheller Manual)',
+                'name': f'{origin} – Konsumsi Kelapa Reject (Sheller Manual)',
                 'origin': origin,
-                'product_id': p_layak.id,
+                'product_id': p_reject.id,
                 'product_uom_qty': self.qty_hasil,
                 'product_uom': uom_kg.id,
                 'location_id': loc_sheller_manual.id,

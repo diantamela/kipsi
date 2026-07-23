@@ -254,7 +254,6 @@
                                 <field name="production_date" string="Tgl Produksi"/>
                                 <field name="total_transfer_sheller" string="Transfer Sheller (Kg)"/>
                                 <field name="transfer_perrer_mesin_qty" string="Transfer Perrer Mesin (Kg)"/>
-                                <field name="transfer_perrer_manual_qty" string="Transfer Perrer Manual (Kg)"/>
                                 <field name="state"
                                        widget="badge"
                                        decoration-success="state == 'done'"

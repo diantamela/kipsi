@@ -64,14 +64,20 @@
                         <page string="Transfer Material" name="tab_transfer_material">
                             <!-- Transfer Sheller -->
                             <group string="Transfer ke Sheller">
-                                <group>
+                                <group string="Kelapa Layak Produksi">
                                     <field name="available_kelapa_layak" string="Stok Kelapa Layak Tersedia (Kg)" readonly="1"/>
                                     <field name="sheller_mesin_qty" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="state != 'draft'"/>
-                                    <field name="sheller_manual_qty" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="state != 'draft'"/>
+                                    <field name="remaining_kelapa_layak" string="Sisa Kelapa Layak Produksi (Kg)" readonly="1"/>
                                 </group>
+                                <group string="Kelapa Reject">
+                                    <field name="available_kelapa_reject" string="Stok Kelapa Reject Tersedia (Kg)" readonly="1"/>
+                                    <field name="sheller_manual_qty" string="Kelapa Reject ke Sheller Manual (Kg)" readonly="state != 'draft'"/>
+                                    <field name="remaining_kelapa_reject" string="Sisa Kelapa Reject (Kg)" readonly="1"/>
+                                </group>
+                            </group>
+                            <group>
                                 <group>
                                     <field name="total_transfer_sheller" string="Total Transfer Sheller (Kg)" readonly="1"/>
-                                    <field name="remaining_kelapa_layak" string="Sisa Kelapa Layak Setelah Transfer (Kg)" readonly="1"/>
                                 </group>
                             </group>
 
@@ -80,12 +86,7 @@
                                 <group string="Sumber: Hasil Sheller Mesin">
                                     <field name="available_hasil_sheller_mesin" string="Stok Hasil Sheller Mesin Tersedia (Kg)" readonly="1"/>
                                     <field name="transfer_perrer_mesin_qty" string="Hasil Sheller Mesin Ditransfer ke Perrer (Kg)" readonly="state != 'draft'"/>
-                                    <field name="remaining_hasil_sheller_mesin" string="Sisa Hasil Sheller Mesin Setelah Transfer (Kg)" readonly="1"/>
-                                </group>
-                                <group string="Sumber: Hasil Sheller Manual">
-                                    <field name="available_hasil_sheller_manual" string="Stok Hasil Sheller Manual Tersedia (Kg)" readonly="1"/>
-                                    <field name="transfer_perrer_manual_qty" string="Hasil Sheller Manual Ditransfer ke Perrer (Kg)" readonly="state != 'draft'"/>
-                                    <field name="remaining_hasil_sheller_manual" string="Sisa Hasil Sheller Manual Setelah Transfer (Kg)" readonly="1"/>
+                                    <field name="remaining_hasil_sheller_mesin" string="Sisa Hasil Sheller Mesin (Kg)" readonly="1"/>
                                 </group>
                             </group>
                         </page>
@@ -126,12 +127,11 @@
                         <!-- Kelompok 2: Alur Perjalanan Material -->
                         <group string="Transfer Bahan Baku ke Sheller">
                             <field name="layak_to_sheller_mesin" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="1"/>
-                            <field name="layak_to_sheller_manual" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="1"/>
+                            <field name="reject_to_sheller_manual" string="Kelapa Reject ke Sheller Manual (Kg)" readonly="1"/>
                         </group>
 
                         <group string="Transfer Bahan Baku ke Parer">
                             <field name="hasil_to_parer_mesin" string="Hasil Sheller Mesin Ditransfer ke Parer (Kg)" readonly="1"/>
-                            <field name="hasil_to_parer_manual" string="Hasil Sheller Manual Ditransfer ke Parer (Kg)" readonly="1"/>
                         </group>
                     </group>
 
@@ -345,12 +345,11 @@
                     <group>
                         <group string="Transfer Bahan Baku ke Sheller">
                             <field name="layak_to_sheller_mesin" string="Kelapa Layak ke Sheller Mesin (Kg)" readonly="1"/>
-                            <field name="layak_to_sheller_manual" string="Kelapa Layak ke Sheller Manual (Kg)" readonly="1"/>
+                            <field name="reject_to_sheller_manual" string="Kelapa Reject ke Sheller Manual (Kg)" readonly="1"/>
                         </group>
 
                         <group string="Transfer Bahan Baku ke Parer">
                             <field name="hasil_to_parer_mesin" string="Hasil Sheller Mesin Ditransfer ke Parer (Kg)" readonly="1"/>
-                            <field name="hasil_to_parer_manual" string="Hasil Sheller Manual Ditransfer ke Parer (Kg)" readonly="1"/>
                         </group>
                     </group>
 
