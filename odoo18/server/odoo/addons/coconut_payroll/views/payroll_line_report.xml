@@ -6,8 +6,8 @@
         <field name="default" eval="False" />
         <field name="format">A5</field>
         <field name="orientation">Landscape</field>
-        <field name="margin_top">5</field>
-        <field name="margin_bottom">5</field>
+        <field name="margin_top">6</field>
+        <field name="margin_bottom">6</field>
         <field name="margin_left">8</field>
         <field name="margin_right">8</field>
         <field name="header_line" eval="False" />
@@ -15,7 +15,7 @@
         <field name="dpi">90</field>
     </record>
 
-    <!-- Individual Payslip Report Action -->
+    <!-- Report Actions -->
     <record id="action_report_payslip" model="ir.actions.report">
         <field name="name">Cetak Slip Gaji</field>
         <field name="model">coconut.payroll.line</field>
@@ -23,168 +23,490 @@
         <field name="report_name">coconut_payroll.report_payslip_template</field>
         <field name="report_file">coconut_payroll.report_payslip_template</field>
         <field name="print_report_name">'Slip_Gaji_' + (object.employee_id.name or '')</field>
-        <field name="binding_model_id" ref="model_coconut_payroll_line"/>
-        <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_a5_payslip"/>
     </record>
 
-    <!-- Recap All Payslips Report Action -->
-    <record id="action_report_recap_payslips" model="ir.actions.report">
-        <field name="name">Cetak Semua Slip Gaji</field>
-        <field name="model">coconut.payroll.recap</field>
+    <record id="action_report_payslip_harian" model="ir.actions.report">
+        <field name="name">Cetak Slip Gaji</field>
+        <field name="model">coconut.payroll.line.harian</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">coconut_payroll.report_recap_payslips_template</field>
-        <field name="report_file">coconut_payroll.report_recap_payslips_template</field>
-        <field name="print_report_name">'Semua_Slip_Gaji_' + (object.name or '')</field>
-        <field name="binding_model_id" ref="model_coconut_payroll_recap"/>
+        <field name="report_name">coconut_payroll.report_payslip_harian_template</field>
+        <field name="report_file">coconut_payroll.report_payslip_harian_template</field>
+        <field name="print_report_name">'Slip_Gaji_Harian_' + (object.employee_id.name or '')</field>
+        <field name="binding_model_id" ref="model_coconut_payroll_line_harian"/>
         <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_a5_payslip"/>
     </record>
 
-    <!-- Shared Payslip Card Component Template -->
-    <template id="payslip_card_component">
-        <div class="page" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; padding: 10px; margin: 0; page-break-after: always; page-break-inside: avoid;">
-            <!-- Header -->
-            <div class="row align-items-center mb-1">
-                <div class="col-2">
-                    <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 50px; max-width: 100%; display: block;" alt="Logo"/>
-                </div>
-                <div class="col-5">
-                    <strong><span t-field="o.company_id.name" style="font-size: 14px; color: #2C3E50;"/></strong><br/>
-                    <span t-field="o.company_id.street" style="font-size: 10px;"/><br/>
-                    <span t-field="o.company_id.city" style="font-size: 10px;"/>
-                </div>
-                <div class="col-5 text-end">
-                    <h3 style="margin: 0; color: #2C3E50; font-weight: bold; font-size: 18px;">SLIP GAJI</h3>
-                    <strong>No:</strong> <span t-field="o.recap_id.name"/><br/>
-                    <strong>Periode:</strong> <span t-field="o.recap_id.date_start" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/> - <span t-field="o.recap_id.date_end" t-options="{'widget': 'date', 'format': 'dd/MM/yyyy'}"/>
-                </div>
-            </div>
+    <record id="action_report_payslip_borongan" model="ir.actions.report">
+        <field name="name">Cetak Slip Gaji</field>
+        <field name="model">coconut.payroll.line.borongan</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_payroll.report_payslip_borongan_template</field>
+        <field name="report_file">coconut_payroll.report_payslip_borongan_template</field>
+        <field name="print_report_name">'Slip_Gaji_Borongan_' + (object.employee_id.name or '')</field>
+        <field name="binding_model_id" ref="model_coconut_payroll_line_borongan"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_a5_payslip"/>
+    </record>
 
-            <hr style="border-top: 1.5px solid #2C3E50; margin-top: 3px; margin-bottom: 8px;"/>
+    <!-- Shared styles component to avoid code duplication and ensure premium styling -->
+    <template id="payslip_shared_styles">
+        <style>
+            .payslip-container {
+                font-family: 'Courier New', Courier, monospace, Arial, sans-serif;
+                font-size: 11px;
+                color: #000;
+                padding: 10px;
+                background-color: #fff;
+                height: 100%;
+            }
+            .payslip-header-table {
+                width: 100%;
+                margin-bottom: 12px;
+                border-bottom: 2px solid #000;
+            }
+            .payslip-header-title {
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                text-decoration: underline;
+                margin-top: 5px;
+                margin-bottom: 2px;
+            }
+            .payslip-header-period {
+                font-size: 11px;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            .payslip-meta-table {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .payslip-meta-table td {
+                padding: 2px 4px;
+                vertical-align: top;
+            }
+            .payslip-details-container {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 8px;
+            }
+            .payslip-details-container th {
+                background-color: #f2f2f2;
+                border: 1px solid #000;
+                padding: 4px;
+                font-weight: bold;
+                text-align: left;
+            }
+            .payslip-details-container td {
+                border: 1px solid #000;
+                padding: 4px;
+                vertical-align: top;
+            }
+            .payslip-subtotal-row {
+                font-weight: bold;
+                border-top: 1.5px solid #000;
+            }
+            .payslip-net-box {
+                width: 100%;
+                border: 2px solid #000;
+                background-color: #e6e6e6;
+                padding: 6px;
+                font-weight: bold;
+                font-size: 13px;
+                margin-bottom: 5px;
+            }
+            .payslip-terbilang {
+                font-style: italic;
+                font-size: 10px;
+                margin-bottom: 12px;
+                padding-left: 5px;
+            }
+            .payslip-footer-signatures {
+                width: 100%;
+                text-align: center;
+                margin-top: 5px;
+            }
+            .payslip-footer-signatures td {
+                width: 33%;
+                padding: 0;
+            }
+            .signature-line {
+                margin-top: 35px;
+                display: inline-block;
+                width: 70%;
+                border-bottom: 1px solid #000;
+            }
+        </style>
+    </template>
 
-            <!-- Employee Details -->
-            <div class="row mb-2">
-                <div class="col-6">
-                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+    <!-- Daily (Harian) Payslip Card Component -->
+    <template id="payslip_harian_card">
+        <div class="page" style="page-break-after: always; page-break-inside: avoid;">
+            <t t-call="coconut_payroll.payslip_shared_styles"/>
+            <div class="payslip-container">
+                <!-- Header -->
+                <table class="payslip-header-table">
+                    <tr>
+                        <td style="width: 20%; padding-bottom: 8px; vertical-align: middle;">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 70px; max-width: 100%; display: block;" alt="Logo"/>
+                        </td>
+                        <td style="width: 80%; padding-left: 15px; padding-bottom: 8px; vertical-align: middle; line-height: 1.4;">
+                            <span t-field="o.company_id.name" style="font-size: 18px; font-weight: bold; display: block;"/><br/>
+                            <span t-field="o.company_id.street"/><br/>
+                            <span t-field="o.company_id.street2"/><br/>
+                            <span t-field="o.company_id.city"/>, <span t-field="o.company_id.state_id.name"/> <span t-field="o.company_id.zip"/>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="payslip-header-title">SLIP GAJI KARYAWAN</div>
+                <div class="payslip-header-period">Periode: <span t-field="o.period_display"/></div>
+
+                <!-- Info Karyawan -->
+                <table class="payslip-meta-table">
+                    <tr>
+                        <td style="width: 15%;"><strong>NIK</strong></td>
+                        <td style="width: 2%;">:</td>
+                        <td style="width: 33%;"><span t-field="o.employee_id.employee_code"/></td>
+                        <td style="width: 15%;"><strong>Jabatan</strong></td>
+                        <td style="width: 2%;">:</td>
+                        <td style="width: 33%;">Karyawan Harian (RMP)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nama</strong></td>
+                        <td>:</td>
+                        <td><span t-field="o.employee_id.name"/></td>
+                        <td><strong>Departemen</strong></td>
+                        <td>:</td>
+                        <td><span t-field="o.department_id.name"/></td>
+                    </tr>
+                </table>
+
+                <!-- Earnings & Deductions -->
+                <table class="payslip-details-container">
+                    <thead>
                         <tr>
-                            <td style="width: 35%; padding: 1px 0;"><strong>Nama Karyawan</strong></td>
-                            <td style="width: 5%; padding: 1px 0;">:</td>
-                            <td style="padding: 1px 0;"><span t-field="o.employee_id.name"/></td>
+                            <th style="width: 50%;">PENGHASILAN</th>
+                            <th style="width: 50%;">POTONGAN</th>
                         </tr>
+                    </thead>
+                    <tbody>
                         <tr>
-                            <td style="padding: 1px 0;"><strong>NIK</strong></td>
-                            <td style="padding: 1px 0;">:</td>
-                            <td style="padding: 1px 0;"><span t-field="o.employee_id.employee_code"/></td>
+                            <!-- Earnings Column -->
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td>Gaji Pokok (<span t-field="o.hari_hadir"/> Hari)</td>
+                                        <td class="text-end"><span t-field="o.wage_pokok" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Premi Kehadiran</td>
+                                        <td class="text-end"><span t-field="o.premi_kehadiran" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Premi Disiplin</td>
+                                        <td class="text-end"><span t-field="o.premi_disiplin" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Uang Makan</td>
+                                        <td class="text-end"><span t-field="o.uang_makan" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Lembur (<span t-field="o.jam_lembur"/> Jam)</td>
+                                        <td class="text-end"><span t-field="o.wage_lembur" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- Deductions Column -->
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td>Alpha (<span t-field="o.hari_alpha"/> Hari)</td>
+                                        <td class="text-end">Rp 0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Terlambat (<span t-field="o.terlambat"/> Hari)</td>
+                                        <td class="text-end"><span t-out="o.terlambat * 5000" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Pulang Cepat (<span t-field="o.pulang_cepat"/> Hari)</td>
+                                        <td class="text-end"><span t-out="o.pulang_cepat * 5000" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Potongan Pinjaman</td>
+                                        <td class="text-end"><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Subtotal Row -->
+                        <tr class="payslip-subtotal-row">
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td><strong>TOTAL PENDAPATAN</strong></td>
+                                        <td class="text-end"><strong><span t-out="o.wage_pokok + o.premi_kehadiran + o.premi_disiplin + o.uang_makan + o.wage_lembur" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td><strong>TOTAL POTONGAN</strong></td>
+                                        <td class="text-end"><strong><span t-out="o.potongan + o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Net Box -->
+                <div class="payslip-net-box">
+                    <table style="width: 100%; border: none; margin: 0;">
+                        <tr>
+                            <td>PENERIMAAN BERSIH (TAKE HOME PAY)</td>
+                            <td class="text-end" style="font-size: 15px;"><span t-field="o.net_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
                         </tr>
                     </table>
                 </div>
-                <div class="col-6">
-                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
-                        <tr>
-                            <td style="width: 35%; padding: 1px 0;"><strong>Bagian/Jabatan</strong></td>
-                            <td style="width: 5%; padding: 1px 0;">:</td>
-                            <td style="padding: 1px 0;"><span t-field="o.worker_type"/></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 1px 0;"><strong>Total Kerja</strong></td>
-                            <td style="padding: 1px 0;">:</td>
-                            <td style="padding: 1px 0;"><span t-field="o.total_quantity_kg"/> Kg</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
 
-            <!-- Earnings and Deductions -->
-            <div class="row mb-2">
-                <!-- Earnings -->
-                <div class="col-6">
-                    <h6 style="border-bottom: 1.5px solid #2C3E50; padding-bottom: 3px; color: #2C3E50; font-weight: bold; font-size: 11px; margin-bottom: 4px;">PENERIMAAN</h6>
-                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
-                        <tr>
-                            <td style="padding: 2px 0;">Upah Dasar</td>
-                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.basic_wage" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 2px 0;">Premi / Bonus</td>
-                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.premium" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                        </tr>
-                        <tr style="border-top: 1px solid #ddd;">
-                            <td style="padding: 4px 0;"><strong>Total Gaji Kotor</strong></td>
-                            <td style="padding: 4px 0;" class="text-end"><strong><span t-field="o.gross_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
-                        </tr>
-                    </table>
+                <!-- Terbilang -->
+                <div class="payslip-terbilang">
+                    Terbilang : # <span t-out="o.currency_id.amount_to_text(o.net_salary)"/> #
                 </div>
 
-                <!-- Deductions -->
-                <div class="col-6" style="border-left: 1px solid #ddd;">
-                    <h6 style="border-bottom: 1.5px solid #2C3E50; padding-bottom: 3px; color: #2C3E50; font-weight: bold; font-size: 11px; margin-bottom: 4px;">POTONGAN</h6>
-                    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
-                        <tr>
-                            <td style="padding: 2px 0;">Potongan Pinjaman</td>
-                            <td style="padding: 2px 0;" class="text-end"><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
-                        </tr>
-                        <!-- Empty alignment line -->
-                        <tr>
-                            <td style="padding: 2px 0;">&amp;nbsp;</td>
-                            <td style="padding: 2px 0;" class="text-end">&amp;nbsp;</td>
-                        </tr>
-                        <tr style="border-top: 1px solid #ddd;">
-                            <td style="padding: 4px 0;"><strong>Total Potongan</strong></td>
-                            <td style="padding: 4px 0;" class="text-end"><strong><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
+                <!-- Footer Signatures -->
+                <table class="payslip-footer-signatures">
+                    <tr>
+                        <td>
+                            Dibuat Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong>Staf Payroll / HRD</strong>
+                        </td>
+                        <td>
+                            Diketahui Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong>Direktur</strong>
+                        </td>
+                        <td>
+                            Diterima Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong><span t-field="o.employee_id.name"/></strong>
+                        </td>
+                    </tr>
+                </table>
 
-            <!-- Net Salary -->
-            <div class="card p-2 mb-2" style="background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; margin-top: 5px;">
-                <div class="row align-items-center">
-                    <div class="col-6">
-                        <h5 style="margin: 0; color: #2C3E50; font-weight: bold; font-size: 12px;">GAJI BERSIH (Take Home Pay)</h5>
-                    </div>
-                    <div class="col-6 text-end">
-                        <h4 style="margin: 0; color: #27AE60; font-weight: bold; font-size: 15px;"><span t-field="o.net_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></h4>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Signatures -->
-            <div class="row text-center mt-3" style="page-break-inside: avoid; margin-top: 15px; font-size: 10px;">
-                <div class="col-4">
-                    <p style="margin-bottom: 30px;">Dibuat Oleh,</p>
-                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;">Staf Payroll</p>
-                </div>
-                <div class="col-4">
-                    <p style="margin-bottom: 30px;">Disetujui Oleh,</p>
-                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;">Manager Operasional / HRD</p>
-                </div>
-                <div class="col-4">
-                    <p style="margin-bottom: 30px;">Diterima Oleh,</p>
-                    <p style="border-top: 1px dashed #888; display: inline-block; width: 80%; margin-bottom: 0;"><span t-field="o.employee_id.name"/></p>
+                <div style="font-size: 9px; text-align: left; margin-top: 8px; color: #666;">
+                    * Slip gaji ini dicetak otomatis oleh sistem ERP. Tanggal Cetak: <span t-out="datetime.date.today().strftime('%d/%m/%Y')"/>
                 </div>
             </div>
         </div>
     </template>
 
-    <!-- Individual Payslip Template -->
-    <template id="report_payslip_template">
+    <!-- Piece-rate (Borongan) Payslip Card Component -->
+    <template id="payslip_borongan_card">
+        <div class="page" style="page-break-after: always; page-break-inside: avoid;">
+            <t t-call="coconut_payroll.payslip_shared_styles"/>
+            <div class="payslip-container">
+                <!-- Header -->
+                <table class="payslip-header-table">
+                    <tr>
+                        <td style="width: 20%; padding-bottom: 8px; vertical-align: middle;">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 70px; max-width: 100%; display: block;" alt="Logo"/>
+                        </td>
+                        <td style="width: 80%; padding-left: 15px; padding-bottom: 8px; vertical-align: middle; line-height: 1.4;">
+                            <span t-field="o.company_id.name" style="font-size: 18px; font-weight: bold; display: block;"/><br/>
+                            <span t-field="o.company_id.street"/><br/>
+                            <span t-field="o.company_id.street2"/><br/>
+                            <span t-field="o.company_id.city"/>, <span t-field="o.company_id.state_id.name"/> <span t-field="o.company_id.zip"/>
+                        </td>
+                    </tr>
+                </table>
+
+                <div class="payslip-header-title">SLIP GAJI KARYAWAN</div>
+                <div class="payslip-header-period">Periode: <span t-field="o.period_display"/></div>
+
+                <!-- Info Karyawan -->
+                <table class="payslip-meta-table">
+                    <tr>
+                        <td style="width: 15%;"><strong>NIK</strong></td>
+                        <td style="width: 2%;">:</td>
+                        <td style="width: 33%;"><span t-field="o.employee_id.employee_code"/></td>
+                        <td style="width: 15%;"><strong>Pekerjaan</strong></td>
+                        <td style="width: 2%;">:</td>
+                        <td style="width: 33%;"><span t-field="o.worker_type"/></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nama</strong></td>
+                        <td>:</td>
+                        <td><span t-field="o.employee_id.name"/></td>
+                        <td><strong>Departemen</strong></td>
+                        <td>:</td>
+                        <td><span t-field="o.department_id.name"/></td>
+                    </tr>
+                </table>
+
+                <!-- Earnings & Deductions -->
+                <table class="payslip-details-container">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">PENGHASILAN</th>
+                            <th style="width: 50%;">POTONGAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <!-- Earnings Column -->
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td>Hasil Kerja (<span t-field="o.total_quantity_kg"/> Kg)</td>
+                                        <td class="text-end"><span t-field="o.basic_wage" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Premi / Bonus</td>
+                                        <td class="text-end"><span t-field="o.premium" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- Deductions Column -->
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td>Potongan Pinjaman</td>
+                                        <td class="text-end"><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>&amp;nbsp;</td>
+                                        <td>&amp;nbsp;</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <!-- Subtotal Row -->
+                        <tr class="payslip-subtotal-row">
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td><strong>TOTAL PENDAPATAN</strong></td>
+                                        <td class="text-end"><strong><span t-out="o.basic_wage + o.premium" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td>
+                                <table style="width: 100%; border: none;">
+                                    <tr>
+                                        <td><strong>TOTAL POTONGAN</strong></td>
+                                        <td class="text-end"><strong><span t-field="o.loan_deduction" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></strong></td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Net Box -->
+                <div class="payslip-net-box">
+                    <table style="width: 100%; border: none; margin: 0;">
+                        <tr>
+                            <td>PENERIMAAN BERSIH (TAKE HOME PAY)</td>
+                            <td class="text-end" style="font-size: 15px;"><span t-field="o.net_salary" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Terbilang -->
+                <div class="payslip-terbilang">
+                    Terbilang : # <span t-out="o.currency_id.amount_to_text(o.net_salary)"/> #
+                </div>
+
+                <!-- Footer Signatures -->
+                <table class="payslip-footer-signatures">
+                    <tr>
+                        <td>
+                            Dibuat Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong>Staf Payroll / HRD</strong>
+                        </td>
+                        <td>
+                            Diketahui Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong>Direktur</strong>
+                        </td>
+                        <td>
+                            Diterima Oleh,<br/>
+                            <span class="signature-line"/><br/>
+                            <strong><span t-field="o.employee_id.name"/></strong>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="font-size: 9px; text-align: left; margin-top: 8px; color: #666;">
+                    * Slip gaji ini dicetak otomatis oleh sistem ERP. Tanggal Cetak: <span t-out="datetime.date.today().strftime('%d/%m/%Y')"/>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Daily (Harian) Reports Container Templates -->
+    <template id="report_payslip_harian_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-call="web.basic_layout">
-                    <t t-call="coconut_payroll.payslip_card_component"/>
+                    <t t-call="coconut_payroll.payslip_harian_card"/>
                 </t>
             </t>
         </t>
     </template>
 
-    <!-- Recap All Payslips Template -->
-    <template id="report_recap_payslips_template">
+    <!-- Piece-rate (Borongan) Reports Container Templates -->
+    <template id="report_payslip_borongan_template">
         <t t-call="web.html_container">
-            <t t-foreach="docs" t-as="recap">
-                <t t-foreach="recap.line_ids" t-as="o">
-                    <t t-call="web.basic_layout">
-                        <t t-call="coconut_payroll.payslip_card_component"/>
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-call="coconut_payroll.payslip_borongan_card"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Unified Reports Container Template -->
+    <template id="report_payslip_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-if="o.payroll_type == 'harian'">
+                        <t t-call="coconut_payroll.payslip_harian_card"/>
+                    </t>
+                    <t t-else="">
+                        <t t-call="coconut_payroll.payslip_borongan_card"/>
                     </t>
                 </t>
             </t>

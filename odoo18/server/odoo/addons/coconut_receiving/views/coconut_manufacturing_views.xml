@@ -471,6 +471,11 @@
               action="action_coconut_manufacturing_spk_ops"
               sequence="1"/>
 
+    <!-- Set sequence of Manufacturing Orders (Order Produksi) higher so SPK is first and opens by default -->
+    <record id="mrp.menu_mrp_production_action" model="ir.ui.menu">
+        <field name="sequence" eval="5"/>
+    </record>
+
     <!-- SPK Analysis Menu (Produksi -> Laporan -> SPK) -->
     <record id="action_coconut_manufacturing_spk_report_analysis" model="ir.actions.act_window">
         <field name="name">SPK</field>

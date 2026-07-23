@@ -12,18 +12,29 @@
                     font-family: Lato;
 
                     h2 {
-                        color: #212529;
+                        color: #4ca825;
                     }
 
                     #informations strong {
-                        color: #212529;
+                        color: #97af83;
                     }
 
                     .o_total strong {
-                        color: #212529;
+                        color: #4ca825;
                     }
 
                     .o_company_tagline {
-                        color: #212529
+                        color: #4ca825
                     }
+                &.o_report_layout_bold {
+                    .o_main_table {
+                        thead th {
+                            border-top: 3px solid #97af83;
+                        }
+
+                        tbody tr:last-child td {
+                            border-bottom: 3px solid #97af83;
+                        }
+                    }
+                }
             }

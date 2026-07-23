@@ -8,9 +8,10 @@
             <form string="Rekapitulasi Penggajian">
                 <header>
                     <button name="action_generate" string="Hitung Rekap" type="object" class="oe_highlight" invisible="state not in ['draft', 'generated']"/>
-                    <button name="action_approve" string="Setujui" type="object" class="oe_highlight" invisible="state != 'generated'"/>
+                    <button name="action_approve" string="Konfirmasi" type="object" class="oe_highlight" invisible="state != 'generated'"/>
                     <button name="action_paid" string="Lunas" type="object" class="oe_highlight" invisible="state != 'approved'"/>
-                    <button name="action_draft" string="Kembali ke Draft" type="object" invisible="state not in ['generated', 'approved']"/>
+                    <button name="action_print_all_payslips" string="Cetak Semua Slip" type="object" class="oe_highlight" invisible="state not in ['approved', 'paid']"/>
+                    <button name="action_draft" string="Kembali Draft" type="object" invisible="state not in ['generated', 'approved']"/>
                     <button name="action_cancel" string="Batal" type="object" invisible="state in ['paid', 'cancelled']"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,generated,approved,paid"/>
                 </header>
@@ -102,28 +103,58 @@
         <field name="model">coconut.payroll.line</field>
         <field name="arch" type="xml">
             <form string="Slip Gaji Karyawan" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_print_payslip" string="Cetak Slip Gaji" type="object" class="oe_highlight"/>
+                </header>
                 <sheet>
                     <group>
                         <group string="Informasi Karyawan">
-                            <field name="recap_id" readonly="1"/>
                             <field name="employee_id" readonly="1"/>
-                            <field name="worker_type" readonly="1"/>
-                        </group>
-                        <group string="Rincian Pembayaran">
-                            <field name="total_quantity_kg" readonly="1"/>
-                            <field name="basic_wage" readonly="1"/>
-                            <field name="premium" readonly="1"/>
-                            <field name="gross_salary" readonly="1"/>
-                            <field name="loan_deduction" readonly="1"/>
-                            <field name="net_salary" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="payroll_type" readonly="1"/>
+                            <field name="period_display" string="Periode" readonly="1"/>
                             <field name="company_id" groups="base.group_multi_company" readonly="1"/>
                             <field name="currency_id" invisible="1"/>
                         </group>
                     </group>
-                    <notebook>
+                    <group invisible="payroll_type != 'borongan'" string="Rincian Gaji Borongan">
+                        <group>
+                            <field name="recap_id" readonly="1"/>
+                            <field name="total_quantity_kg" string="Total Hasil Kerja (Kg)" readonly="1"/>
+                            <field name="basic_wage" string="Tarif Borongan / Upah Dasar" readonly="1"/>
+                            <field name="premium" string="Bonus / Premi" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="gross_salary" readonly="1"/>
+                            <field name="loan_deduction" readonly="1"/>
+                            <field name="net_salary" readonly="1"/>
+                        </group>
+                    </group>
+                    <group invisible="payroll_type != 'harian'" string="Rincian Gaji Harian">
+                        <group string="Kehadiran &amp; Jam Kerja">
+                            <field name="rmp_recap_id" readonly="1"/>
+                            <field name="hari_hadir" readonly="1"/>
+                            <field name="hari_alpha" readonly="1"/>
+                            <field name="jam_kerja" readonly="1"/>
+                            <field name="jam_lembur" readonly="1"/>
+                            <field name="terlambat" readonly="1"/>
+                            <field name="pulang_cepat" readonly="1"/>
+                        </group>
+                        <group string="Komponen Keuangan">
+                            <field name="wage_pokok" readonly="1"/>
+                            <field name="premi_kehadiran" readonly="1"/>
+                            <field name="premi_disiplin" readonly="1"/>
+                            <field name="uang_makan" readonly="1"/>
+                            <field name="wage_lembur" readonly="1"/>
+                            <field name="potongan" readonly="1"/>
+                            <field name="loan_deduction" readonly="1"/>
+                            <field name="net_salary" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook invisible="payroll_type != 'borongan'">
                         <page string="Hasil Kerja Harian Terkait" name="work_results">
                             <field name="work_result_ids" readonly="1">
-                                <list>
+                                <list style="border: none;">
                                     <field name="date"/>
                                     <field name="quantity_kg"/>
                                     <field name="wage_rate"/>
@@ -139,21 +170,17 @@
         </field>
     </record>
 
-    <!-- Salary Slip Tree View -->
+    <!-- Salary Slip List View -->
     <record id="view_coconut_payroll_line_list" model="ir.ui.view">
         <field name="name">coconut.payroll.line.list</field>
         <field name="model">coconut.payroll.line</field>
         <field name="arch" type="xml">
             <list string="Slip Gaji Karyawan" create="false" edit="false" delete="false">
                 <field name="employee_id"/>
-                <field name="recap_id"/>
-                <field name="worker_type"/>
-                <field name="total_quantity_kg"/>
-                <field name="basic_wage"/>
-                <field name="premium"/>
-                <field name="gross_salary"/>
-                <field name="loan_deduction"/>
-                <field name="net_salary"/>
+                <field name="department_id"/>
+                <field name="payroll_type"/>
+                <field name="period_display" string="Periode"/>
+                <field name="net_salary" sum="Total Gaji Bersih"/>
                 <field name="company_id" groups="base.group_multi_company"/>
             </list>
         </field>
@@ -167,19 +194,185 @@
             <search string="Cari Slip Gaji">
                 <field name="employee_id"/>
                 <field name="recap_id"/>
+                <field name="rmp_recap_id"/>
+                <filter string="Harian" name="filter_harian" domain="[('payroll_type', '=', 'harian')]"/>
+                <filter string="Borongan" name="filter_borongan" domain="[('payroll_type', '=', 'borongan')]"/>
                 <group expand="0" string="Group By">
-                    <filter string="Rekapitulasi" name="group_by_recap" context="{'group_by': 'recap_id'}"/>
+                    <filter string="Jenis Payroll" name="group_by_payroll_type" context="{'group_by': 'payroll_type'}"/>
                     <filter string="Karyawan" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Departemen" name="group_by_department" context="{'group_by': 'department_id'}"/>
                 </group>
             </search>
         </field>
     </record>
 
-    <!-- Salary Slip Action -->
-    <record id="action_coconut_payroll_line" model="ir.actions.act_window">
-        <field name="name">Slip Gaji</field>
-        <field name="res_model">coconut.payroll.line</field>
+    <!-- Harian Slip Views -->
+    <record id="view_coconut_payroll_line_harian_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.harian.form</field>
+        <field name="model">coconut.payroll.line.harian</field>
+        <field name="arch" type="xml">
+            <form string="Slip Gaji Harian" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_print_payslip" string="Cetak" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Informasi Karyawan">
+                            <field name="employee_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="period_display" string="Periode" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Rincian Gaji Harian">
+                        <group string="Kehadiran &amp; Jam Kerja">
+                            <field name="rmp_recap_id" readonly="1"/>
+                            <field name="hari_hadir" readonly="1"/>
+                            <field name="hari_alpha" readonly="1"/>
+                            <field name="jam_kerja" readonly="1"/>
+                            <field name="jam_lembur" readonly="1"/>
+                            <field name="terlambat" readonly="1"/>
+                            <field name="pulang_cepat" readonly="1"/>
+                        </group>
+                        <group string="Komponen Keuangan">
+                            <field name="wage_pokok" readonly="1"/>
+                            <field name="premi_kehadiran" readonly="1"/>
+                            <field name="premi_disiplin" readonly="1"/>
+                            <field name="uang_makan" readonly="1"/>
+                            <field name="wage_lembur" readonly="1"/>
+                            <field name="potongan" readonly="1"/>
+                            <field name="loan_deduction" readonly="1"/>
+                            <field name="net_salary" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_harian_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.harian.list</field>
+        <field name="model">coconut.payroll.line.harian</field>
+        <field name="arch" type="xml">
+            <list string="Slip Gaji Harian" create="false" edit="false" delete="false">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="period_display" string="Periode"/>
+                <field name="net_salary" sum="Total Gaji Bersih"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_harian_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.harian.search</field>
+        <field name="model">coconut.payroll.line.harian</field>
+        <field name="arch" type="xml">
+            <search string="Cari Slip Gaji Harian">
+                <field name="employee_id"/>
+                <field name="rmp_recap_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Karyawan" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Departemen" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Borongan Slip Views -->
+    <record id="view_coconut_payroll_line_borongan_form" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.borongan.form</field>
+        <field name="model">coconut.payroll.line.borongan</field>
+        <field name="arch" type="xml">
+            <form string="Slip Gaji Borongan" create="false" edit="false" delete="false">
+                <header>
+                    <button name="action_print_payslip" string="Cetak" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="Informasi Karyawan">
+                            <field name="employee_id" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                            <field name="period_display" string="Periode" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Rincian Gaji Borongan">
+                        <group>
+                            <field name="recap_id" readonly="1"/>
+                            <field name="total_quantity_kg" string="Total Hasil Kerja (Kg)" readonly="1"/>
+                            <field name="basic_wage" string="Tarif Borongan / Upah Dasar" readonly="1"/>
+                            <field name="premium" string="Bonus / Premi" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="gross_salary" readonly="1"/>
+                            <field name="loan_deduction" readonly="1"/>
+                            <field name="net_salary" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Hasil Kerja Harian Terkait" name="work_results">
+                            <field name="work_result_ids" readonly="1">
+                                <list style="border: none;">
+                                    <field name="date"/>
+                                    <field name="quantity_kg"/>
+                                    <field name="wage_rate"/>
+                                    <field name="basic_wage"/>
+                                    <field name="premium"/>
+                                    <field name="total_wage"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_borongan_list" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.borongan.list</field>
+        <field name="model">coconut.payroll.line.borongan</field>
+        <field name="arch" type="xml">
+            <list string="Slip Gaji Borongan" create="false" edit="false" delete="false">
+                <field name="employee_id"/>
+                <field name="department_id"/>
+                <field name="period_display" string="Periode"/>
+                <field name="net_salary" sum="Total Gaji Bersih"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_coconut_payroll_line_borongan_search" model="ir.ui.view">
+        <field name="name">coconut.payroll.line.borongan.search</field>
+        <field name="model">coconut.payroll.line.borongan</field>
+        <field name="arch" type="xml">
+            <search string="Cari Slip Gaji Borongan">
+                <field name="employee_id"/>
+                <field name="recap_id"/>
+                <group expand="0" string="Group By">
+                    <filter string="Karyawan" name="group_by_employee" context="{'group_by': 'employee_id'}"/>
+                    <filter string="Departemen" name="group_by_department" context="{'group_by': 'department_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Salary Slip Harian Action -->
+    <record id="action_coconut_payroll_line_harian" model="ir.actions.act_window">
+        <field name="name">Slip Gaji Harian</field>
+        <field name="res_model">coconut.payroll.line.harian</field>
         <field name="view_mode">list,form</field>
-        <field name="search_view_id" ref="view_coconut_payroll_line_search"/>
+        <field name="search_view_id" ref="view_coconut_payroll_line_harian_search"/>
+    </record>
+
+    <!-- Salary Slip Borongan Action -->
+    <record id="action_coconut_payroll_line_borongan" model="ir.actions.act_window">
+        <field name="name">Slip Gaji Borongan</field>
+        <field name="res_model">coconut.payroll.line.borongan</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_coconut_payroll_line_borongan_search"/>
     </record>
 </odoo>

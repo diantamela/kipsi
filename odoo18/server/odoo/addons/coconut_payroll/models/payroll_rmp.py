@@ -51,8 +51,8 @@ class CoconutPayrollRmp(models.Model):
     ], string='Status', default='draft', required=True, index=True, copy=False)
 
     line_ids = fields.One2many(
-        'coconut.payroll.rmp.line',
-        'rmp_payroll_id',
+        'coconut.payroll.line',
+        'rmp_recap_id',
         string='Rincian Gaji RMP',
     )
 
@@ -96,10 +96,10 @@ class CoconutPayrollRmp(models.Model):
         if self.line_ids:
             self.line_ids.unlink()
 
-        # Find RMP employees
+        # Find RMP employees based on their department in the employee module
         employees = self.env['hr.employee'].search([
-            ('payroll_job_type', '=', 'rmp'),
-            ('payroll_active', '=', True),
+            ('department_id.name', 'ilike', 'RMP'),
+            ('active', '=', True),
         ])
 
         if not employees:
@@ -210,9 +210,10 @@ class CoconutPayrollRmp(models.Model):
             net_salary = wage_pokok + wage_lembur + premi_kehadiran + premi_disiplin + uang_makan - potongan
 
             # Create payroll line
-            self.env['coconut.payroll.rmp.line'].create({
-                'rmp_payroll_id': self.id,
+            self.env['coconut.payroll.line'].create({
+                'rmp_recap_id': self.id,
                 'employee_id': emp.id,
+                'worker_type': 'rmp',
                 'hari_hadir': hari_hadir,
                 'hari_alpha': hari_alpha,
                 'jam_kerja': jam_kerja,
@@ -267,135 +268,6 @@ class CoconutPayrollRmp(models.Model):
                 raise UserError(_("Hanya rekapitulasi dengan status Draft yang dapat dihapus."))
         return super(CoconutPayrollRmp, self).unlink()
 
-
-class CoconutPayrollRmpLine(models.Model):
-    _name = 'coconut.payroll.rmp.line'
-    _description = 'Slip Gaji Karyawan RMP'
-    _order = 'employee_id'
-
-    rmp_payroll_id = fields.Many2one(
-        'coconut.payroll.rmp',
-        string='Rekapitulasi Penggajian RMP',
-        required=True,
-        ondelete='cascade',
-        index=True,
-    )
-
-    employee_id = fields.Many2one(
-        'hr.employee',
-        string='Karyawan',
-        required=True,
-        ondelete='restrict',
-    )
-
-    department_id = fields.Many2one(
-        'hr.department',
-        related='employee_id.department_id',
-        string='Departemen',
-        store=True,
-        readonly=True,
-    )
-
-    period_display = fields.Char(
-        string='Periode',
-        compute='_compute_period_display',
-    )
-
-    company_id = fields.Many2one(
-        'res.company',
-        string='Perusahaan',
-        required=True,
-        default=lambda self: self.env.company,
-        index=True,
-    )
-
-    currency_id = fields.Many2one(
-        'res.currency',
-        related='company_id.currency_id',
-        store=True,
-        readonly=True,
-    )
-
-    hari_hadir = fields.Integer(
-        string='Hari Hadir',
-        default=0,
-    )
-
-    hari_alpha = fields.Integer(
-        string='Hari Alpha',
-        default=0,
-    )
-
-    jam_kerja = fields.Float(
-        string='Jam Kerja',
-        default=0.0,
-    )
-
-    jam_lembur = fields.Float(
-        string='Jam Lembur',
-        default=0.0,
-    )
-
-    terlambat = fields.Integer(
-        string='Terlambat (Hari)',
-        default=0,
-    )
-
-    pulang_cepat = fields.Integer(
-        string='Pulang Cepat (Hari)',
-        default=0,
-    )
-
-    wage_pokok = fields.Monetary(
-        string='Gaji Pokok',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    wage_lembur = fields.Monetary(
-        string='Total Lembur',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    premi_kehadiran = fields.Monetary(
-        string='Premi Kehadiran',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    premi_disiplin = fields.Monetary(
-        string='Premi Disiplin',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    uang_makan = fields.Monetary(
-        string='Uang Makan',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    potongan = fields.Monetary(
-        string='Potongan',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    net_salary = fields.Monetary(
-        string='Gaji Bersih',
-        currency_field='currency_id',
-        default=0.0,
-    )
-
-    _sql_constraints = [
-        ('rmp_payroll_employee_unique', 'unique(rmp_payroll_id, employee_id)', 'Karyawan hanya boleh memiliki satu slip gaji dalam satu rekapitulasi RMP!')
-    ]
-
-    @api.depends('rmp_payroll_id.date_start', 'rmp_payroll_id.date_end')
-    def _compute_period_display(self):
-        for line in self:
-            if line.rmp_payroll_id.date_start and line.rmp_payroll_id.date_end:
-                line.period_display = f"{line.rmp_payroll_id.date_start} - {line.rmp_payroll_id.date_end}"
-            else:
-                line.period_display = ""
+    def action_print_all_payslips(self):
+        self.ensure_one()
+        return self.env.ref('coconut_payroll.action_report_payslip').report_action(self.line_ids)

@@ -5,34 +5,46 @@
               sequence="50"/>
 
     <menuitem id="menu_coconut_work_sheet"
-              name="Hasil Kerja Harian"
+              name="Hasil Kerja Borongan"
               parent="menu_coconut_payroll_root"
               action="action_coconut_work_sheet"
               sequence="10"/>
 
-    <menuitem id="menu_coconut_payroll_recap"
+    <!-- Parent Menu: Rekapitulasi Penggajian -->
+    <menuitem id="menu_recap_penggajian_parent"
               name="Rekapitulasi Penggajian"
               parent="menu_coconut_payroll_root"
-              action="action_coconut_payroll_recap"
               sequence="20"/>
 
     <menuitem id="menu_coconut_payroll_rmp"
-              name="Penggajian Harian RMP"
-              parent="menu_coconut_payroll_root"
+              name="Rekapitulasi Penggajian Harian"
+              parent="menu_recap_penggajian_parent"
               action="action_coconut_payroll_rmp"
-              sequence="25"/>
+              sequence="10"/>
 
-    <menuitem id="menu_coconut_payroll_line"
+    <menuitem id="menu_coconut_payroll_recap"
+              name="Rekapitulasi Penggajian Borongan"
+              parent="menu_recap_penggajian_parent"
+              action="action_coconut_payroll_recap"
+              sequence="20"/>
+
+    <!-- Parent Menu: Slip Gaji -->
+    <menuitem id="menu_coconut_payroll_line_parent"
               name="Slip Gaji"
               parent="menu_coconut_payroll_root"
-              action="action_coconut_payroll_line"
               sequence="30"/>
 
-    <menuitem id="menu_coconut_payroll_rmp_line"
-              name="Slip Gaji RMP"
-              parent="menu_coconut_payroll_root"
-              action="action_coconut_payroll_rmp_line"
-              sequence="35"/>
+    <menuitem id="menu_coconut_payroll_line_harian"
+              name="Slip Gaji Harian"
+              parent="menu_coconut_payroll_line_parent"
+              action="action_coconut_payroll_line_harian"
+              sequence="10"/>
+
+    <menuitem id="menu_coconut_payroll_line_borongan"
+              name="Slip Gaji Borongan"
+              parent="menu_coconut_payroll_line_parent"
+              action="action_coconut_payroll_line_borongan"
+              sequence="20"/>
 
     <menuitem id="menu_coconut_employee_loan"
               name="Pinjaman Karyawan"

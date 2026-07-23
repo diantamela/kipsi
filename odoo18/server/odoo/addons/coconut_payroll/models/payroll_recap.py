@@ -224,3 +224,7 @@ class CoconutPayrollRecap(models.Model):
             if record.state != 'draft':
                 raise UserError(_("Hanya rekapitulasi dengan status Draft yang dapat dihapus."))
         return super().unlink()
+
+    def action_print_all_payslips(self):
+        self.ensure_one()
+        return self.env.ref('coconut_payroll.action_report_payslip').report_action(self.line_ids)
