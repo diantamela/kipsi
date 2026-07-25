@@ -36,123 +36,22 @@
     z-index: 0;
 }
 
-/* Ensure other elements render above watermark */
-.coco_header_bar,
-.coco_section_title,
-.row {
-    position: relative;
-    z-index: 1;
-}
-
-/* Header style resembling Odoo's topbar navigation */
-.coco_header_bar {
-    background-color: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 16px;
-    padding: 16px 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-}
-
-.coco_logo {
-    height: 52px;
-    width: auto;
-    object-fit: contain;
-}
-
-.coco_main_title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2E7D32;
-    margin: 0;
-    line-height: 1.2;
-}
-
-.coco_sub_title {
-    font-size: 13px;
-    font-weight: 500;
-    color: #6B7280;
-    margin: 2px 0 0 0;
-}
-
-/* Right Navigation Icons */
-.coco_user_nav {
-    border-left: 1px solid #E5E7EB;
-    padding-left: 20px;
-}
-
-.coco_nav_icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #4B5563;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.coco_nav_icon:hover {
-    background-color: #F3F4F6;
-    color: #1F2937;
-}
-
-.coco_badge_num {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 6px;
-    border: 2px solid #FFFFFF;
-}
-
-/* Profile dropdown */
-.coco_profile_dropdown {
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 20px;
-    transition: background-color 0.2s;
-}
-
-.coco_profile_dropdown:hover {
-    background-color: #F3F4F6;
-}
-
-.coco_avatar {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background-color: #2E7D32;
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-.coco_user_name {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-}
-
-/* Dashboard subheader */
 .coco_dashboard_icon_wrapper {
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     background-color: #E8F5E9;
-    border-radius: 8px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #4CAF50;
-    font-size: 16px;
+    color: #2E7D32;
+    font-size: 20px;
 }
 
 .coco_section_title {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
-    color: #374151;
+    color: #1F2937;
 }
 
 .coco_refresh_btn {
@@ -163,256 +62,85 @@
     border: 1px solid #E5E7EB;
     background-color: #FFFFFF;
     color: #4B5563;
-    transition: all 0.2s;
+    transition: all 0.2s ease-in-out;
 }
 
 .coco_refresh_btn:hover {
     background-color: #F9FAFB;
     color: #111827;
     border-color: #D1D5DB;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
-/* Cards Design System */
-.coco_kpi_card,
-.coco_dashboard_card {
-    background-color: #FFFFFF;
-    border: 1px solid #E5E7EB !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-}
-
+/* KPI Cards Design System */
 .coco_kpi_card {
     cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
 }
 
 .coco_kpi_card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02) !important;
-    border-color: #4CAF50 !important;
-}
-
-.coco_kpi_label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #9CA3AF;
-    letter-spacing: 0.5px;
-}
-
-.coco_kpi_sublabel {
-    display: block;
-    font-size: 11px;
-    font-weight: 500;
-    color: #9CA3AF;
-    margin-top: 1px;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04) !important;
 }
 
 .coco_kpi_value {
-    font-size: 26px;
-    font-weight: 700;
-    color: #111827;
-    margin: 6px 0;
-}
-
-.coco_kpi_trend {
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.coco_kpi_trend_sub {
-    font-size: 12px;
-    font-weight: 500;
-    color: #6B7280;
-}
-
-.coco_kpi_icon_wrapper {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background-color: #E8F5E9;
-    color: #4CAF50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 22px;
-    transition: all 0.25s;
 }
 
-.coco_kpi_card:hover .coco_kpi_icon_wrapper {
-    background-color: #4CAF50;
-    color: #FFFFFF;
+/* Shortcut Buttons */
+.coco_shortcut_btn {
+    border-radius: 12px !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-/* Card titles */
-.coco_card_title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
+.coco_shortcut_btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.08) !important;
 }
 
-.coco_card_title i {
-    color: #2E7D32;
-}
-
-/* Inventory List Styling */
-.coco_inventory_item {
+/* Chart styling */
+.coco_bar_hover {
     cursor: pointer;
-    background-color: #F9FAFB;
-    border: 1px solid transparent;
-    transition: all 0.2s;
+    transition: opacity 0.2s;
 }
 
-.coco_inventory_item:hover {
-    background-color: #FFFFFF;
-    border-color: #E5E7EB;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-    transform: translateX(4px);
+.coco_bar_hover:hover {
+    opacity: 0.8;
 }
 
-.coco_inv_icon_circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background-color: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    color: #4B5563;
+/* Activity Table Styling */
+.coco_table_row {
+    transition: background-color 0.15s ease-in-out;
 }
 
-.coco_inventory_item:hover .coco_inv_icon_circle {
-    color: #4CAF50;
-    border-color: #4CAF50;
+.coco_table_row:hover {
+    background-color: #F3F4F6 !important;
 }
 
-.coco_inv_item_title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-}
-
-.coco_inv_item_subtitle {
+.table th {
     font-size: 11px;
-    color: #9CA3AF;
-    display: block;
-}
-
-.coco_inv_qty_val {
-    font-size: 15px;
     font-weight: 700;
-}
-
-.coco_inv_qty_val small {
-    font-size: 11px;
-    font-weight: 500;
+    text-transform: uppercase;
     color: #6B7280;
-}
-
-/* SVG Chart styling */
-.coco_chart_text {
-    font-size: 10px;
-    fill: #9CA3AF;
-    font-weight: 500;
-}
-
-.coco_chart_legend_y {
-    font-size: 9px;
-    fill: #9CA3AF;
-    font-weight: 600;
     letter-spacing: 0.5px;
 }
 
-.coco_legend_color {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    background-color: #4CAF50;
-    display: inline-block;
-}
-
-.coco_legend_label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #6B7280;
-}
-
-/* Bottom elements */
-.coco_status_box {
-    background-color: #F9FAFB;
-    transition: all 0.2s;
-}
-
-.coco_status_box:hover {
+/* Stock Monitoring Kanban Cards */
+.coco_stock_card {
+    cursor: pointer;
     background-color: #FFFFFF;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.coco_status_icon {
-    font-size: 18px;
+.coco_stock_card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.08) !important;
+    border-color: #10B981 !important;
 }
 
-.coco_status_num {
+.coco_stock_qty h3 {
     font-size: 20px;
-    font-weight: 700;
-    color: #111827;
-    margin: 4px 0;
+    color: #1F2937;
 }
 
-.coco_status_label {
-    font-size: 10px;
-    font-weight: 600;
-    color: #6B7280;
-    text-transform: uppercase;
-    display: block;
-    line-height: 1.2;
-}
-
-/* Payroll Box */
-.coco_payroll_lbl {
-    font-size: 11px;
-    font-weight: 700;
-    color: #9CA3AF;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: block;
-}
-
-.coco_payroll_val {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
-    margin: 4px 0;
-}
-
-.coco_payroll_sub {
-    font-size: 11px;
-    color: #6B7280;
-}
-
-.coco_payroll_status_badge {
-    background-color: #E8F5E9;
-    color: #2E7D32;
-    border-radius: 20px;
-    padding: 6px 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.coco_payroll_status_badge i {
-    font-size: 14px;
-}

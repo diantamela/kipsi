@@ -530,3 +530,289 @@ class CoconutReceipt(models.Model):
                 "Silakan ubah satuan produk menjadi kg sebelum melanjutkan."
             ) % {'name': variant.name, 'uom': variant.uom_id.name})
         return variant
+
+    @api.model
+    def get_rmp_dashboard_data(self):
+        import datetime
+        from odoo import fields
+
+        today_start = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        today_end = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+
+        # 1. KPI: Kelapa Masuk Hari Ini (Kg)
+        receipts_today = self.search([
+            ('entry_datetime', '>=', today_start),
+            ('entry_datetime', '<=', today_end),
+            ('state', '!=', 'cancelled')
+        ])
+        kelapa_masuk_hari_ini = sum(receipts_today.mapped('net_received_weight'))
+
+        # 2. KPI: Total Stok Kelapa Bulat (Kg)
+        tmpl_bulat = self.env.ref('coconut_receiving.product_kelapa_bulat', raise_if_not_found=False)
+        if not tmpl_bulat:
+            tmpl_bulat = self.env['product.template'].search([('default_code', '=', 'COCO-BULAT')], limit=1)
+        prod_bulat = tmpl_bulat.product_variant_ids[:1] if tmpl_bulat else False
+
+        loc_bulat = self.env.ref('coconut_receiving.location_gudang_kelapa_bulat', raise_if_not_found=False)
+        if not loc_bulat:
+            loc_bulat = self.env['stock.location'].search([('name', '=', 'Kelapa Bulat')], limit=1)
+
+        total_stok_kelapa = 0.0
+        if prod_bulat and loc_bulat:
+            quants = self.env['stock.quant'].search([
+                ('product_id', '=', prod_bulat.id),
+                ('location_id', '=', loc_bulat.id)
+            ])
+            total_stok_kelapa = sum(quants.mapped('quantity'))
+        elif prod_bulat:
+            quants = self.env['stock.quant'].search([('product_id', '=', prod_bulat.id)])
+            total_stok_kelapa = sum(quants.mapped('quantity'))
+
+        # 3. KPI: Supplier Hari Ini
+        supplier_hari_ini = len(set(receipts_today.mapped('partner_id').ids))
+
+        # 4. KPI: Purchase Order Pending
+        po_pending_count = self.env['purchase.order'].search_count([
+            ('state', 'in', ['draft', 'sent', 'to approve'])
+        ]) if 'purchase.order' in self.env else 0
+
+        # 5. KPI: Transfer Pending (Internal Transfers)
+        transfer_pending_count = self.env['stock.picking'].search_count([
+            ('picking_type_id.code', '=', 'internal'),
+            ('state', 'in', ['draft', 'waiting', 'confirmed', 'assigned'])
+        ]) if 'stock.picking' in self.env else 0
+
+        # 6. KPI: Receiving Pending
+        receiving_pending_count = self.search_count([
+            ('state', '=', 'draft')
+        ])
+
+        # --- RECENT ACTIVITIES ---
+        # 10 Penerimaan Terakhir
+        last_10_receipts = self.search([], order='entry_datetime desc, id desc', limit=10)
+        recent_receipts = []
+        for r in last_10_receipts:
+            dt_str = fields.Datetime.context_timestamp(self, r.entry_datetime).strftime('%d/%m/%Y %H:%M') if r.entry_datetime else '-'
+            recent_receipts.append({
+                'id': r.id,
+                'name': r.name,
+                'date': dt_str,
+                'partner': r.partner_id.name or '-',
+                'plate': r.vehicle_plate or '-',
+                'net_weight': r.net_received_weight,
+                'state': r.state,
+            })
+
+        # 10 Transfer Terakhir
+        recent_transfers = []
+        if 'stock.picking' in self.env:
+            last_10_transfers = self.env['stock.picking'].search([
+                ('picking_type_id.code', '=', 'internal')
+            ], order='date desc, id desc', limit=10)
+            for t in last_10_transfers:
+                dt_str = fields.Datetime.context_timestamp(self, t.date or t.create_date).strftime('%d/%m/%Y %H:%M') if (t.date or t.create_date) else '-'
+                recent_transfers.append({
+                    'id': t.id,
+                    'name': t.name,
+                    'date': dt_str,
+                    'src': t.location_id.display_name or '-',
+                    'dest': t.location_dest_id.display_name or '-',
+                    'state': t.state,
+                })
+
+        # 10 Stock Adjustment Terakhir
+        recent_adjustments = []
+        if 'stock.move' in self.env:
+            adjust_moves = self.env['stock.move'].search([
+                ('state', '=', 'done'),
+                '|', ('location_id.usage', '=', 'inventory'), ('location_dest_id.usage', '=', 'inventory')
+            ], order='date desc, id desc', limit=10)
+            if not adjust_moves and 'stock.quant' in self.env:
+                adjust_quants = self.env['stock.quant'].search([
+                    ('location_id.usage', '=', 'internal')
+                ], order='write_date desc', limit=10)
+                for q in adjust_quants:
+                    dt_str = fields.Datetime.context_timestamp(self, q.write_date or q.create_date).strftime('%d/%m/%Y %H:%M') if (q.write_date or q.create_date) else '-'
+                    recent_adjustments.append({
+                        'id': q.id,
+                        'name': q.product_id.display_name or 'Adjustment',
+                        'location': q.location_id.display_name or '-',
+                        'quantity': q.quantity,
+                        'date': dt_str,
+                    })
+            else:
+                for m in adjust_moves:
+                    dt_str = fields.Datetime.context_timestamp(self, m.date or m.create_date).strftime('%d/%m/%Y %H:%M') if (m.date or m.create_date) else '-'
+                    recent_adjustments.append({
+                        'id': m.id,
+                        'name': m.reference or m.product_id.display_name or 'Adjustment',
+                        'location': m.location_id.display_name if m.location_dest_id.usage == 'inventory' else m.location_dest_id.display_name,
+                        'quantity': m.quantity,
+                        'date': dt_str,
+                    })
+
+        # Purchase Order Pending (max 10)
+        pending_pos = []
+        if 'purchase.order' in self.env:
+            pending_pos_recs = self.env['purchase.order'].search([
+                ('state', 'in', ['draft', 'sent', 'to approve'])
+            ], order='date_order desc, id desc', limit=10)
+            for po in pending_pos_recs:
+                dt_str = fields.Datetime.context_timestamp(self, po.date_order).strftime('%d/%m/%Y') if po.date_order else '-'
+                pending_pos.append({
+                    'id': po.id,
+                    'name': po.name,
+                    'partner': po.partner_id.name or '-',
+                    'date': dt_str,
+                    'amount_total': po.amount_total,
+                    'state': po.state,
+                })
+
+        # --- MONITORING STOK PRODUK KELAPA ---
+        coconut_product_refs = [
+            ('coconut_receiving.product_kelapa_bulat', 'coconut_receiving.location_gudang_kelapa_bulat', 'Kelapa Bulat'),
+            ('coconut_receiving.product_kelapa_layak', 'coconut_receiving.location_stok_kelapa_layak', 'Kelapa Layak Produksi'),
+            ('coconut_receiving.product_kelapa_reject', 'coconut_receiving.location_stok_kelapa_reject', 'Kelapa Reject'),
+            ('coconut_receiving.product_kelapa_sheller', 'coconut_receiving.location_area_sheller', 'Kelapa Sheller'),
+            ('coconut_receiving.product_kelapa_parer', 'coconut_receiving.location_area_parer', 'Kelapa Parer'),
+            ('coconut_receiving.product_kelapa_akhir_mp', 'coconut_receiving.location_gudang_kelapa_akhir_mp', 'Kelapa Akhir MP'),
+        ]
+
+        coconut_products_stock = []
+        for prod_ref, loc_ref, default_name in coconut_product_refs:
+            tmpl = self.env.ref(prod_ref, raise_if_not_found=False)
+            loc = self.env.ref(loc_ref, raise_if_not_found=False)
+            prod = tmpl.product_variant_ids[:1] if tmpl else False
+
+            qty = 0.0
+            last_update = '-'
+            loc_name = loc.display_name if loc else 'Gudang Utama'
+            prod_name = tmpl.name if tmpl else default_name
+            uom_name = tmpl.uom_id.name if tmpl and tmpl.uom_id else 'Kg'
+
+            if prod:
+                quant_domain = [('product_id', '=', prod.id)]
+                if loc:
+                    quant_domain.append(('location_id', '=', loc.id))
+                else:
+                    quant_domain.append(('location_id.usage', '=', 'internal'))
+                
+                quants = self.env['stock.quant'].search(quant_domain)
+                qty = sum(quants.mapped('quantity'))
+
+                if quants:
+                    latest_quant = max(quants, key=lambda q: q.write_date or q.create_date)
+                    dt = latest_quant.write_date or latest_quant.create_date
+                    if dt:
+                        last_update = fields.Datetime.context_timestamp(self, dt).strftime('%d/%m/%Y %H:%M')
+
+            if qty >= 10000:
+                status_code = 'aman'
+                status_label = 'Aman'
+            elif qty >= 2000:
+                status_code = 'normal'
+                status_label = 'Peringatan'
+            else:
+                status_code = 'kritis'
+                status_label = 'Kritis'
+
+            coconut_products_stock.append({
+                'product_id': prod.id if prod else False,
+                'name': prod_name,
+                'qty': qty,
+                'uom': uom_name,
+                'location': loc_name,
+                'status_code': status_code,
+                'status_label': status_label,
+                'last_update': last_update,
+            })
+
+        # --- CHARTS DATA ---
+        # 1. Kelapa Masuk 7 Hari Terakhir
+        receiving_7_days = []
+        today = datetime.date.today()
+        for i in range(6, -1, -1):
+            day = today - datetime.timedelta(days=i)
+            d_start = datetime.datetime.combine(day, datetime.time.min)
+            d_end = datetime.datetime.combine(day, datetime.time.max)
+            day_recs = self.search([
+                ('entry_datetime', '>=', d_start),
+                ('entry_datetime', '<=', d_end),
+                ('state', '!=', 'cancelled')
+            ])
+            day_qty = sum(day_recs.mapped('net_received_weight'))
+            receiving_7_days.append({
+                'day_name': day.strftime('%d %b'),
+                'qty': day_qty
+            })
+
+        # 2. Pergerakan Stok Kelapa 7 Hari Terakhir
+        stock_movement_7_days = []
+        for i in range(6, -1, -1):
+            day = today - datetime.timedelta(days=i)
+            d_start = datetime.datetime.combine(day, datetime.time.min)
+            d_end = datetime.datetime.combine(day, datetime.time.max)
+            
+            moves_in = self.env['stock.move'].search([
+                ('location_dest_id', '=', loc_bulat.id if loc_bulat else False),
+                ('state', '=', 'done'),
+                ('date', '>=', d_start),
+                ('date', '<=', d_end)
+            ]) if (loc_bulat and 'stock.move' in self.env) else []
+            in_qty = sum(moves_in.mapped('quantity')) if moves_in else 0.0
+
+            moves_out = self.env['stock.move'].search([
+                ('location_id', '=', loc_bulat.id if loc_bulat else False),
+                ('state', '=', 'done'),
+                ('date', '>=', d_start),
+                ('date', '<=', d_end)
+            ]) if (loc_bulat and 'stock.move' in self.env) else []
+            out_qty = sum(moves_out.mapped('quantity')) if moves_out else 0.0
+
+            stock_movement_7_days.append({
+                'day_name': day.strftime('%d %b'),
+                'in_qty': in_qty,
+                'out_qty': out_qty,
+            })
+
+        # 3. Supplier Terbanyak Bulan Ini
+        first_day_month = today.replace(day=1)
+        month_start = datetime.datetime.combine(first_day_month, datetime.time.min)
+        month_recs = self.search([
+            ('entry_datetime', '>=', month_start),
+            ('entry_datetime', '<=', today_end),
+            ('state', '!=', 'cancelled')
+        ])
+        
+        supplier_qty_map = {}
+        for r in month_recs:
+            p_name = r.partner_id.name or 'Unknown'
+            supplier_qty_map[p_name] = supplier_qty_map.get(p_name, 0.0) + r.net_received_weight
+        
+        sorted_suppliers = sorted(supplier_qty_map.items(), key=lambda x: x[1], reverse=True)[:5]
+        top_suppliers = [{'name': name, 'qty': qty} for name, qty in sorted_suppliers]
+
+        return {
+            'kpi': {
+                'kelapa_masuk_hari_ini': kelapa_masuk_hari_ini,
+                'total_stok_kelapa': total_stok_kelapa,
+                'supplier_hari_ini': supplier_hari_ini,
+                'purchase_order_pending': po_pending_count,
+                'transfer_pending': transfer_pending_count,
+                'receiving_pending': receiving_pending_count,
+            },
+            'recent': {
+                'receipts': recent_receipts,
+                'transfers': recent_transfers,
+                'adjustments': recent_adjustments,
+                'pos': pending_pos,
+            },
+            'coconut_products_stock': coconut_products_stock,
+            'charts': {
+                'receiving_7_days': receiving_7_days,
+                'stock_movement_7_days': stock_movement_7_days,
+                'top_suppliers': top_suppliers,
+            }
+        }
+
+

@@ -258,36 +258,7 @@
         </field>
     </record>
 
-    <!-- Override / Rename Root Menu from coconut_receiving to "Penerimaan" -->
-    <menuitem id="coconut_receiving.menu_coconut_receiving_root"
-              name="Penerimaan"
-              sequence="40"/>
-
-    <!-- Re-parent Penerimaan Kelapa under Kelapa -->
-    <menuitem id="coconut_receiving.menu_coconut_receipt"
-              name="Penerimaan Kelapa"
-              parent="coconut_receiving.menu_coconut_receiving_root"
-              sequence="10"/>
-
-    <!-- Parent Menu for Sortir Kelapa (Dropdown) -->
-    <menuitem id="menu_coconut_sorting_parent"
-              name="Sortir Kelapa"
-              parent="coconut_receiving.menu_coconut_receiving_root"
-              sequence="20"/>
-
-    <!-- Sortir Kelapa list submenu -->
-    <menuitem id="menu_coconut_sorting"
-              name="Data Sortir Kelapa"
-              parent="coconut_receiving.menu_coconut_sorting_parent"
-              action="action_coconut_sorting"
-              sequence="10"/>
-
-    <!-- Transfer Kelapa ke Produksi – menu langsung (bukan folder) -->
-    <menuitem id="menu_coconut_manufacturing_root"
-              name="Transfer Kelapa ke Produksi"
-              parent="coconut_receiving.menu_coconut_receiving_root"
-              action="action_coconut_manufacturing"
-              sequence="30"/>
+    <!-- Root menu name ensured in menu_views.xml -->
 
     <!-- ═══════════════════════════════════════════════════
          SPK Read-only Dashboard Views

@@ -176,3 +176,16 @@ class TestCoconutReceiving(TransactionCase):
                 product,
                 msg=f"Active product '{name}' must not exist in the system"
             )
+
+    def test_09_rmp_dashboard_data(self):
+        """
+        Test RPC method get_rmp_dashboard_data returns required structure and metrics.
+        """
+        receipt = self._create_receipt(gross=10000.0, tare=4000.0, pot=0.0)
+        data = self.env['coconut.receipt'].get_rmp_dashboard_data()
+        self.assertIn('kpi', data)
+        self.assertIn('recent', data)
+        self.assertIn('charts', data)
+        self.assertGreaterEqual(data['kpi']['kelapa_masuk_hari_ini'], 6000.0)
+        self.assertTrue(len(data['recent']['receipts']) > 0)
+

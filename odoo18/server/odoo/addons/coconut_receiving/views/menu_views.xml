@@ -2,18 +2,132 @@
 <odoo>
     <!-- Client Action for Dashboard -->
     <record id="action_coconut_product_dashboard" model="ir.actions.client">
-        <field name="name">Dashboard Produk Kelapa</field>
+        <field name="name">Dashboard Operational RMP</field>
         <field name="tag">pt_coconut_dashboard_action</field>
     </record>
 
+    <!-- Category 1: Dashboard -->
+    <menuitem id="menu_dashboard_rmp_parent"
+              name="Dashboard"
+              parent="coconut_receiving.menu_coconut_receiving_root"
+              sequence="1"/>
 
-
-    <!-- Add Dashboard menu under Dashboards module -->
-    <menuitem id="menu_dashboard_coconut"
-              name="Dashboard Produk Kelapa"
-              parent="spreadsheet_dashboard.spreadsheet_dashboard_menu_root"
+    <menuitem id="menu_dashboard_rmp"
+              name="Dashboard Operasional RMP"
+              parent="coconut_receiving.menu_dashboard_rmp_parent"
               action="coconut_receiving.action_coconut_product_dashboard"
+              sequence="1"/>
+
+    <!-- Category 2: Penerimaan -->
+    <record id="coconut_receiving.menu_penerimaan_kelapa_parent" model="ir.ui.menu">
+        <field name="name">Penerimaan</field>
+        <field name="parent_id" ref="coconut_receiving.menu_coconut_receiving_root"/>
+        <field name="sequence">2</field>
+    </record>
+
+    <menuitem id="menu_coconut_receipt"
+              name="Penerimaan Kelapa"
+              parent="coconut_receiving.menu_penerimaan_kelapa_parent"
+              action="coconut_receiving.action_coconut_receipt"
+              sequence="1"/>
+
+    <menuitem id="menu_coconut_stock_rmp"
+              name="Stok Kelapa"
+              parent="coconut_receiving.menu_penerimaan_kelapa_parent"
+              action="coconut_receiving.action_coconut_daily_stock"
               sequence="2"/>
+
+    <menuitem id="menu_coconut_sorting_rmp"
+              name="Sortir Kelapa"
+              parent="coconut_receiving.menu_penerimaan_kelapa_parent"
+              action="coconut_receiving.action_coconut_sorting"
+              sequence="3"/>
+
+    <menuitem id="menu_coconut_manufacturing_rmp"
+              name="Transfer Kelapa ke Produksi"
+              parent="coconut_receiving.menu_penerimaan_kelapa_parent"
+              action="coconut_receiving.action_coconut_manufacturing"
+              sequence="4"/>
+
+    <!-- Category 3: Purchase -->
+    <menuitem id="menu_purchase_rmp_parent"
+              name="Purchase"
+              parent="coconut_receiving.menu_coconut_receiving_root"
+              sequence="3"/>
+
+    <menuitem id="menu_coconut_po_rmp"
+              name="Purchase Order"
+              parent="coconut_receiving.menu_purchase_rmp_parent"
+              action="purchase.purchase_form_action"
+              sequence="1"/>
+
+    <menuitem id="menu_coconut_supplier_rmp"
+              name="Supplier"
+              parent="coconut_receiving.menu_purchase_rmp_parent"
+              action="account.res_partner_action_supplier"
+              sequence="2"/>
+
+    <!-- Category 4: Inventory -->
+    <menuitem id="menu_stok_kelapa_parent"
+              name="Inventory"
+              parent="coconut_receiving.menu_coconut_receiving_root"
+              sequence="4"/>
+
+    <menuitem id="menu_coconut_products_rmp"
+              name="Produk Kelapa"
+              parent="coconut_receiving.menu_stok_kelapa_parent"
+              action="stock.stock_product_normal_action"
+              sequence="1"/>
+
+    <menuitem id="menu_coconut_internal_transfer_rmp"
+              name="Transfer Internal"
+              parent="coconut_receiving.menu_stok_kelapa_parent"
+              action="stock.action_picking_tree_all"
+              sequence="2"/>
+
+    <menuitem id="menu_coconut_stock_adjustment_rmp"
+              name="Stock Adjustment"
+              parent="coconut_receiving.menu_stok_kelapa_parent"
+              action="stock.action_view_quants"
+              sequence="3"/>
+
+    <menuitem id="menu_coconut_location_rmp"
+              name="Lokasi"
+              parent="coconut_receiving.menu_stok_kelapa_parent"
+              action="stock.action_location_form"
+              sequence="4"/>
+
+    <!-- Category 5: Laporan -->
+    <menuitem id="menu_laporan_rmp_parent"
+              name="Laporan"
+              parent="coconut_receiving.menu_coconut_receiving_root"
+              sequence="5"/>
+
+    <menuitem id="menu_coconut_laporan_penerimaan_rmp"
+              name="Laporan Penerimaan"
+              parent="coconut_receiving.menu_laporan_rmp_parent"
+              action="coconut_receiving.action_coconut_receipt"
+              sequence="1"/>
+
+    <menuitem id="menu_coconut_reports_rmp"
+              name="Laporan Stok"
+              parent="coconut_receiving.menu_laporan_rmp_parent"
+              action="coconut_receiving.action_coconut_daily_stock"
+              sequence="2"/>
+
+    <menuitem id="menu_coconut_laporan_sortir_rmp"
+              name="Laporan Sortir"
+              parent="coconut_receiving.menu_laporan_rmp_parent"
+              action="coconut_receiving.action_coconut_sorting"
+              sequence="3"/>
+
+    <menuitem id="menu_coconut_stock_move_history_rmp"
+              name="Riwayat Pergerakan"
+              parent="coconut_receiving.menu_laporan_rmp_parent"
+              action="stock.stock_move_action"
+              sequence="4"/>
+
+
 
     <!-- Menu for Finalisasi Kelapa MP under Inventory -> Products -->
     <menuitem id="menu_finalisasi_kelapa_mp"

@@ -279,12 +279,16 @@
          Menus
          ═══════════════════════════════════════════════════ -->
     <menuitem id="menu_coconut_receiving_root"
-              name="Penerimaan Kelapa"
+              name="Raw Material Management"
               sequence="40"/>
-    <menuitem id="menu_coconut_receipt"
+    <menuitem id="menu_penerimaan_kelapa_parent"
               name="Penerimaan"
               parent="menu_coconut_receiving_root"
+              sequence="2"/>
+    <menuitem id="menu_coconut_receipt"
+              name="Penerimaan Kelapa"
+              parent="menu_penerimaan_kelapa_parent"
               action="action_coconut_receipt"
-              sequence="10"/>
+              sequence="1"/>
 
 </odoo>

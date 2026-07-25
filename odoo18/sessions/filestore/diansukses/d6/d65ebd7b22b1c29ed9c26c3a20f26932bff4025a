@@ -21158,12 +21158,28 @@ const spreadsheetBinaryField=__exports.spreadsheetBinaryField={...binaryField,co
 odoo.define('@spreadsheet_dashboard/assets/dashboard_action_loader',['@spreadsheet/assets_backend/spreadsheet_action_loader'],function(require){'use strict';let __exports={};const{addSpreadsheetActionLazyLoader}=require("@spreadsheet/assets_backend/spreadsheet_action_loader");addSpreadsheetActionLazyLoader("action_spreadsheet_dashboard");return __exports;});;
 
 /* /coconut_receiving/static/src/js/coconut_dashboard.js */
-odoo.define('@coconut_receiving/js/coconut_dashboard',['@web/core/registry','@odoo/owl','@web/core/utils/hooks'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{Component,onWillStart,useState}=require("@odoo/owl");const{useService}=require("@web/core/utils/hooks");class CoconutDashboard extends Component{setup(){this.orm=useService("orm");this.actionService=useService("action");this.state=useState({products:[],isManager:false,loading:true,metrics:{receiving_qty:12500,receiving_count:3,production_qty:8750,ready_stock_qty:35200,active_employees:125,inventory:{bulat:12500,layak:8700,reject:1200,parer:2500,},production_status:{mo_active:12,mo_running:7,mo_finished_today:15,efficiency:92,},payroll:{total_employees:150,daily_wage:125450000,production_bonus:18750000,status:'Sudah Dihitung',}}});onWillStart(async()=>{await this.loadData();});}
-async loadData(){this.state.loading=true;try{const data=await this.orm.call("finalisasi.kelapa.mp","get_dashboard_data",[]);this.state.products=data.products||[];this.state.isManager=data.is_manager||false;if(data.metrics){this.state.metrics=data.metrics;}}catch(error){console.error("Error loading dashboard data:",error);}finally{this.state.loading=false;}}
-formatNumber(num){if(num===undefined||num===null)return'0';return num.toLocaleString('id-ID');}
-formatCurrency(num){if(num===undefined||num===null)return'Rp 0';return'Rp '+num.toLocaleString('id-ID');}
+odoo.define('@coconut_receiving/js/coconut_dashboard',['@web/core/registry','@odoo/owl','@web/core/utils/hooks'],function(require){'use strict';let __exports={};const{registry}=require("@web/core/registry");const{Component,onWillStart,useState}=require("@odoo/owl");const{useService}=require("@web/core/utils/hooks");class CoconutDashboard extends Component{setup(){this.orm=useService("orm");this.actionService=useService("action");this.state=useState({loading:true,kpi:{kelapa_masuk_hari_ini:0,total_stok_kelapa:0,supplier_hari_ini:0,purchase_order_pending:0,transfer_pending:0,receiving_pending:0,},recent:{receipts:[],transfers:[],adjustments:[],pos:[],},coconut_products_stock:[],charts:{receiving_7_days:[],stock_movement_7_days:[],top_suppliers:[],}});onWillStart(async()=>{await this.loadData();});}
+async loadData(){this.state.loading=true;try{const data=await this.orm.call("coconut.receipt","get_rmp_dashboard_data",[]);if(data){if(data.kpi)this.state.kpi=data.kpi;if(data.recent)this.state.recent=data.recent;if(data.coconut_products_stock)this.state.coconut_products_stock=data.coconut_products_stock;if(data.charts)this.state.charts=data.charts;}}catch(error){console.error("Error loading RMP dashboard data:",error);}finally{this.state.loading=false;}}
+formatNumber(num){if(num===undefined||num===null)return'0';return Number(num).toLocaleString('id-ID');}
+formatCurrency(num){if(num===undefined||num===null)return'Rp 0';return'Rp '+Number(num).toLocaleString('id-ID');}
 openAction(actionXmlId){if(!actionXmlId)return;this.actionService.doAction(actionXmlId);}
-openProductStock(productCode){if(!productCode)return;this.actionService.doAction("coconut_receiving.action_coconut_daily_stock",{additionalContext:{selected_product_code:productCode,},});}}
+openDashboard(){this.loadData();}
+openReceipts(){this.actionService.doAction("coconut_receiving.action_coconut_receipt");}
+createReceipt(){this.actionService.doAction({type:'ir.actions.act_window',name:'Penerimaan Kelapa Baru',res_model:'coconut.receipt',views:[[false,'form']],target:'current',});}
+openSorting(){this.actionService.doAction("coconut_receiving.action_coconut_sorting");}
+openManufacturing(){this.actionService.doAction("coconut_receiving.action_coconut_manufacturing");}
+openStockReport(){this.actionService.doAction("coconut_receiving.action_coconut_daily_stock");}
+openProducts(){this.actionService.doAction({type:'ir.actions.act_window',name:'Produk Kelapa',res_model:'product.product',views:[[false,'kanban'],[false,'list'],[false,'form']],target:'current',});}
+openInternalTransfers(){this.actionService.doAction({type:'ir.actions.act_window',name:'Transfer Internal',res_model:'stock.picking',domain:[['picking_type_id.code','=','internal']],views:[[false,'list'],[false,'form']],target:'current',});}
+openStockAdjustment(){this.actionService.doAction({type:'ir.actions.act_window',name:'Stock Adjustment',res_model:'stock.quant',views:[[false,'list']],target:'current',});}
+openPurchaseOrders(){this.actionService.doAction({type:'ir.actions.act_window',name:'Purchase Orders',res_model:'purchase.order',views:[[false,'list'],[false,'form']],target:'current',});}
+openSuppliers(){this.actionService.doAction({type:'ir.actions.act_window',name:'Supplier',res_model:'res.partner',domain:[['supplier_rank','>',0]],views:[[false,'list'],[false,'form']],target:'current',});}
+openReports(){this.actionService.doAction("coconut_receiving.action_coconut_daily_stock");}
+openProductRecord(productId){if(!productId){this.openProducts();return;}
+this.actionService.doAction({type:'ir.actions.act_window',res_model:'product.product',res_id:productId,views:[[false,'form']],target:'current',});}
+openReceiptRecord(id){if(!id)return;this.actionService.doAction({type:'ir.actions.act_window',res_model:'coconut.receipt',res_id:id,views:[[false,'form']],target:'current',});}
+openTransferRecord(id){if(!id)return;this.actionService.doAction({type:'ir.actions.act_window',res_model:'stock.picking',res_id:id,views:[[false,'form']],target:'current',});}
+openPoRecord(id){if(!id)return;this.actionService.doAction({type:'ir.actions.act_window',res_model:'purchase.order',res_id:id,views:[[false,'form']],target:'current',});}}
 CoconutDashboard.template="coconut_receiving.CoconutDashboard";registry.category("actions").add("pt_coconut_dashboard_action",CoconutDashboard);return __exports;});;
 
 /* /hr_attendance/static/src/components/attendance_menu/attendance_menu.js */
@@ -36882,182 +36898,144 @@ registerTemplate("spreadsheet.SpreadsheetBinaryField", `/spreadsheet/static/src/
     </t>
 `);
 registerTemplate("coconut_receiving.CoconutDashboard", `/coconut_receiving/static/src/xml/coconut_dashboard.xml`, `<t t-name="coconut_receiving.CoconutDashboard" owl="1" xml:space="preserve">
-        <div class="o_coco_dashboard">
+        <div class="o_coco_dashboard p-4">
 
             <div class="coco_watermark"/>
 
 
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-3">
                     <span class="coco_dashboard_icon_wrapper">
-                        <i class="fa fa-dashboard"/>
+                        <i class="fa fa-tachometer"/>
                     </span>
-                    <h2 class="coco_section_title m-0">Dashboard</h2>
+                    <div>
+                        <h2 class="coco_section_title m-0">Dashboard Operational RMP</h2>
+                        <span class="text-muted small">Pusat Aktivitas Penerimaan &amp; Manajemen Stok Kelapa</span>
+                    </div>
                 </div>
                 <div>
-                    <button class="btn btn-light coco_refresh_btn" t-on-click="loadData">
-                        <i class="fa fa-refresh mr-1"/> Segarkan
+                    <button class="btn btn-light coco_refresh_btn border shadow-sm" t-on-click="loadData">
+                        <i class="fa fa-refresh mr-1"/> Segarkan Data
                     </button>
                 </div>
             </div>
 
 
-            <div class="row g-4 mb-4">
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_receipt')">
-                        <div class="card-body d-flex align-items-center justify-content-between p-4">
-                            <div>
-                                <span class="coco_kpi_label">Penerimaan Kelapa</span>
-                                <span class="coco_kpi_sublabel">Hari Ini</span>
-                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.receiving_qty)"/> Kg</h3>
-                                <span class="coco_kpi_trend text-success"><i class="fa fa-arrow-up"/> <t t-esc="state.metrics.receiving_count"/> penerimaan</span>
-                            </div>
-                            <div class="coco_kpi_icon_wrapper">
-                                <i class="fa fa-cubes"/>
-                            </div>
-                        </div>
+            <t t-if="state.loading">
+                <div class="text-center py-5">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Memuat data dashboard...</span>
                     </div>
+                    <p class="mt-2 text-muted">Memuat data operational RMP...</p>
                 </div>
+            </t>
 
+            <t t-else="">
 
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_manufacturing')">
-                        <div class="card-body d-flex align-items-center justify-content-between p-4">
-                            <div>
-                                <span class="coco_kpi_label">Produksi</span>
-                                <span class="coco_kpi_sublabel">Hari Ini</span>
-                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.production_qty)"/> Kg</h3>
-                                <span class="coco_kpi_trend_sub">Kelapa Layak Produksi</span>
-                            </div>
-                            <div class="coco_kpi_icon_wrapper">
-                                <i class="fa fa-industry"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div class="row g-3 mb-4">
 
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openProductStock('COCO-LAYAK')">
-                        <div class="card-body d-flex align-items-center justify-content-between p-4">
-                            <div>
-                                <span class="coco_kpi_label">Stok Kelapa Layak</span>
-                                <span class="coco_kpi_sublabel">Produksi</span>
-                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.ready_stock_qty)"/> Kg</h3>
-                                <span class="coco_kpi_trend_sub">Ready Production</span>
-                            </div>
-                            <div class="coco_kpi_icon_wrapper">
-                                <i class="fa fa-database"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card coco_kpi_card" t-on-click="() =&gt; this.openAction('hr.open_view_employee_list')">
-                        <div class="card-body d-flex align-items-center justify-content-between p-4">
-                            <div>
-                                <span class="coco_kpi_label">Karyawan Aktif</span>
-                                <span class="coco_kpi_sublabel">Shift Hari Ini</span>
-                                <h3 class="coco_kpi_value mt-2"><t t-esc="formatNumber(state.metrics.active_employees)"/> Orang</h3>
-                                <span class="coco_kpi_trend_sub">3 Shift</span>
-                            </div>
-                            <div class="coco_kpi_icon_wrapper">
-                                <i class="fa fa-user-circle-o"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="row g-4 mb-4">
-
-                <div class="col-12 col-lg-8">
-                    <div class="card coco_dashboard_card h-100">
-                        <div class="card-body p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
-                                <h4 class="coco_card_title m-0"><i class="fa fa-line-chart me-2"/>Produksi Kelapa Bulanan</h4>
-                                <div class="coco_chart_filter">
-                                    <button class="btn btn-sm btn-light">Tahun Ini <i class="fa fa-angle-down ms-1"/></button>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_receipt')">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">Kelapa Masuk (Hari Ini)</span>
+                                    <div class="coco_kpi_icon bg-success-subtle text-success p-2 rounded-circle">
+                                        <i class="fa fa-truck fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.kelapa_masuk_hari_ini)"/> <small class="fs-6 fw-normal text-muted">Kg</small></h4>
+                                    <span class="coco_kpi_subtext text-success small"><i class="fa fa-check-circle me-1"/>Penerimaan Hari Ini</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
 
-                            <div class="coco_chart_container position-relative" style="height: 320px;">
-                                <svg class="w-100 h-100" viewBox="0 0 800 300" preserveAspectRatio="none">
-                                    <defs>
-
-                                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stop-color="#4CAF50" stop-opacity="0.25"/>
-                                            <stop offset="100%" stop-color="#E8F5E9" stop-opacity="0.0"/>
-                                        </linearGradient>
-                                    </defs>
-
-
-                                    <line x1="50" y1="20" x2="770" y2="20" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="60" x2="770" y2="60" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="100" x2="770" y2="100" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="140" x2="770" y2="140" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="180" x2="770" y2="180" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="220" x2="770" y2="220" stroke="#F1F3F5" stroke-width="1"/>
-                                    <line x1="50" y1="260" x2="770" y2="260" stroke="#F1F3F5" stroke-width="1"/>
-
-
-                                    <text x="40" y="24" class="coco_chart_text text-end">60,000</text>
-                                    <text x="40" y="64" class="coco_chart_text text-end">50,000</text>
-                                    <text x="40" y="104" class="coco_chart_text text-end">40,000</text>
-                                    <text x="40" y="144" class="coco_chart_text text-end">30,000</text>
-                                    <text x="40" y="184" class="coco_chart_text text-end">20,000</text>
-                                    <text x="40" y="224" class="coco_chart_text text-end">10,000</text>
-                                    <text x="40" y="264" class="coco_chart_text text-end">0</text>
-
-
-                                    <text x="15" y="24" class="coco_chart_legend_y" transform="rotate(-90 15 24)">Kg</text>
-
-
-                                    <text x="75" y="285" class="coco_chart_text text-center">Jan</text>
-                                    <text x="135" y="285" class="coco_chart_text text-center">Feb</text>
-                                    <text x="195" y="285" class="coco_chart_text text-center">Mar</text>
-                                    <text x="255" y="285" class="coco_chart_text text-center">Apr</text>
-                                    <text x="315" y="285" class="coco_chart_text text-center">Mei</text>
-                                    <text x="375" y="285" class="coco_chart_text text-center">Jun</text>
-                                    <text x="435" y="285" class="coco_chart_text text-center">Jul</text>
-                                    <text x="495" y="285" class="coco_chart_text text-center">Agu</text>
-                                    <text x="555" y="285" class="coco_chart_text text-center">Sep</text>
-                                    <text x="615" y="285" class="coco_chart_text text-center">Okt</text>
-                                    <text x="675" y="285" class="coco_chart_text text-center">Nov</text>
-                                    <text x="735" y="285" class="coco_chart_text text-center">Des</text>
-
-
-                                    <path d="M 75 260 L 75 188 L 135 160 L 195 148 L 255 156 L 315 124 L 375 100 L 435 116 L 495 88 L 555 80 L 615 56 L 675 72 L 735 48 L 735 260 Z" fill="url(#chartGradient)"/>
-
-
-                                    <path d="M 75 188 L 135 160 L 195 148 L 255 156 L 315 124 L 375 100 L 435 116 L 495 88 L 555 80 L 615 56 L 675 72 L 735 48" fill="none" stroke="#4CAF50" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-
-
-                                    <circle cx="75" cy="188" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="135" cy="160" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="195" cy="148" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="255" cy="156" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="315" cy="124" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="375" cy="100" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="435" cy="116" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="495" cy="88" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="555" cy="80" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="615" cy="56" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="675" cy="72" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                    <circle cx="735" cy="48" r="4" fill="#2E7D32" stroke="#FFFFFF" stroke-width="2"/>
-                                </svg>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="openStockReport">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">Total Stok Kelapa</span>
+                                    <div class="coco_kpi_icon bg-primary-subtle text-primary p-2 rounded-circle">
+                                        <i class="fa fa-cubes fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.total_stok_kelapa)"/> <small class="fs-6 fw-normal text-muted">Kg</small></h4>
+                                    <span class="coco_kpi_subtext text-primary small"><i class="fa fa-archive me-1"/>Stok Kelapa Bulat</span>
+                                </div>
                             </div>
+                        </div>
+                    </div>
 
 
-                            <div class="d-flex justify-content-center mt-3">
-                                <div class="d-flex align-items-center gap-2">
-                                    <span class="coco_legend_color"/>
-                                    <span class="coco_legend_label">Produksi (Kg)</span>
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="openSuppliers">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">Supplier Hari Ini</span>
+                                    <div class="coco_kpi_icon bg-info-subtle text-info p-2 rounded-circle">
+                                        <i class="fa fa-users fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.supplier_hari_ini)"/> <small class="fs-6 fw-normal text-muted">Supplier</small></h4>
+                                    <span class="coco_kpi_subtext text-info small"><i class="fa fa-handshake-o me-1"/>Pengirim Aktif</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="openPurchaseOrders">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">PO Pending</span>
+                                    <div class="coco_kpi_icon bg-warning-subtle text-warning p-2 rounded-circle">
+                                        <i class="fa fa-file-text-o fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.purchase_order_pending)"/> <small class="fs-6 fw-normal text-muted">Dokumen</small></h4>
+                                    <span class="coco_kpi_subtext text-warning small"><i class="fa fa-clock-o me-1"/>Draft / Sent PO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="openInternalTransfers">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">Transfer Pending</span>
+                                    <div class="coco_kpi_icon bg-secondary-subtle text-secondary p-2 rounded-circle">
+                                        <i class="fa fa-exchange fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.transfer_pending)"/> <small class="fs-6 fw-normal text-muted">Transfer</small></h4>
+                                    <span class="coco_kpi_subtext text-secondary small"><i class="fa fa-random me-1"/>Pergerakan Stok</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                        <div class="card coco_kpi_card border-0 shadow-sm rounded-3 h-100" t-on-click="() =&gt; this.openAction('coconut_receiving.action_coconut_receipt')">
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <span class="coco_kpi_label text-muted small fw-bold">Receiving Pending</span>
+                                    <div class="coco_kpi_icon bg-danger-subtle text-danger p-2 rounded-circle">
+                                        <i class="fa fa-hourglass-half fa-lg"/>
+                                    </div>
+                                </div>
+                                <div class="mt-2">
+                                    <h4 class="coco_kpi_value text-dark fw-bold m-0"><t t-esc="formatNumber(state.kpi.receiving_pending)"/> <small class="fs-6 fw-normal text-muted">Draft</small></h4>
+                                    <span class="coco_kpi_subtext text-danger small"><i class="fa fa-exclamation-circle me-1"/>Belum Divalidasi</span>
                                 </div>
                             </div>
                         </div>
@@ -37065,171 +37043,381 @@ registerTemplate("coconut_receiving.CoconutDashboard", `/coconut_receiving/stati
                 </div>
 
 
-                <div class="col-12 col-lg-4">
-                    <div class="card coco_dashboard_card h-100">
-                        <div class="card-body p-4">
-                            <h4 class="coco_card_title mb-4"><i class="fa fa-cubes me-2"/>Status Persediaan</h4>
-
-                            <div class="coco_inventory_list d-flex flex-column gap-3">
-
-                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-BULAT')">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="coco_inv_icon_circle">
-                                            <i class="fa fa-archive"/>
-                                        </div>
-                                        <div>
-                                            <h5 class="coco_inv_item_title m-0">Kelapa Bulat</h5>
-                                            <span class="coco_inv_item_subtitle">Total Stok</span>
-                                        </div>
-                                    </div>
-                                    <div class="coco_inv_qty_val text-success">
-                                        <t t-esc="formatNumber(state.metrics.inventory.bulat)"/> <small>Kg</small>
-                                    </div>
-                                </div>
-
-
-                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-LAYAK')">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="coco_inv_icon_circle">
-                                            <i class="fa fa-check-circle"/>
-                                        </div>
-                                        <div>
-                                            <h5 class="coco_inv_item_title m-0">Kelapa Layak Produksi</h5>
-                                            <span class="coco_inv_item_subtitle">Siap Diproses</span>
-                                        </div>
-                                    </div>
-                                    <div class="coco_inv_qty_val text-primary">
-                                        <t t-esc="formatNumber(state.metrics.inventory.layak)"/> <small>Kg</small>
-                                    </div>
-                                </div>
-
-
-                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-REJECT')">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="coco_inv_icon_circle">
-                                            <i class="fa fa-times-circle"/>
-                                        </div>
-                                        <div>
-                                            <h5 class="coco_inv_item_title m-0">Reject</h5>
-                                            <span class="coco_inv_item_subtitle">Tidak Layak</span>
-                                        </div>
-                                    </div>
-                                    <div class="coco_inv_qty_val text-danger">
-                                        <t t-esc="formatNumber(state.metrics.inventory.reject)"/> <small>Kg</small>
-                                    </div>
-                                </div>
-
-
-                                <div class="coco_inventory_item d-flex align-items-center justify-content-between p-3 rounded" t-on-click="() =&gt; this.openProductStock('COCO-PARER')">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="coco_inv_icon_circle">
-                                            <i class="fa fa-tasks"/>
-                                        </div>
-                                        <div>
-                                            <h5 class="coco_inv_item_title m-0">Parrer</h5>
-                                            <span class="coco_inv_item_subtitle">Stok Tersedia</span>
-                                        </div>
-                                    </div>
-                                    <div class="coco_inv_qty_val text-warning">
-                                        <t t-esc="formatNumber(state.metrics.inventory.parer)"/> <small>Kg</small>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="fa fa-bolt text-warning me-2 fs-5"/>
+                            <h5 class="coco_card_title m-0 fw-bold">Pintas Pintar (Quick Actions Operasional)</h5>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        <div class="row g-2">
 
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-success w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openDashboard">
+                                    <i class="fa fa-tachometer fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Dashboard</span>
+                                </button>
+                            </div>
 
-            <div class="row g-4">
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-success w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openReceipts">
+                                    <i class="fa fa-truck fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Penerimaan</span>
+                                </button>
+                            </div>
 
-                <div class="col-12 col-md-6 col-lg-5">
-                    <div class="card coco_dashboard_card h-100">
-                        <div class="card-body p-4">
-                            <h4 class="coco_card_title mb-4"><i class="fa fa-cog me-2"/>Status Produksi</h4>
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-primary w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openSorting">
+                                    <i class="fa fa-filter fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Sortir</span>
+                                </button>
+                            </div>
 
-                            <div class="row g-3 text-center">
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-primary w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openManufacturing">
+                                    <i class="fa fa-cogs fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Transfer Produksi</span>
+                                </button>
+                            </div>
 
-                                <div class="col-3">
-                                    <div class="coco_status_box p-3 rounded">
-                                        <div class="coco_status_icon text-primary"><i class="fa fa-clipboard"/></div>
-                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_active"/></h3>
-                                        <span class="coco_status_label">MO Aktif</span>
-                                    </div>
-                                </div>
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-info w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openStockReport">
+                                    <i class="fa fa-cubes fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Stok Kelapa</span>
+                                </button>
+                            </div>
 
-                                <div class="col-3">
-                                    <div class="coco_status_box p-3 rounded">
-                                        <div class="coco_status_icon text-warning"><i class="fa fa-refresh"/></div>
-                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_running"/></h3>
-                                        <span class="coco_status_label">Sedang Berjalan</span>
-                                    </div>
-                                </div>
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-info w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openProducts">
+                                    <i class="fa fa-tags fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Produk Kelapa</span>
+                                </button>
+                            </div>
 
-                                <div class="col-3">
-                                    <div class="coco_status_box p-3 rounded">
-                                        <div class="coco_status_icon text-success"><i class="fa fa-check-square-o"/></div>
-                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.mo_finished_today"/></h3>
-                                        <span class="coco_status_label">Selesai Hari Ini</span>
-                                    </div>
-                                </div>
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-secondary w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openInternalTransfers">
+                                    <i class="fa fa-exchange fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Transfer Internal</span>
+                                </button>
+                            </div>
 
-                                <div class="col-3">
-                                    <div class="coco_status_box p-3 rounded">
-                                        <div class="coco_status_icon text-info"><i class="fa fa-tachometer"/></div>
-                                        <h3 class="coco_status_num mt-2"><t t-esc="state.metrics.production_status.efficiency"/>%</h3>
-                                        <span class="coco_status_label">Efisiensi Produksi</span>
-                                    </div>
-                                </div>
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-secondary w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openStockAdjustment">
+                                    <i class="fa fa-sliders fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Stock Adjustment</span>
+                                </button>
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-warning w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openPurchaseOrders">
+                                    <i class="fa fa-shopping-cart fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Purchase Order</span>
+                                </button>
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-warning w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openSuppliers">
+                                    <i class="fa fa-address-book fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Supplier</span>
+                                </button>
+                            </div>
+
+                            <div class="col-6 col-md-3 col-lg-2 col-xl-1">
+                                <button class="btn btn-outline-dark w-100 py-2 d-flex flex-column align-items-center justify-content-center border-2 coco_shortcut_btn h-100" t-on-click="openReports">
+                                    <i class="fa fa-file-text-o fa-xl mb-1"/>
+                                    <span class="fw-semibold small text-center">Laporan</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
 
 
-                <div class="col-12 col-md-6 col-lg-7">
-                    <div class="card coco_dashboard_card h-100" t-on-click="() =&gt; this.openAction('om_hr_payroll.menu_hr_payroll_employees')">
-                        <div class="card-body p-4">
-                            <h4 class="coco_card_title mb-4"><i class="fa fa-users me-2"/>Payroll Hari Ini</h4>
-
-                            <div class="row g-4 align-items-center">
-
-                                <div class="col-9">
-                                    <div class="row text-center">
-
-                                        <div class="col-4 border-end">
-                                            <span class="coco_payroll_lbl">Total Karyawan</span>
-                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatNumber(state.metrics.payroll.total_employees)"/> Orang</h3>
-                                            <span class="coco_payroll_sub">Karyawan Aktif</span>
+                <div class="card border-0 shadow-sm rounded-3 mb-4">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-archive text-success me-2 fs-5"/>
+                                <h5 class="coco_card_title m-0 fw-bold">Monitoring Stok Real-Time (Produk Kelapa)</h5>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success" t-on-click="openProducts">
+                                <i class="fa fa-external-link me-1"/> Kelola Produk
+                            </button>
+                        </div>
+                        <div class="row g-3">
+                            <t t-if="state.coconut_products_stock &amp;&amp; state.coconut_products_stock.length &gt; 0">
+                                <t t-foreach="state.coconut_products_stock" t-as="p" t-key="p.name">
+                                    <div class="col-12 col-sm-6 col-lg-4 col-xl-2">
+                                        <div class="card border border-light-subtle shadow-sm rounded-3 h-100 coco_stock_card" t-on-click="() =&gt; this.openProductRecord(p.product_id)">
+                                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                                <div>
+                                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                                        <h6 class="fw-bold text-dark mb-0 text-truncate" t-att-title="p.name"><t t-esc="p.name"/></h6>
+                                                        <span t-attf-class="badge rounded-pill {{ p.status_code == 'aman' ? 'bg-success' : (p.status_code == 'normal' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                                            <t t-esc="p.status_label"/>
+                                                        </span>
+                                                    </div>
+                                                    <div class="coco_stock_qty my-2">
+                                                        <h3 class="fw-bold text-dark m-0"><t t-esc="formatNumber(p.qty)"/> <small class="fs-6 fw-normal text-muted"><t t-esc="p.uom"/></small></h3>
+                                                    </div>
+                                                </div>
+                                                <div class="border-top pt-2 mt-2">
+                                                    <div class="d-flex justify-content-between align-items-center text-muted small" style="font-size: 11px;">
+                                                        <span class="text-truncate me-1" t-att-title="p.location"><i class="fa fa-map-marker me-1"/><t t-esc="p.location"/></span>
+                                                    </div>
+                                                    <div class="text-muted small mt-1" style="font-size: 10px;">
+                                                        <i class="fa fa-clock-o me-1"/>Update: <t t-esc="p.last_update"/>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+                                </t>
+                            </t>
+                            <t t-else="">
+                                <div class="col-12 text-center py-4 text-muted small">
+                                    Memuat data stok produk kelapa...
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
 
-                                        <div class="col-4 border-end">
-                                            <span class="coco_payroll_lbl">Upah Hari Ini</span>
-                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatCurrency(state.metrics.payroll.daily_wage)"/></h3>
-                                            <span class="coco_payroll_sub">Total Upah</span>
-                                        </div>
 
-                                        <div class="col-4">
-                                            <span class="coco_payroll_lbl">Premi Produksi</span>
-                                            <h3 class="coco_payroll_val mt-2"><t t-esc="formatCurrency(state.metrics.payroll.production_bonus)"/></h3>
-                                            <span class="coco_payroll_sub">Total Premi</span>
-                                        </div>
+                <div class="row g-4 mb-4">
+
+                    <div class="col-12 col-lg-6">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="coco_card_title m-0 fw-bold"><i class="fa fa-line-chart text-success me-2"/>Kelapa Masuk 7 Hari Terakhir</h5>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">7 Hari</span>
+                                </div>
+                                <div class="coco_chart_container position-relative py-3" style="height: 240px;">
+                                    <div class="d-flex align-items-end justify-content-around h-100 pt-4 px-2 border-bottom">
+                                        <t t-foreach="state.charts.receiving_7_days" t-as="item" t-key="item.day_name">
+                                            <div class="d-flex flex-column align-items-center flex-grow-1 h-100 justify-content-end px-1">
+                                                <span class="small fw-bold text-success mb-1" style="font-size: 11px;"><t t-esc="formatNumber(item.qty)"/></span>
+                                                <div class="bg-success rounded-top w-100 coco_bar_hover" t-attf-style="height: {{ item.qty &gt; 0 ? Math.min(100, Math.max(15, Math.round((item.qty / (Math.max(...state.charts.receiving_7_days.map(d =&gt; d.qty) || [1])) * 160)))) : 4 }}px; min-height: 4px; transition: height 0.5s ease;">
+                                                </div>
+                                                <span class="small text-muted mt-2 fw-semibold" style="font-size: 11px;"><t t-esc="item.day_name"/></span>
+                                            </div>
+                                        </t>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="col-3 text-center">
-                                    <span class="coco_payroll_lbl">Status Payroll</span>
-                                    <div class="coco_payroll_status_badge mt-2">
-                                        <i class="fa fa-check-circle"/>
-                                        <span>Sudah Dihitung</span>
-                                    </div>
-                                    <span class="coco_payroll_sub mt-1 d-block">Siap Dibayarkan</span>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="coco_card_title m-0 fw-bold"><i class="fa fa-pie-chart text-primary me-2"/>Supplier Terbanyak Bulan Ini</h5>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle">Top 5 Supplier</span>
+                                </div>
+                                <div class="coco_top_suppliers_list d-flex flex-column gap-2 mt-3">
+                                    <t t-if="state.charts.top_suppliers &amp;&amp; state.charts.top_suppliers.length &gt; 0">
+                                        <t t-foreach="state.charts.top_suppliers" t-as="sup" t-key="sup.name">
+                                            <div class="d-flex align-items-center justify-content-between p-2 rounded bg-light border-start border-4 border-primary">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="fa fa-user-circle text-primary"/>
+                                                    <span class="fw-semibold text-dark small"><t t-esc="sup.name"/></span>
+                                                </div>
+                                                <span class="badge bg-primary text-white"><t t-esc="formatNumber(sup.qty)"/> Kg</span>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="text-center py-4 text-muted small">
+                                            Belum ada transaksi supplier bulan ini.
+                                        </div>
+                                    </t>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+
+
+                <div class="row g-4 mb-4">
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold text-dark"><i class="fa fa-truck text-success me-2"/>Penerimaan Terakhir</h6>
+                                <button class="btn btn-sm btn-link text-success p-0 text-decoration-none" t-on-click="openReceipts">Lihat Semua</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle m-0 small">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Kode</th>
+                                                <th>Supplier</th>
+                                                <th class="text-end">Berat (Kg)</th>
+                                                <th class="text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="state.recent.receipts &amp;&amp; state.recent.receipts.length &gt; 0">
+                                                <t t-foreach="state.recent.receipts" t-as="r" t-key="r.id">
+                                                    <tr t-on-click="() =&gt; this.openReceiptRecord(r.id)" role="button" class="coco_table_row">
+                                                        <td class="fw-semibold text-primary"><t t-esc="r.name"/></td>
+                                                        <td><t t-esc="r.partner"/></td>
+                                                        <td class="text-end fw-bold"><t t-esc="formatNumber(r.net_weight)"/></td>
+                                                        <td class="text-center">
+                                                            <span t-attf-class="badge rounded-pill {{ r.state == 'done' ? 'bg-success' : (r.state == 'draft' ? 'bg-warning text-dark' : 'bg-secondary') }}">
+                                                                <t t-esc="r.state == 'done' ? 'Selesai' : (r.state == 'draft' ? 'Draft' : r.state)"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-3">Belum ada penerimaan.</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold text-dark"><i class="fa fa-exchange text-primary me-2"/>Transfer Terakhir</h6>
+                                <button class="btn btn-sm btn-link text-primary p-0 text-decoration-none" t-on-click="openInternalTransfers">Lihat Semua</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle m-0 small">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Referensi</th>
+                                                <th>Dari / Ke</th>
+                                                <th class="text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="state.recent.transfers &amp;&amp; state.recent.transfers.length &gt; 0">
+                                                <t t-foreach="state.recent.transfers" t-as="t" t-key="t.id">
+                                                    <tr t-on-click="() =&gt; this.openTransferRecord(t.id)" role="button" class="coco_table_row">
+                                                        <td class="fw-semibold text-dark"><t t-esc="t.name"/></td>
+                                                        <td>
+                                                            <div class="text-truncate" style="max-width: 140px;" t-att-title="t.src + ' → ' + t.dest">
+                                                                <t t-esc="t.src"/> → <t t-esc="t.dest"/>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <span t-attf-class="badge rounded-pill {{ t.state == 'done' ? 'bg-success' : (t.state == 'assigned' ? 'bg-info text-white' : 'bg-warning text-dark') }}">
+                                                                <t t-esc="t.state"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-3">Belum ada transfer internal.</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold text-dark"><i class="fa fa-sliders text-info me-2"/>Stock Adjustment Terakhir</h6>
+                                <button class="btn btn-sm btn-link text-info p-0 text-decoration-none" t-on-click="openStockAdjustment">Lihat Semua</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle m-0 small">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Produk / Ref</th>
+                                                <th>Lokasi</th>
+                                                <th class="text-end">Jumlah</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="state.recent.adjustments &amp;&amp; state.recent.adjustments.length &gt; 0">
+                                                <t t-foreach="state.recent.adjustments" t-as="adj" t-key="adj.id">
+                                                    <tr t-on-click="openStockAdjustment" role="button" class="coco_table_row">
+                                                        <td class="fw-semibold text-dark text-truncate" style="max-width: 110px;" t-att-title="adj.name"><t t-esc="adj.name"/></td>
+                                                        <td class="text-truncate" style="max-width: 100px;" t-att-title="adj.location"><t t-esc="adj.location"/></td>
+                                                        <td class="text-end fw-bold text-info"><t t-esc="formatNumber(adj.quantity)"/></td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <tr>
+                                                    <td colspan="3" class="text-center text-muted py-3">Belum ada stock adjustment.</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="col-12 col-md-6 col-xl-3">
+                        <div class="card border-0 shadow-sm rounded-3 h-100">
+                            <div class="card-header bg-white border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                                <h6 class="m-0 fw-bold text-dark"><i class="fa fa-shopping-cart text-warning me-2"/>PO Pending</h6>
+                                <button class="btn btn-sm btn-link text-warning p-0 text-decoration-none" t-on-click="openPurchaseOrders">Lihat Semua</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle m-0 small">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Nomor PO</th>
+                                                <th>Supplier</th>
+                                                <th class="text-end">Total</th>
+                                                <th class="text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-if="state.recent.pos &amp;&amp; state.recent.pos.length &gt; 0">
+                                                <t t-foreach="state.recent.pos" t-as="po" t-key="po.id">
+                                                    <tr t-on-click="() =&gt; this.openPoRecord(po.id)" role="button" class="coco_table_row">
+                                                        <td class="fw-semibold text-warning"><t t-esc="po.name"/></td>
+                                                        <td><t t-esc="po.partner"/></td>
+                                                        <td class="text-end fw-bold"><t t-esc="formatCurrency(po.amount_total)"/></td>
+                                                        <td class="text-center">
+                                                            <span class="badge rounded-pill bg-warning text-dark">
+                                                                <t t-esc="po.state"/>
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <tr>
+                                                    <td colspan="4" class="text-center text-muted py-3">Tidak ada PO pending.</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
         </div>
     </t>
 `);
