@@ -4,9 +4,16 @@
               name="Penggajian"
               sequence="50"/>
 
-    <menuitem id="menu_coconut_work_sheet"
+    <!-- Parent Menu for Hasil Kerja Borongan (Dropdown) -->
+    <menuitem id="menu_coconut_work_sheet_parent"
               name="Hasil Kerja Borongan"
               parent="menu_coconut_payroll_root"
+              sequence="10"/>
+
+    <!-- Hasil Kerja Borongan list submenu -->
+    <menuitem id="menu_coconut_work_sheet"
+              name="Data Hasil Kerja Borongan"
+              parent="menu_coconut_work_sheet_parent"
               action="action_coconut_work_sheet"
               sequence="10"/>
 
@@ -68,5 +75,12 @@
               name="Aturan Premi"
               parent="menu_coconut_payroll_config_parent"
               action="action_coconut_premium_rule"
+              sequence="20"/>
+
+    <!-- Form Hasil Kerja Borongan under Dropdown -->
+    <menuitem id="menu_hr_payroll_borongan_print_wizard"
+              name="Form Hasil Kerja Borongan"
+              parent="menu_coconut_work_sheet_parent"
+              action="action_hr_payroll_borongan_print_wizard"
               sequence="20"/>
 </odoo>
