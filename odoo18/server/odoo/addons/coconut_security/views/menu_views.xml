@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Deactivate standard Purchase Root Menu -->
+    <record id="purchase.menu_purchase_root" model="ir.ui.menu">
+        <field name="active" eval="False"/>
+    </record>
+
+    <record id="stock.menu_stock_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="mrp.menu_mrp_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="hr.menu_hr_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="hr_attendance.menu_hr_attendance_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_payroll.menu_coconut_payroll_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <!-- Custom Module Penerimaan Root Menu -->
+    <record id="coconut_receiving.menu_coconut_receiving_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <!-- Custom Submenus: RMP Roles -->
+    <record id="coconut_receiving.menu_coconut_receipt" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_sorting_parent" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_sorting" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_sorting_print_wizard" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_finalisasi_kelapa_mp" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_stock_move_history" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <!-- Custom Submenus: Produksi Roles -->
+    <record id="coconut_receiving.menu_coconut_manufacturing_root" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_hasil_kerja_harian" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_material_terbuang" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_manufacturing_spk_ops" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <record id="coconut_receiving.menu_coconut_manufacturing_spk_report_analysis" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+
+    <!-- Shared/All-Roles Menus -->
+    <record id="coconut_receiving.menu_dashboard_coconut" model="ir.ui.menu">
+        <field name="groups_id" eval="[
+            (6, 0, [
+                ref('group_coconut_pegawai_rmp'),
+                ref('group_coconut_kepala_divisi_produksi'),
+                ref('group_coconut_manager'),
+                ref('group_coconut_administrator')
+            ])
+        ]"/>
+    </record>
+</odoo>

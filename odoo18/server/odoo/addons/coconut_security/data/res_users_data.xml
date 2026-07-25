@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- User: Pegawai RMP -->
+    <record id="user_pegawai_rmp" model="res.users">
+        <field name="name">Pegawai RMP</field>
+        <field name="login">rmp@coconut.com</field>
+        <field name="password">rmp123</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+        <field name="groups_id" eval="[(6, 0, [ref('coconut_security.group_coconut_pegawai_rmp')])]"/>
+    </record>
+
+    <!-- User: Kepala Divisi Produksi -->
+    <record id="user_kepala_divisi_produksi" model="res.users">
+        <field name="name">Kepala Divisi Produksi</field>
+        <field name="login">produksi@coconut.com</field>
+        <field name="password">produksi123</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+        <field name="groups_id" eval="[(6, 0, [ref('coconut_security.group_coconut_kepala_divisi_produksi')])]"/>
+    </record>
+
+    <!-- User: Manager (Read Only) -->
+    <record id="user_manager_readonly" model="res.users">
+        <field name="name">Manager Read Only</field>
+        <field name="login">manager@coconut.com</field>
+        <field name="password">manager123</field>
+        <field name="company_id" ref="base.main_company"/>
+        <field name="company_ids" eval="[(6, 0, [ref('base.main_company')])]"/>
+        <field name="groups_id" eval="[(6, 0, [ref('coconut_security.group_coconut_manager')])]"/>
+    </record>
+</odoo>

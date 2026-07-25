@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_coconut_security" model="ir.module.category">
+        <field name="name">Coconut Access Roles</field>
+        <field name="description">Custom security access roles for PT Coco Murni Prima Jaya.</field>
+        <field name="sequence">10</field>
+    </record>
+
+    <!-- Pegawai RMP Role -->
+    <record id="group_coconut_pegawai_rmp" model="res.groups">
+        <field name="name">Pegawai RMP</field>
+        <field name="category_id" ref="module_category_coconut_security"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user')),
+            (4, ref('purchase.group_purchase_user')),
+            (4, ref('stock.group_stock_user'))
+        ]"/>
+    </record>
+
+    <!-- Kepala Divisi Produksi Role -->
+    <record id="group_coconut_kepala_divisi_produksi" model="res.groups">
+        <field name="name">Kepala Divisi Produksi</field>
+        <field name="category_id" ref="module_category_coconut_security"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user')),
+            (4, ref('mrp.group_mrp_user')),
+            (4, ref('hr.group_hr_user')),
+            (4, ref('hr_attendance.group_hr_attendance_officer')),
+            (4, ref('coconut_payroll.group_coconut_payroll_supervisor'))
+        ]"/>
+    </record>
+
+    <!-- Manager (Read Only) Role -->
+    <record id="group_coconut_manager" model="res.groups">
+        <field name="name">Manager (Read Only)</field>
+        <field name="category_id" ref="module_category_coconut_security"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user'))
+        ]"/>
+    </record>
+
+    <!-- Administrator Role -->
+    <record id="group_coconut_administrator" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="category_id" ref="module_category_coconut_security"/>
+        <field name="implied_ids" eval="[
+            (4, ref('base.group_user')),
+            (4, ref('group_coconut_pegawai_rmp')),
+            (4, ref('group_coconut_kepala_divisi_produksi')),
+            (4, ref('group_coconut_manager')),
+            (4, ref('purchase.group_purchase_manager')),
+            (4, ref('stock.group_stock_manager')),
+            (4, ref('mrp.group_mrp_manager')),
+            (4, ref('hr.group_hr_manager')),
+            (4, ref('hr_attendance.group_hr_attendance_manager')),
+            (4, ref('coconut_payroll.group_coconut_payroll_manager'))
+        ]"/>
+        <field name="users" eval="[(4, ref('base.user_admin')), (4, ref('base.user_root'))]"/>
+    </record>
+</odoo>
