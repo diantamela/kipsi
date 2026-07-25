@@ -41,4 +41,4 @@ access_coconut_payroll_line_harian_manager,coconut.payroll.line.harian manager,m
 access_coconut_payroll_line_borongan_operator,coconut.payroll.line.borongan operator,model_coconut_payroll_line_borongan,group_coconut_payroll_operator,1,0,0,0
 access_coconut_payroll_line_borongan_supervisor,coconut.payroll.line.borongan supervisor,model_coconut_payroll_line_borongan,group_coconut_payroll_supervisor,1,1,1,1
 access_coconut_payroll_line_borongan_manager,coconut.payroll.line.borongan manager,model_coconut_payroll_line_borongan,group_coconut_payroll_manager,1,1,1,1
-
+access_hr_payroll_borongan_print_wizard_user,hr.payroll.borongan.print.wizard user,model_hr_payroll_borongan_print_wizard,base.group_user,1,1,1,1

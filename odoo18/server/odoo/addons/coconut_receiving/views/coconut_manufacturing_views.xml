@@ -269,12 +269,18 @@
               parent="coconut_receiving.menu_coconut_receiving_root"
               sequence="10"/>
 
-    <!-- Sortir Kelapa – menu mandiri (bukan folder) -->
-    <menuitem id="menu_coconut_sorting"
+    <!-- Parent Menu for Sortir Kelapa (Dropdown) -->
+    <menuitem id="menu_coconut_sorting_parent"
               name="Sortir Kelapa"
               parent="coconut_receiving.menu_coconut_receiving_root"
-              action="action_coconut_sorting"
               sequence="20"/>
+
+    <!-- Sortir Kelapa list submenu -->
+    <menuitem id="menu_coconut_sorting"
+              name="Data Sortir Kelapa"
+              parent="coconut_receiving.menu_coconut_sorting_parent"
+              action="action_coconut_sorting"
+              sequence="10"/>
 
     <!-- Transfer Kelapa ke Produksi – menu langsung (bukan folder) -->
     <menuitem id="menu_coconut_manufacturing_root"

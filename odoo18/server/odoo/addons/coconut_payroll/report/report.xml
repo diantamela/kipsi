@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_hasil_kerja_borongan" model="ir.actions.report">
+        <field name="name">Form Hasil Kerja Borongan</field>
+        <field name="model">hr.payroll.borongan.print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_payroll.report_hasil_kerja_borongan_template</field>
+        <field name="report_file">coconut_payroll.report_hasil_kerja_borongan_template</field>
+        <field name="paperformat_id" ref="coconut_payroll.paperformat_hasil_kerja_borongan"/>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+</odoo>

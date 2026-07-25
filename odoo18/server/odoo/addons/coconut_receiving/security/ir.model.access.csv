@@ -12,3 +12,4 @@ access_finalisasi_kelapa_mp_user,finalisasi.kelapa.mp user,model_finalisasi_kela
 access_finalisasi_kelapa_mp_manager,finalisasi.kelapa.mp manager,model_finalisasi_kelapa_mp,stock.group_stock_manager,1,1,1,1
 access_coconut_hasil_kerja_harian_user,coconut.hasil.kerja.harian user,model_coconut_hasil_kerja_harian,base.group_user,1,1,1,1
 access_coconut_material_terbuang_user,coconut.material.terbuang user,model_coconut_material_terbuang,base.group_user,1,1,1,1
+access_coconut_sorting_print_wizard_user,coconut.sorting.print.wizard user,model_coconut_sorting_print_wizard,base.group_user,1,1,1,1

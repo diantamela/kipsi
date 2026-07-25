@@ -27,6 +27,11 @@
                                 string="Batalkan"
                                 type="object"
                                 invisible="state in ('done', 'cancelled')"/>
+                        <button name="%(action_report_coconut_sorting_reject)d"
+                                string="Cetak Laporan Sortir"
+                                type="action"
+                                class="oe_highlight"
+                                invisible="state in ('draft', 'cancelled')"/>
                         <button name="action_reset_draft"
                                 id="btn_reset_sort"
                                 string="Kembalikan ke Draft"

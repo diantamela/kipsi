@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Paper Format A5 Landscape (Half of A4) -->
+    <record id="paperformat_coconut_sorting_reject" model="report.paperformat">
+        <field name="name">Format Kertas Laporan Sortir A5 Landscape</field>
+        <field name="default" eval="False" />
+        <field name="format">A5</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">5</field>
+        <field name="margin_right">5</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">0</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Report Action 1: Print from existing coconut.sorting record (with data) -->
+    <record id="action_report_coconut_sorting_reject" model="ir.actions.report">
+        <field name="name">Laporan Hasil Sortiran Kelapa</field>
+        <field name="model">coconut.sorting</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_receiving.report_coconut_sorting_reject_template</field>
+        <field name="report_file">coconut_receiving.report_coconut_sorting_reject_template</field>
+        <field name="paperformat_id" ref="paperformat_coconut_sorting_reject"/>
+        <field name="binding_model_id" ref="model_coconut_sorting"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- Report Action 2: Print blank form from wizard -->
+    <record id="action_report_coconut_sorting_blank_form" model="ir.actions.report">
+        <field name="name">Form Hasil Sortir Kelapa</field>
+        <field name="model">coconut.sorting.print.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">coconut_receiving.report_coconut_sorting_blank_form_template</field>
+        <field name="report_file">coconut_receiving.report_coconut_sorting_blank_form_template</field>
+        <field name="paperformat_id" ref="paperformat_coconut_sorting_reject"/>
+        <field name="binding_model_id" eval="False"/>
+    </record>
+
+    <!-- Common CSS Styles Component adjusted for A5 Landscape -->
+    <template id="sorting_report_styles">
+        <style type="text/css">
+            .page-container {
+                font-size: 10px;
+            }
+            .header-table, .main-table, .footer-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .header-table td {
+                border: 1px solid #000;
+                padding: 3px 6px;
+                vertical-align: middle;
+            }
+            .title-cell {
+                text-align: center;
+                font-weight: bold;
+                font-size: 12px;
+                width: 75%;
+            }
+            .title-cell-sub {
+                font-weight: bold;
+                font-size: 10px;
+                width: 75%;
+                padding-left: 6px;
+                text-align: center;
+            }
+            .meta-cell {
+                width: 25%;
+                font-size: 9px;
+            }
+            .main-table th, .main-table td {
+                border: 1px solid #000;
+                padding: 2px 4px;
+                height: 5mm;
+                box-sizing: border-box;
+            }
+            .main-table th {
+                text-align: center;
+                font-weight: bold;
+                font-size: 9px;
+                background-color: #f2f2f2;
+            }
+            .main-table td {
+                vertical-align: middle;
+            }
+            .text-center {
+                text-align: center;
+            }
+            .text-left {
+                text-align: left;
+            }
+            .text-right {
+                text-align: right;
+            }
+            .footer-table {
+                margin-top: 3px;
+                border: 1px solid #000;
+            }
+            .footer-table td {
+                border: 1px solid #000;
+                width: 33.33%;
+                padding: 3px 6px;
+                vertical-align: top;
+                font-size: 9px;
+            }
+            .signature-title {
+                font-weight: bold;
+                text-decoration: underline;
+                margin-bottom: 12px;
+            }
+            .signature-info {
+                line-height: 1.2;
+            }
+        </style>
+    </template>
+
+    <!-- QWeb Template 1: Print from existing record -->
+    <template id="report_coconut_sorting_reject_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page-container" style="box-sizing: border-box; width: 100%; height: 138mm; border: 2px solid #000; padding: 5px; font-family: Arial, sans-serif; position: relative;">
+                        <!-- Lampiran Text on Top Right Outside Table -->
+                        <div style="width: 100%; text-align: right; font-size: 10px; margin-bottom: 2px; font-weight: bold;">
+                            Lampiran 13
+                        </div>
+
+                        <t t-call="coconut_receiving.sorting_report_styles"/>
+
+                        <!-- Header -->
+                        <table class="header-table">
+                            <tr>
+                                <td rowspan="2" class="title-cell">
+                                    <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                                        <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)" style="max-height: 24px; margin-right: 10px; display: inline-block; vertical-align: middle;" alt="Logo"/>
+                                        <span style="display: inline-block; vertical-align: middle; line-height: 24px; font-size: 12px;">PT. COCO MURNI PRIMA JAYA</span>
+                                    </div>
+                                </td>
+                                <td class="meta-cell">
+                                    DOK : <t t-esc="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="meta-cell">
+                                    TGL : <t t-esc="o.date_sorting.strftime('%d/%m/%Y') if o.date_sorting else ''"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title-cell-sub">
+                                    LAPORAN HASIL SORTIRAN KELAPA
+                                </td>
+                                <td class="meta-cell">
+                                    HLM : 1 dari 1
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Main Table -->
+                        <table class="main-table" style="margin-top: 4px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width: 4%;">No</th>
+                                    <th rowspan="2" style="width: 18%;">Supplier</th>
+                                    <th rowspan="2" style="width: 12%;">Asal kelapa</th>
+                                    <th rowspan="2" style="width: 14%;">No Kendaraan</th>
+                                    <th colspan="5" style="width: 38%;">Hasil Sortiran ( kg )</th>
+                                    <th rowspan="2" style="width: 7%;">total</th>
+                                    <th rowspan="2" style="width: 7%;">keterangan</th>
+                                </tr>
+                                <tr>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa pecah</th>
+                                    <th style="font-size: 8px; width: 7%;">Kelapa kecil</th>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa Tunas</th>
+                                    <th style="font-size: 8px; width: 7%;">kelapa busuk</th>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa Muda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Row 1 contains actual data of the sorting process -->
+                                <tr>
+                                    <td class="text-center">1</td>
+                                    <td class="text-left"><t t-esc="o.supplier_id.name or ''"/></td>
+                                    <td class="text-center"><t t-esc="o.coconut_origin or ''"/></td>
+                                    <td class="text-center"><t t-esc="o.vehicle_plate or ''"/></td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_pecah_kg &gt; 0">
+                                            <t t-esc="int(o.reject_pecah_kg) if o.reject_pecah_kg.is_integer() else o.reject_pecah_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_kecil_kg &gt; 0">
+                                            <t t-esc="int(o.reject_kecil_kg) if o.reject_kecil_kg.is_integer() else o.reject_kecil_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_tunas_kg &gt; 0">
+                                            <t t-esc="int(o.reject_tunas_kg) if o.reject_tunas_kg.is_integer() else o.reject_tunas_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_busuk_kg &gt; 0">
+                                            <t t-esc="int(o.reject_busuk_kg) if o.reject_busuk_kg.is_integer() else o.reject_busuk_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_muda_kg &gt; 0">
+                                            <t t-esc="int(o.reject_muda_kg) if o.reject_muda_kg.is_integer() else o.reject_muda_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right" style="font-weight: bold;">
+                                        <t t-if="o.reject_coconut_kg &gt; 0">
+                                            <t t-esc="int(o.reject_coconut_kg) if o.reject_coconut_kg.is_integer() else o.reject_coconut_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-center"><t t-esc="o.notes or ''"/></td>
+                                </tr>
+
+                                <!-- Empty rows 2 to 10 to replicate blank form rows -->
+                                <t t-foreach="range(2, 11)" t-as="row_idx">
+                                    <tr>
+                                        <td class="text-center"><t t-esc="row_idx"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </t>
+
+                                <!-- Total Row -->
+                                <tr style="font-weight: bold; background-color: #f9f9f9;">
+                                    <td colspan="4" class="text-center">TOTAL</td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_pecah_kg &gt; 0">
+                                            <t t-esc="int(o.reject_pecah_kg) if o.reject_pecah_kg.is_integer() else o.reject_pecah_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_kecil_kg &gt; 0">
+                                            <t t-esc="int(o.reject_kecil_kg) if o.reject_kecil_kg.is_integer() else o.reject_kecil_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_tunas_kg &gt; 0">
+                                            <t t-esc="int(o.reject_tunas_kg) if o.reject_tunas_kg.is_integer() else o.reject_tunas_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_busuk_kg &gt; 0">
+                                            <t t-esc="int(o.reject_busuk_kg) if o.reject_busuk_kg.is_integer() else o.reject_busuk_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_muda_kg &gt; 0">
+                                            <t t-esc="int(o.reject_muda_kg) if o.reject_muda_kg.is_integer() else o.reject_muda_kg"/>
+                                        </t>
+                                    </td>
+                                    <td class="text-right">
+                                        <t t-if="o.reject_coconut_kg &gt; 0">
+                                            <t t-esc="int(o.reject_coconut_kg) if o.reject_coconut_kg.is_integer() else o.reject_coconut_kg"/>
+                                        </t>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Catatan section -->
+                        <div style="margin-top: 6px; font-size: 10px; font-weight: bold;">
+                            Catatan :
+                        </div>
+
+                        <!-- Footer / Signatures -->
+                        <table class="footer-table" style="position: absolute; bottom: 5px; left: 5px; width: calc(100% - 10px);">
+                            <tr>
+                                <td>
+                                    <div class="signature-title">Dibuat oleh,</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-title">Diketahui oleh</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-title">Disetujui oleh,</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- QWeb Template 2: Print completely blank form from wizard -->
+    <template id="report_coconut_sorting_blank_form_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page-container" style="box-sizing: border-box; width: 100%; height: 138mm; border: 2px solid #000; padding: 5px; font-family: Arial, sans-serif; position: relative;">
+                        <!-- Lampiran Text on Top Right Outside Table -->
+                        <div style="width: 100%; text-align: right; font-size: 10px; margin-bottom: 2px; font-weight: bold;">
+                            Lampiran 13
+                        </div>
+
+                        <t t-call="coconut_receiving.sorting_report_styles"/>
+
+                        <!-- Header -->
+                        <table class="header-table">
+                            <tr>
+                                <td rowspan="2" class="title-cell">
+                                    <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                                        <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)" style="max-height: 24px; margin-right: 10px; display: inline-block; vertical-align: middle;" alt="Logo"/>
+                                        <span style="display: inline-block; vertical-align: middle; line-height: 24px; font-size: 12px;">PT. COCO MURNI PRIMA JAYA</span>
+                                    </div>
+                                </td>
+                                <td class="meta-cell">
+                                    DOK : 
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="meta-cell">
+                                    TGL : <t t-esc="o.date.strftime('%d/%m/%Y') if o.date else ''"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="title-cell-sub">
+                                    LAPORAN HASIL SORTIRAN KELAPA
+                                </td>
+                                <td class="meta-cell">
+                                    HLM : 1 dari 1
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Main Table -->
+                        <table class="main-table" style="margin-top: 4px;">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2" style="width: 4%;">No</th>
+                                    <th rowspan="2" style="width: 18%;">Supplier</th>
+                                    <th rowspan="2" style="width: 12%;">Asal kelapa</th>
+                                    <th rowspan="2" style="width: 14%;">No Kendaraan</th>
+                                    <th colspan="5" style="width: 38%;">Hasil Sortiran ( kg )</th>
+                                    <th rowspan="2" style="width: 7%;">total</th>
+                                    <th rowspan="2" style="width: 7%;">keterangan</th>
+                                </tr>
+                                <tr>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa pecah</th>
+                                    <th style="font-size: 8px; width: 7%;">Kelapa kecil</th>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa Tunas</th>
+                                    <th style="font-size: 8px; width: 7%;">kelapa busuk</th>
+                                    <th style="font-size: 8px; width: 8%;">Kelapa Muda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Empty rows 1 to 10 for the operator to fill by hand -->
+                                <t t-foreach="range(1, 11)" t-as="row_idx">
+                                    <tr>
+                                        <td class="text-center"><t t-esc="row_idx"/></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </t>
+
+                                <!-- Total Row (Blank) -->
+                                <tr style="font-weight: bold; background-color: #f9f9f9;">
+                                    <td colspan="4" class="text-center">TOTAL</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Catatan section -->
+                        <div style="margin-top: 6px; font-size: 10px; font-weight: bold;">
+                            Catatan :
+                        </div>
+
+                        <!-- Footer / Signatures -->
+                        <table class="footer-table" style="position: absolute; bottom: 5px; left: 5px; width: calc(100% - 10px);">
+                            <tr>
+                                <td>
+                                    <div class="signature-title">Dibuat oleh,</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-title">Diketahui oleh</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="signature-title">Disetujui oleh,</div>
+                                    <div class="signature-info" style="margin-top: 10px;">
+                                        Nama : <br/>
+                                        Jabatan : <br/>
+                                        Tanggal :
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

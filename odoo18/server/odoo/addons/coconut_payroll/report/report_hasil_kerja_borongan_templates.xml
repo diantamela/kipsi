@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_hasil_kerja_borongan_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <t t-set="employees" t-value="o.get_employees()"/>
+                    
+                    <!-- Chunk employees into pages of 28 rows to prevent overlapping with footer -->
+                    <t t-set="rows_per_page" t-value="28"/>
+                    <t t-set="total_employees" t-value="len(employees)"/>
+                    <t t-set="total_pages" t-value="max(1, int((total_employees + rows_per_page - 1) / rows_per_page))"/>
+                    
+                    <t t-foreach="range(total_pages)" t-as="page_idx">
+                        <div class="page-container" style="page-break-after: always; box-sizing: border-box; width: 100%; height: 275mm; border: 2px solid #000; padding: 5px; font-family: Arial, sans-serif; position: relative;">
+                            <!-- Styles -->
+                            <style type="text/css">
+                                .page-container {
+                                    font-size: 11px;
+                                }
+                                .header-table, .main-table, .footer-table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                }
+                                .header-table td {
+                                    border: 1px solid #000;
+                                    padding: 4px 8px;
+                                    vertical-align: middle;
+                                }
+                                .title-cell {
+                                    text-align: center;
+                                    font-weight: bold;
+                                    font-size: 13px;
+                                    width: 75%;
+                                }
+                                .title-cell-sub {
+                                    font-weight: bold;
+                                    font-size: 11px;
+                                    width: 75%;
+                                    padding-left: 8px;
+                                }
+                                .meta-cell {
+                                    width: 25%;
+                                    font-size: 11px;
+                                }
+                                .main-table th, .main-table td {
+                                    border: 1px solid #000;
+                                    padding: 3px 5px;
+                                    height: 5.2mm;
+                                    box-sizing: border-box;
+                                }
+                                .main-table th {
+                                    text-align: center;
+                                    font-weight: bold;
+                                    font-size: 10px;
+                                    background-color: #f2f2f2;
+                                }
+                                .main-table td {
+                                    vertical-align: middle;
+                                }
+                                .text-center {
+                                    text-align: center;
+                                }
+                                .text-left {
+                                    text-align: left;
+                                }
+                                .footer-table {
+                                    margin-top: 5px;
+                                    border: 1px solid #000;
+                                }
+                                .footer-table td {
+                                    border: 1px solid #000;
+                                    width: 33.33%;
+                                    padding: 4px 8px;
+                                    vertical-align: top;
+                                    font-size: 10px;
+                                }
+                                .signature-title {
+                                    font-weight: bold;
+                                    text-decoration: underline;
+                                    margin-bottom: 25px;
+                                }
+                                .signature-info {
+                                    line-height: 1.3;
+                                }
+                            </style>
+
+                            <!-- Header -->
+                            <table class="header-table">
+                                <tr>
+                                    <td rowspan="2" class="title-cell">
+                                        <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
+                                            <img t-if="env.company.logo" t-att-src="image_data_uri(env.company.logo)" style="max-height: 32px; margin-right: 12px; display: inline-block; vertical-align: middle;" alt="Logo"/>
+                                            <span style="display: inline-block; vertical-align: middle; line-height: 32px;">PT .COCO MURNI PRIMA JAYA</span>
+                                        </div>
+                                    </td>
+                                    <td class="meta-cell">
+                                        tgl : <t t-esc="o.date.strftime('%d-%b-%Y') if o.date else ''"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="meta-cell">
+                                        shift : ________
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="title-cell-sub">
+                                        HASIL KERJA <t t-esc="dict(o._fields['jenis_pekerjaan'].selection).get(o.jenis_pekerjaan, '').upper()"/> BORONGAN
+                                    </td>
+                                    <td class="meta-cell">
+                                        Hal : <t t-esc="page_idx + 1"/> dari <t t-esc="total_pages"/>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Main Table -->
+                            <table class="main-table" style="margin-top: 5px;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 5%;">NO</th>
+                                        <th style="width: 10%;">No line/<br/>Bak</th>
+                                        <th style="width: 35%;">NAMA</th>
+                                        <th style="width: 18%;">TGL MASUK</th>
+                                        <th style="width: 12%;">HASIL KERJA</th>
+                                        <th style="width: 10%;">PARAF</th>
+                                        <th style="width: 10%;">KET</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop exactly 28 rows per page -->
+                                    <t t-foreach="range(rows_per_page)" t-as="row_idx">
+                                        <t t-set="emp_idx" t-value="page_idx * rows_per_page + row_idx"/>
+                                        <tr>
+                                            <t t-if="emp_idx &lt; total_employees">
+                                                <t t-set="emp" t-value="employees[emp_idx]"/>
+                                                <td class="text-center"><t t-esc="emp_idx + 1"/></td>
+                                                <td></td>
+                                                <td class="text-left"><t t-esc="emp.name"/></td>
+                                                <td class="text-center">
+                                                    <t t-if="emp.tanggal_masuk">
+                                                        <t t-esc="emp.tanggal_masuk.strftime('%d-%b-%Y')"/>
+                                                    </t>
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td class="text-center">
+                                                    <t t-if="emp.status_karyawan">
+                                                        <t t-esc="emp.status_karyawan.upper()"/>
+                                                    </t>
+                                                </td>
+                                            </t>
+                                            <t t-else="">
+                                                <td class="text-center"><t t-esc="emp_idx + 1"/></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+
+                            <!-- Footer / Signatures -->
+                            <table class="footer-table" style="position: absolute; bottom: 5px; left: 5px; width: calc(100% - 10px);">
+                                <tr>
+                                    <td>
+                                        <div class="signature-title">Di buat oleh,</div>
+                                        <div class="signature-info" style="margin-top: 15px;">
+                                            Nama : DINDA MULTIKA SARI<br/>
+                                            Jabatan : JURU CATAT<br/>
+                                            Tanggal :
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="signature-title">Diketahui oleh</div>
+                                        <div class="signature-info" style="margin-top: 15px;">
+                                            Nama : Heni S<br/>
+                                            Jabatan : Kepala Divisi<br/>
+                                            Tanggal :
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="signature-title">Disetujui Oleh</div>
+                                        <div class="signature-info" style="margin-top: 15px;">
+                                            Nama : Lavenia<br/>
+                                            Jabatan : Manager Operasional<br/>
+                                            Tanggal :
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

@@ -12,6 +12,8 @@
                             <field name="employee_code"/>
                             <field name="payroll_worker_type"/>
                             <field name="payroll_job_type"/>
+                            <field name="status_karyawan"/>
+                            <field name="tanggal_masuk"/>
                             <field name="payroll_active"/>
                         </group>
                     </group>

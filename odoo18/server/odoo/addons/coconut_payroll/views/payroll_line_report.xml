@@ -167,9 +167,9 @@
                 <!-- Info Karyawan -->
                 <table class="payslip-meta-table">
                     <tr>
-                        <td style="width: 15%;"><strong>NIK</strong></td>
-                        <td style="width: 2%;">:</td>
-                        <td style="width: 33%;"><span t-field="o.employee_id.employee_code"/></td>
+                        <td style="width: 15%;"></td>
+                        <td style="width: 2%;"></td>
+                        <td style="width: 33%;"></td>
                         <td style="width: 15%;"><strong>Jabatan</strong></td>
                         <td style="width: 2%;">:</td>
                         <td style="width: 33%;">Karyawan Harian (RMP)</td>
@@ -332,9 +332,9 @@
                 <!-- Info Karyawan -->
                 <table class="payslip-meta-table">
                     <tr>
-                        <td style="width: 15%;"><strong>NIK</strong></td>
-                        <td style="width: 2%;">:</td>
-                        <td style="width: 33%;"><span t-field="o.employee_id.employee_code"/></td>
+                        <td style="width: 15%;"></td>
+                        <td style="width: 2%;"></td>
+                        <td style="width: 33%;"></td>
                         <td style="width: 15%;"><strong>Pekerjaan</strong></td>
                         <td style="width: 2%;">:</td>
                         <td style="width: 33%;"><span t-field="o.worker_type"/></td>

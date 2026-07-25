@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_coconut_sorting_print_wizard_form" model="ir.ui.view">
+        <field name="name">coconut.sorting.print.wizard.form</field>
+        <field name="model">coconut.sorting.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cetak Form Hasil Sortir Kelapa">
+                <group>
+                    <field name="date"/>
+                </group>
+                <footer>
+                    <button name="print_pdf" string="Print PDF" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_coconut_sorting_print_wizard" model="ir.actions.act_window">
+        <field name="name">Cetak Form Hasil Sortir Kelapa</field>
+        <field name="res_model">coconut.sorting.print.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item in Navbar under Sortir Kelapa Dropdown -->
+    <menuitem id="menu_coconut_sorting_print_wizard"
+              name="Form Hasil Sortir Kelapa"
+              parent="coconut_receiving.menu_coconut_sorting_parent"
+              action="action_coconut_sorting_print_wizard"
+              sequence="20"/>
+</odoo>

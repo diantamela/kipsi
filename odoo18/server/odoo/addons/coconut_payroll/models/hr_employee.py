@@ -19,6 +19,13 @@ class HrEmployee(models.Model):
         ('rmp', 'RMP'),
     ], string='Jenis Pekerjaan Payroll', store=True)
 
+    status_karyawan = fields.Selection([
+        ('mss', 'MSS'),
+        ('cmpj', 'CMPJ'),
+    ], string='Status Karyawan', default='mss')
+
+    tanggal_masuk = fields.Date(string='Tanggal Masuk')
+
     @api.onchange('department_id')
     def _onchange_department_id_payroll_job_type(self):
         if self.department_id:

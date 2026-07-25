@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hr_payroll_borongan_print_wizard_form" model="ir.ui.view">
+        <field name="name">hr.payroll.borongan.print.wizard.form</field>
+        <field name="model">hr.payroll.borongan.print.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cetak Form Hasil Kerja Borongan">
+                <group>
+                    <group>
+                        <field name="date"/>
+                    </group>
+                    <group>
+                        <field name="jenis_pekerjaan"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="print_pdf" string="Print PDF" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hr_payroll_borongan_print_wizard" model="ir.actions.act_window">
+        <field name="name">Cetak Form Hasil Kerja Borongan</field>
+        <field name="res_model">hr.payroll.borongan.print.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item under Root Payroll Menu -->
+    <menuitem id="menu_hr_payroll_borongan_print_wizard"
+              name="Form Hasil Kerja Borongan"
+              parent="coconut_payroll.menu_coconut_payroll_root"
+              action="action_hr_payroll_borongan_print_wizard"
+              sequence="15"/>
+</odoo>
